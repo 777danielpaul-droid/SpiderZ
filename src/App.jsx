@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePokemonData } from "./usePokemonData";
-import { TOTAL_POKEMON } from "./pokemonList";
+import { TOTAL_POKEMON, TYPE_COLORS } from "./pokemonList";
 import PokemonCard from "./PokemonCard";
 import ScrubSection from "./ScrubSection";
 import SearchResult from "./SearchResult";
@@ -119,11 +119,32 @@ export default function App() {
           ))}
 
           <footer className="endcard">
-            <div className="trophy" data-complete={caughtIds.length >= TOTAL_POKEMON}>
-              <div className="trophy-cup">🏆</div>
-              <h2>{caughtIds.length >= TOTAL_POKEMON ? "Pokédex komplett!" : "Runde geschafft!"}</h2>
+            <h2 className="end-title">
+              {caughtIds.length >= TOTAL_POKEMON ? "Dein Team ist komplett" : "Dein Team"}
+            </h2>
+
+            <div className="team-grid">
+              {data.map((p) => {
+                const caught = caughtIds.includes(p.id);
+                const primary = p.types && p.types[0];
+                return (
+                  <div
+                    key={p.name_en}
+                    className={`team-card${caught ? " is-caught" : ""}`}
+                  >
+                    <img
+                      src={p.artwork}
+                      alt={p.name_de}
+                      loading="lazy"
+                      style={caught ? { filter: `drop-shadow(0 0 22px ${primary ? TYPE_COLORS[primary] : "#6d28d9"}aa)` } : { filter: "grayscale(1) opacity(0.35)" }}
+                    />
+                    <span className="team-name">{caught ? p.name_de : "???"}</span>
+                  </div>
+                );
+              })}
             </div>
-            <p>
+
+            <p className="end-sub">
               Du hast <strong>{caughtIds.length}</strong> von{" "}
               <strong>{TOTAL_POKEMON}</strong> Pokémon freigeschaltet.
             </p>

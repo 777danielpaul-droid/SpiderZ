@@ -1,5 +1,5 @@
 // Typ-Farben (Light-Mode freundlich, lila als Akzent).
-export const TOTAL_POKEMON = 7; // zufällige Auswahl aus dem nationalen Dex (1..1025)
+export const TOTAL_POKEMON = 3; // zufällige Auswahl aus dem nationalen Dex (1..1025)
 
 export const TYPE_COLORS = {
   normal:  "#9fa19f",
