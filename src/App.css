@@ -74,6 +74,21 @@
   border-radius: 999px; padding: 6px 16px;
 }
 .hud-caught .ball { color: #ff6b6b; margin-right: 4px; }
+.hud-toast {
+  position: absolute;
+  top: 100%; right: 0; left: auto;
+  width: 100%;
+  height: 0; overflow: visible;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: flex-end;
+}
+.hud-toast-item {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 900;
+  color: var(--gold-soft);
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.7);
+  white-space: nowrap;
+}
 
 /* Partikel-Burst beim Level-Up / Pokemon-Flash (HUD) */
 .hud-fx { position: absolute; top: 50%; left: 50%; width: 0; height: 0; pointer-events: none; }
@@ -106,18 +121,6 @@
   background: linear-gradient(90deg, var(--neon), var(--cyan));
   box-shadow: 0 0 calc(6px + var(--seg-glow, 0) * 22px) rgba(192, 38, 211, 0.9);
 }
-.loadbar-fill {
-  position: absolute; left: 4px; top: 4px; height: 16px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(192,38,211,0.55), rgba(34,211,238,0.5));
-  transition: width 0.5s ease;
-  pointer-events: none;
-}
-.hud-bar-text {
-  display: block; margin-top: 6px; text-align: right;
-  font-family: var(--font-mono); font-size: 11px; opacity: 0.7;
-}
-
 .hud-scroll {
   width: 240px; height: 7px; border-radius: 999px;
   background: rgba(22, 17, 31, 0.5);
@@ -460,3 +463,30 @@
   .search-body { flex-direction: column; gap: 14px; }
   .search-num { font-size: 22vmin; }
 }
+
+/* ============ "Weiter"-Button (ein Pokemon weiter) ============ */
+.next-btn {
+  position: fixed;
+  bottom: 22px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 120;
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 800; letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(160deg, rgba(192,38,211,0.92), rgba(108,40,217,0.92));
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 999px;
+  padding: 12px 26px;
+  cursor: pointer;
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: 0 12px 30px -10px rgba(162, 28, 175, 0.9), inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.2s ease;
+}
+.next-btn:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.03);
+  filter: brightness(1.1);
+  box-shadow: 0 16px 38px -10px rgba(162, 28, 175, 1), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.next-btn:active { transform: translateX(-50%) translateY(1px) scale(0.98); }

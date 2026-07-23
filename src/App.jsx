@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { usePokemonData } from "./usePokemonData";
 import { TOTAL_POKEMON, TYPE_COLORS } from "./pokemonList";
 import PokemonCard from "./PokemonCard";
@@ -9,19 +10,34 @@ import SearchResult from "./SearchResult";
 import HUD from "./HUD";
 import "./App.css";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export default function App() {
   const { data, error, progress, search, runSearch, clearSearch } = usePokemonData(TOTAL_POKEMON);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
-  const pulseRef = useRef(null); // HUD meldet hier pulse()-Methode an
   const heroRef = useRef(null);
   const [hudVisible, setHudVisible] = useState(false);
+  const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
 
   const scrollFillRef = useRef(null);
   const stRef = useRef(null);
+  const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
+
+  // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
+  const goNext = useCallback(() => {
+    const next = Math.min(activeCard + 1, TOTAL_POKEMON);
+    const trg = cardTrgRef.current[next];
+    if (trg) {
+      const y = trg.start + window.innerHeight * 0.5; // mitte der Karte
+      gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
+    } else if (next >= TOTAL_POKEMON) {
+      const footer = document.querySelector(".endcard");
+      if (footer) gsap.to(window, { scrollTo: footer, duration: 0.9, ease: "power2.inOut" });
+    }
+    setActiveCard(next);
+  }, [activeCard]);
 
   // HUD sichtbar erst nach der Video-Animation (Held-Scrub durchgescrollt).
   useEffect(() => {
@@ -58,10 +74,16 @@ export default function App() {
   }, [data]);
 
   // Sobald die Karten gemountet sind, ScrollTrigger neu vermessen,
-  // damit Pin-Distanzen (viewport-abhaengig) stimmen.
+  // damit Pin-Distanzen (viewport-abhaengig) stimmen. Danach alle Card-Trigger
+  // fuer den "Weiter"-Button einsammeln.
   useEffect(() => {
     if (!data) return;
-    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    const id = requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+      cardTrgRef.current = ScrollTrigger.getAll()
+        .filter((st) => st.trigger && st.trigger.classList.contains("card-section"))
+        .sort((a, b) => a.start - b.start);
+    });
     return () => cancelAnimationFrame(id);
   }, [data]);
 
@@ -76,19 +98,8 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [search.result, search.loading, search.error, clearSearch]);
 
-  // Stabil memoizen: gleiche Referenz über alle Renders hinweg, damit das
-  // useLayoutEffect in PokemonCard NICHT bei jedem App-Re-Render neu feuert
-  // (das wuerde alle ScrollTrigger 60x/Sekunde killen + rebuilden -> Springen).
-  // Level-Up erkennen (alle 100 XP = 2 neue Pokemon) -> HUD-Puls ausloesen.
   const handleReveal = useCallback((id) => {
-    setCaughtIds((prev) => {
-      if (prev.includes(id)) return prev;
-      const next = [...prev, id];
-      const oldLevel = Math.floor((prev.length * 50) / 100) + 1;
-      const newLevel = Math.floor((next.length * 50) / 100) + 1;
-      if (newLevel > oldLevel) pulseRef.current?.();
-      return next;
-    });
+    setCaughtIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
   }, []);
 
   return (
@@ -98,7 +109,6 @@ export default function App() {
         caughtIds={caughtIds}
         data={data}
         scrollFillRef={scrollFillRef}
-        pulseRef={pulseRef}
         visible={hudVisible}
       />
 
@@ -201,6 +211,10 @@ export default function App() {
           </footer>
         </main>
       )}
+
+      <button className="next-btn" onClick={goNext} aria-label="Nächstes Pokémon">
+        {activeCard >= TOTAL_POKEMON ? "Zum Team ▾" : "Weiter ▸"}
+      </button>
     </div>
   );
 }
