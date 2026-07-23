@@ -4,73 +4,115 @@
    erdbaeren2-Signature (aurora, grid, mono-label).
    ============================================================ */
 
-/* ============ HUD (Gamification) ============ */
+/* ============ HUD (Gamification — Side-Panel rechts, kein Container) ============ */
 .hud {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%) translateX(40px);
   z-index: 100;
-  background: rgba(22, 17, 31, 0.86);
-  backdrop-filter: blur(18px) saturate(140%);
-  border-bottom: 1px solid rgba(192, 38, 211, 0.30);
-  padding: 10px 18px 12px;
-  box-shadow: 0 10px 40px -18px rgba(80, 40, 120, 0.55);
-  color: var(--bone);
-}
-.hud-row {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 1100px;
-  margin: 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  color: var(--bone);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hud-visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
 }
 .hud-badge {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(160deg, var(--neon), var(--lila));
+  background: linear-gradient(160deg, rgba(192,38,211,0.22), rgba(108,40,217,0.18));
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(192, 38, 211, 0.45);
   color: #fff;
-  border-radius: 12px;
-  padding: 5px 14px;
+  border-radius: 14px;
+  padding: 6px 16px;
   line-height: 1;
-  box-shadow: 0 6px 18px -8px rgba(162, 28, 175, 0.9), inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow: 0 8px 22px -10px rgba(162, 28, 175, 0.8), inset 0 1px 0 rgba(255,255,255,0.25);
 }
 .hud-label {
   font-family: var(--font-mono);
   font-size: 9px; letter-spacing: 0.18em; opacity: 0.85; text-transform: uppercase;
 }
 .hud-level { font-size: 22px; font-weight: 800; }
-
-/* Partikel-Burst beim Level-Up (HUD) */
-.hud-fx { position: absolute; top: 50%; left: 50%; width: 0; height: 0; pointer-events: none; }
-.fx-particle {
-  position: absolute; top: 0; left: 0;
-  width: 8px; height: 8px; margin: -4px 0 0 -4px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff, var(--neon-soft));
-  box-shadow: 0 0 8px var(--neon-soft);
-}
-
 .hud-title {
-  font-weight: 800; font-size: 15px;
+  font-weight: 800; font-size: 14px; text-align: right;
   background: linear-gradient(90deg, var(--neon-soft), var(--cyan));
   -webkit-background-clip: text; background-clip: text; color: transparent;
-  flex: 1;
 }
 .hud-caught {
-  font-weight: 700; font-size: 14px; color: var(--bone); white-space: nowrap;
+  font-weight: 700; font-size: 13px; color: var(--bone);
+  background: rgba(22, 17, 31, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(192, 38, 211, 0.3);
+  border-radius: 999px; padding: 4px 12px;
 }
 .hud-caught .ball { color: #ff6b6b; margin-right: 4px; }
 
-.hud-bar {
-  position: relative; max-width: 1100px; margin: 8px auto 0;
-  height: 14px; background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px; overflow: hidden;
+/* Partikel-Burst beim Level-Up / Pokemon-Flash (HUD) */
+.hud-fx { position: absolute; top: 50%; left: 50%; width: 0; height: 0; pointer-events: none; }
+.fx-spark {
+  position: absolute; top: 0; left: 0;
+  width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--neon-soft));
+  box-shadow: 0 0 10px var(--neon-soft);
 }
-.hud-bar-fill {
+
+/* Flashiger Ladebalken — ein Segment pro Pokemon */
+.loadbar { position: relative; width: 200px; }
+.loadbar-track {
+  display: flex; gap: 4px; height: 12px;
+  padding: 3px; border-radius: 999px;
+  background: rgba(22, 17, 31, 0.55);
+  border: 1px solid rgba(192, 38, 211, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.load-seg {
+  flex: 1; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: inset 0 0 0 0 transparent;
+}
+.load-seg.is-lit {
+  background: linear-gradient(90deg, var(--neon), var(--cyan));
+  box-shadow: 0 0 calc(6px + var(--seg-glow, 0) * 22px) rgba(192, 38, 211, 0.9);
+}
+.loadbar-fill {
+  position: absolute; left: 3px; top: 3px; height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(192,38,211,0.55), rgba(34,211,238,0.5));
+  transition: width 0.5s ease;
+  pointer-events: none;
+}
+.hud-bar-text {
+  display: block; margin-top: 5px; text-align: right;
+  font-family: var(--font-mono); font-size: 10px; opacity: 0.7;
+}
+
+.hud-scroll {
+  width: 200px; height: 5px; border-radius: 999px;
+  background: rgba(22, 17, 31, 0.5);
+  border: 1px solid rgba(192, 38, 211, 0.3);
+  overflow: hidden;
+}
+.hud-scroll-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--neon), var(--cyan));
-  border-radius: 999px; transition: width 0.4s ease;
+  border-radius: 999px;
 }
 .hud-bar-text {
   position: absolute; inset: 0;
@@ -287,17 +329,19 @@
 
 /* ---------- Hero-Suche ---------- */
 .hero-search {
-  margin-top: 26px; display: flex; gap: 8px; width: min(440px, 86vw);
-  background: rgba(22, 17, 31, 0.86);
-  backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(192, 38, 211, 0.30);
+  position: absolute;
+  top: 18px; left: 18px;
+  display: flex; gap: 8px; width: min(360px, 78vw);
+  background: rgba(22, 17, 31, 0.72);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(192, 38, 211, 0.45);
   border-radius: 999px; padding: 6px 6px 6px 18px;
-  box-shadow: 0 10px 30px -16px rgba(109, 40, 217, 0.6);
+  box-shadow: 0 14px 40px -16px rgba(109, 40, 217, 0.7);
 }
-/* Suche im End-Footer zentriert + Abstand zur Trophäe */
-.end-search {
-  margin: 28px auto 0;
-}
+/* Suche liegt im scrub-overlay: nicht von Pointer-Events des Hints blockieren */
+.scrub-overlay { pointer-events: none; }
+.scrub-overlay-children { pointer-events: auto; }
 .search-input {
   flex: 1; border: none; background: transparent;
   font-family: var(--font-display);

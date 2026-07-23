@@ -17,10 +17,29 @@ export default function App() {
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
   const pulseRef = useRef(null); // HUD meldet hier pulse()-Methode an
+  const heroRef = useRef(null);
+  const [hudVisible, setHudVisible] = useState(false);
 
   const scrollFillRef = useRef(null);
+  const stRef = useRef(null);
 
-  // Globaler Scroll-Fortschritt fuer das HUD.
+  // HUD sichtbar erst nach der Video-Animation (Held-Scrub durchgescrollt).
+  useEffect(() => {
+    if (!data) return;
+    const id = requestAnimationFrame(() => {
+      const st = ScrollTrigger.create({
+        trigger: heroRef.current,
+        start: "bottom 90%",
+        onEnter: () => setHudVisible(true),
+        onLeaveBack: () => setHudVisible(false),
+      });
+      stRef.current = st;
+    });
+    return () => {
+      cancelAnimationFrame(id);
+      stRef.current?.kill();
+    };
+  }, [data]);
   // WICHTIG: kein setScrollProgress pro Frame -> sonst 60x Re-Render/Sekunde,
   // neue onReveal-Ref, Karten-Effect rebuild -> ScrollTrigger-Reset ("springt zur 1").
   // Stattdessen Progress-Bar direkt per DOM-Ref updaten (kein React-Re-Render).
@@ -79,10 +98,32 @@ export default function App() {
         caughtIds={caughtIds}
         scrollFillRef={scrollFillRef}
         pulseRef={pulseRef}
+        visible={hudVisible}
       />
 
-      <header className="hero">
-        <ScrubSection />
+      <header className="hero" ref={heroRef}>
+        <ScrubSection>
+          <form
+            className="hero-search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (query.trim()) runSearch(query);
+            }}
+          >
+            <input
+              className="search-input"
+              type="text"
+              inputMode="text"
+              placeholder="Nummer (1–1025) oder Name (z.B. pikachu)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Pokémon suchen"
+            />
+            <button className="search-btn" type="submit">
+              Suchen
+            </button>
+          </form>
+        </ScrubSection>
       </header>
 
       {search.result || search.loading || search.error ? (
@@ -149,27 +190,6 @@ export default function App() {
               <strong>{TOTAL_POKEMON}</strong> Pokémon freigeschaltet.
             </p>
             <p className="end-sub">Scroll zurück oder aktualisiere für eine neue zufällige Runde.</p>
-
-            <form
-              className="hero-search end-search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (query.trim()) runSearch(query);
-              }}
-            >
-              <input
-                className="search-input"
-                type="text"
-                inputMode="text"
-                placeholder="Nummer (1–1025) oder Name (z.B. pikachu)"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                aria-label="Pokémon suchen"
-              />
-              <button className="search-btn" type="submit">
-                Suchen
-              </button>
-            </form>
           </footer>
         </main>
       )}

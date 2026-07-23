@@ -14,7 +14,7 @@ const FRAME_COUNT = 59;
 const FRAME_BASE = "/scrub/frame_";
 const PAD = 3;
 
-export default function ScrubSection() {
+export default function ScrubSection({ children }) {
   const [loaded, setLoaded] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -137,6 +137,7 @@ export default function ScrubSection() {
           ) : (
             <div className="scrub-hint">↓ Scrollen spult vor · ↑ zurück</div>
           )}
+          {children && <div className="scrub-overlay-children">{children}</div>}
         </div>
       </div>
     </section>
