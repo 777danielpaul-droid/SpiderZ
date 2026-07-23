@@ -26,18 +26,21 @@ export default function App() {
   const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
 
   // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
+  // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
   const goNext = useCallback(() => {
+    if (caughtIds.length === 0) return;
     const next = Math.min(activeCard + 1, TOTAL_POKEMON);
     const trg = cardTrgRef.current[next];
     if (trg) {
-      const y = trg.start + window.innerHeight * 0.5; // mitte der Karte
+      // ans Ende des naechsten Pokemons springen -> voll aufgedeckt
+      const y = trg.end - window.innerHeight * 0.3;
       gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
     } else if (next >= TOTAL_POKEMON) {
       const footer = document.querySelector(".endcard");
       if (footer) gsap.to(window, { scrollTo: footer, duration: 0.9, ease: "power2.inOut" });
     }
     setActiveCard(next);
-  }, [activeCard]);
+  }, [activeCard, caughtIds.length]);
 
   // HUD sichtbar erst nach der Video-Animation (Held-Scrub durchgescrollt).
   useEffect(() => {
@@ -113,7 +116,7 @@ export default function App() {
       />
 
       <header className="hero" ref={heroRef}>
-        <ScrubSection>
+        <ScrubSection hintHidden={caughtIds.length > 0}>
           <form
             className="hero-search"
             onSubmit={(e) => {
@@ -212,7 +215,11 @@ export default function App() {
         </main>
       )}
 
-      <button className="next-btn" onClick={goNext} aria-label="Nächstes Pokémon">
+      <button
+        className={`next-btn${caughtIds.length > 0 ? "" : " hidden"}`}
+        onClick={goNext}
+        aria-label="Nächstes Pokémon"
+      >
         {activeCard >= TOTAL_POKEMON ? "Zum Team ▾" : "Weiter ▸"}
       </button>
     </div>

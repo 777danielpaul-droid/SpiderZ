@@ -359,11 +359,16 @@
   box-shadow: 0 6px 16px -8px rgba(162, 28, 175, 0.9);
   animation: bob 2.4s ease-in-out infinite;
 }
+.scrub-hint-text { transition: opacity 0.4s ease; }
+.scrub-hint-text.hidden { opacity: 0; }
 
-/* ---------- Hero-Suche ---------- */
+/* "Weiter"-Button: erst sichtbar nach erstem gefangenen Pokemon */
+.next-btn.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(14px); }
+
 .hero-search {
   position: absolute;
-  top: 18px; left: 18px;
+  top: 18px; left: 50%;
+  transform: translateX(-50%);
   display: flex; gap: 8px; width: min(360px, 78vw);
   background: rgba(22, 17, 31, 0.72);
   backdrop-filter: blur(20px) saturate(150%);
