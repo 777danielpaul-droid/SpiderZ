@@ -247,11 +247,12 @@
   overflow: hidden;
 }
 .scrub-canvas {
-  width: min(92vw, 1100px); max-height: 78vh; aspect-ratio: 688 / 384;
-  border-radius: 18px;
-  border: 1px solid rgba(192, 38, 211, 0.30);
-  box-shadow: 0 24px 60px rgba(80, 40, 120, 0.3);
-  background: #0a0712; object-fit: contain;
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  background: #0a0712;
 }
 .scrub-overlay {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
