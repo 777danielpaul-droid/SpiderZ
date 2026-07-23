@@ -128,7 +128,7 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
               ))}
             </div>
             <div className="stat-total" style={{ color: primary }}>
-              BST {total}
+              BST {total} · <span className="strength-badge">STÄRKE {pokemon.strength}</span>
             </div>
           </div>
         </div>

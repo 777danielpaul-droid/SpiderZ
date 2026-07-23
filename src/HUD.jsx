@@ -15,16 +15,23 @@ const LEVEL_TITLES = [
   "Champion Challenger", "Pokemon Legend",
 ];
 
-export default function HUD({ total, caughtIds, scrollFillRef, pulseRef, visible }) {
+export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible }) {
   const caught = caughtIds.length;
   const xp = caught * 50; // 50 XP pro freigeschaltetem Pokemon
   const level = Math.floor(xp / 100) + 1;
   const xpInLevel = xp % 100;
   const title = LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)];
 
+  // Challenge-Score: Gesamtstaerke aller gefangenen Pokemon.
+  const teamStrength = useMemo(
+    () => (data ? data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0) : 0),
+    [data, caughtIds]
+  );
+
   const pctLevel = useMemo(() => (caught / total) * 100, [caught, total]);
 
   const badgeRef = useRef(null);
+  const scoreRef = useRef(null);
   const barRef = useRef(null);   // Loadbar-Container (fuer Segment-Flash)
   const fxRef = useRef(null);    // Partikel-Container
 
@@ -64,26 +71,39 @@ export default function HUD({ total, caughtIds, scrollFillRef, pulseRef, visible
     return () => { pulseRef.current = null; };
   }, [pulseRef]);
 
-  // Pro aufgedecktem Pokemon: Segment-Flash + Balken-Glow
+  // Pro aufgedecktem Pokemon: Segment-Flash + Balken-Glow + Score-Puls
   useEffect(() => {
     if (!barRef.current) return;
     const seg = barRef.current.querySelector(`.load-seg[data-i="${caught - 1}"]`);
-    if (!seg) return;
-    gsap.fromTo(
-      seg,
-      { "--seg-glow": 1 },
-      { "--seg-glow": 0, duration: 0.9, ease: "power2.out" }
-    );
+    if (seg) {
+      gsap.fromTo(
+        seg,
+        { "--seg-glow": 1 },
+        { "--seg-glow": 0, duration: 0.9, ease: "power2.out" }
+      );
+    }
     gsap.fromTo(
       barRef.current,
       { filter: "brightness(1.6)" },
       { filter: "brightness(1)", duration: 0.7, ease: "power2.out" }
     );
+    if (scoreRef.current) {
+      gsap.fromTo(
+        scoreRef.current,
+        { scale: 1.15, filter: "brightness(1.5)" },
+        { scale: 1, filter: "brightness(1)", duration: 0.6, ease: "power2.out" }
+      );
+    }
     pulseRef.current?.();
   }, [caught]);
 
   return (
     <div className={`hud${visible ? " hud-visible" : ""}`}>
+      <div className="hud-score" ref={scoreRef}>
+        <span className="hud-score-label mono-label">TEAM-STÄRKE</span>
+        <span className="hud-score-val">{teamStrength}</span>
+      </div>
+
       <div className="hud-badge mono-label" ref={badgeRef}>
         <span className="hud-label">LEVEL</span>
         <span className="hud-level">{level}</span>

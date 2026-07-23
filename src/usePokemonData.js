@@ -5,6 +5,22 @@ import { TOTAL_POKEMON } from "./pokemonList";
 const pokeCache = new Map();   // id -> pokemon basis
 const nameCache = new Map();   // id -> deutscher name
 
+// Staerke-Schaetzung aus den 6 Basis-Stats (gewichtet).
+// Angriff/SpAngriff zaehlen mehr, HP etwas weniger -> kampfnaeher Wert.
+// Ergebnis: Integer-Staerke (typisch ~220 bei schwach, ~520 bei stark).
+function computeStrength(stats) {
+  const map = {};
+  for (const s of stats) map[s.name] = s.value;
+  const raw =
+    (map["attack"] ?? 0) * 1.1 +
+    (map["special-attack"] ?? 0) * 1.1 +
+    (map["defense"] ?? 0) * 0.9 +
+    (map["special-defense"] ?? 0) * 0.9 +
+    (map["speed"] ?? 0) * 1.0 +
+    (map["hp"] ?? 0) * 0.6;
+  return Math.round(raw);
+}
+
 // Nationaler Dex: 1..1025 (alle Haupt-Spiele, inkl. DE-Namen).
 const MAX_POKEMON_ID = 1025;
 
@@ -96,7 +112,7 @@ export function usePokemonData(count = TOTAL_POKEMON) {
             fetchPokemon(id),
             fetchGermanName(id),
           ]);
-          results.push({ name_de: deName, ...poke });
+          results.push({ name_de: deName, strength: computeStrength(poke.stats), ...poke });
           if (!cancelled) setProgress(Math.round(((i + 1) / idsRef.current.length) * 100));
         }
         if (!cancelled) setData(results);
@@ -116,7 +132,7 @@ export function usePokemonData(count = TOTAL_POKEMON) {
         fetchPokemon(id),
         fetchGermanName(id),
       ]);
-      setSearch({ loading: false, result: { name_de: deName, ...poke }, error: null });
+      setSearch({ loading: false, result: { name_de: deName, strength: computeStrength(poke.stats), ...poke }, error: null });
     } catch (e) {
       setSearch({ loading: false, result: null, error: e.message });
     }

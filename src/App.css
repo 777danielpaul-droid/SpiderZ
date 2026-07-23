@@ -8,13 +8,13 @@
 .hud {
   position: fixed;
   top: 50%;
-  right: 18px;
+  right: 22px;
   transform: translateY(-50%) translateX(40px);
   z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 14px;
   color: var(--bone);
   opacity: 0;
   pointer-events: none;
@@ -24,6 +24,21 @@
   opacity: 1;
   transform: translateY(-50%) translateX(0);
   pointer-events: auto;
+}
+/* Grosse Challenge-Score-Zahl */
+.hud-score {
+  display: flex; flex-direction: column; align-items: flex-end;
+  line-height: 1; margin-bottom: 2px;
+}
+.hud-score-label {
+  font-size: 11px; letter-spacing: 0.22em; opacity: 0.7; margin-bottom: 4px;
+}
+.hud-score-val {
+  font-family: var(--font-display);
+  font-size: 46px; font-weight: 900;
+  background: linear-gradient(92deg, var(--neon-soft), var(--cyan) 60%, var(--gold-soft));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 16px rgba(192, 38, 211, 0.55));
 }
 .hud-badge {
   position: relative;
@@ -35,28 +50,28 @@
   -webkit-backdrop-filter: blur(14px) saturate(150%);
   border: 1px solid rgba(192, 38, 211, 0.45);
   color: #fff;
-  border-radius: 14px;
-  padding: 6px 16px;
+  border-radius: 16px;
+  padding: 10px 22px;
   line-height: 1;
   box-shadow: 0 8px 22px -10px rgba(162, 28, 175, 0.8), inset 0 1px 0 rgba(255,255,255,0.25);
 }
 .hud-label {
   font-family: var(--font-mono);
-  font-size: 9px; letter-spacing: 0.18em; opacity: 0.85; text-transform: uppercase;
+  font-size: 11px; letter-spacing: 0.18em; opacity: 0.85; text-transform: uppercase;
 }
-.hud-level { font-size: 22px; font-weight: 800; }
+.hud-level { font-size: 30px; font-weight: 800; }
 .hud-title {
-  font-weight: 800; font-size: 14px; text-align: right;
+  font-weight: 800; font-size: 17px; text-align: right;
   background: linear-gradient(90deg, var(--neon-soft), var(--cyan));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .hud-caught {
-  font-weight: 700; font-size: 13px; color: var(--bone);
+  font-weight: 700; font-size: 15px; color: var(--bone);
   background: rgba(22, 17, 31, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(192, 38, 211, 0.3);
-  border-radius: 999px; padding: 4px 12px;
+  border-radius: 999px; padding: 6px 16px;
 }
 .hud-caught .ball { color: #ff6b6b; margin-right: 4px; }
 
@@ -71,10 +86,10 @@
 }
 
 /* Flashiger Ladebalken — ein Segment pro Pokemon */
-.loadbar { position: relative; width: 200px; }
+.loadbar { position: relative; width: 240px; }
 .loadbar-track {
-  display: flex; gap: 4px; height: 12px;
-  padding: 3px; border-radius: 999px;
+  display: flex; gap: 5px; height: 16px;
+  padding: 4px; border-radius: 999px;
   background: rgba(22, 17, 31, 0.55);
   border: 1px solid rgba(192, 38, 211, 0.35);
   backdrop-filter: blur(10px);
@@ -92,19 +107,19 @@
   box-shadow: 0 0 calc(6px + var(--seg-glow, 0) * 22px) rgba(192, 38, 211, 0.9);
 }
 .loadbar-fill {
-  position: absolute; left: 3px; top: 3px; height: 12px;
+  position: absolute; left: 4px; top: 4px; height: 16px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(192,38,211,0.55), rgba(34,211,238,0.5));
   transition: width 0.5s ease;
   pointer-events: none;
 }
 .hud-bar-text {
-  display: block; margin-top: 5px; text-align: right;
-  font-family: var(--font-mono); font-size: 10px; opacity: 0.7;
+  display: block; margin-top: 6px; text-align: right;
+  font-family: var(--font-mono); font-size: 11px; opacity: 0.7;
 }
 
 .hud-scroll {
-  width: 200px; height: 5px; border-radius: 999px;
+  width: 240px; height: 7px; border-radius: 999px;
   background: rgba(22, 17, 31, 0.5);
   border: 1px solid rgba(192, 38, 211, 0.3);
   overflow: hidden;
@@ -277,6 +292,21 @@
   text-transform: uppercase; letter-spacing: 0.04em;
 }
 .team-card:not(.is-caught) .team-name { opacity: 0.45; }
+.team-strength {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+  color: var(--cyan); opacity: 0.9;
+}
+.team-total {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; margin-top: 4px;
+  background: linear-gradient(92deg, var(--neon-soft), var(--cyan) 60%, var(--gold-soft));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.strength-badge {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
+  color: var(--cyan);
+}
 
 /* ============ Scroll-Scrubbing-Sektion (Canvas) ============ */
 .scrub-section { position: relative; }

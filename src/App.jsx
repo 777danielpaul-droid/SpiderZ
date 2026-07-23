@@ -96,6 +96,7 @@ export default function App() {
       <HUD
         total={TOTAL_POKEMON}
         caughtIds={caughtIds}
+        data={data}
         scrollFillRef={scrollFillRef}
         pulseRef={pulseRef}
         visible={hudVisible}
@@ -180,10 +181,17 @@ export default function App() {
                       style={caught ? { filter: `drop-shadow(0 0 22px ${primary ? TYPE_COLORS[primary] : "#6d28d9"}aa)` } : { filter: "grayscale(1) opacity(0.35)" }}
                     />
                     <span className="team-name">{caught ? p.name_de : "???"}</span>
+                    <span className="team-strength">{caught ? `STÄRKE ${p.strength}` : ""}</span>
                   </div>
                 );
               })}
             </div>
+
+            {caughtIds.length > 0 && (
+              <p className="team-total">
+                Team-Stärke: <strong>{data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + p.strength, 0)}</strong>
+              </p>
+            )}
 
             <p className="end-sub">
               Du hast <strong>{caughtIds.length}</strong> von{" "}
