@@ -307,20 +307,24 @@ export default function App() {
 
   useEffect(() => {
     if (!data) return;
+    let trigger;
     const id = requestAnimationFrame(() => {
       teamRefs.current = {};
       document.querySelectorAll(".team-card").forEach((el) => {
         teamRefs.current[el.dataset.id] = el;
       });
-      ScrollTrigger.create({
+      trigger = ScrollTrigger.create({
         trigger: endcardRef.current,
         start: "top 65%",
         once: true,
         onEnter: () => playTeamReveal(),
       });
     });
-    return () => cancelAnimationFrame(id);
-  }, []);
+    return () => {
+      cancelAnimationFrame(id);
+      if (trigger) trigger.kill();
+    };
+  }, [data]);
 
   // Escape schließt das Such-Modal.
   useEffect(() => {
