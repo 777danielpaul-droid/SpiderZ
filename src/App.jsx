@@ -431,6 +431,23 @@ export default function App() {
                       style={caught ? { filter: `drop-shadow(0 0 22px ${primary ? TYPE_COLORS[primary] : "#6d28d9"}aa)` } : { filter: "grayscale(1) opacity(0.35)" }}
                     />
                     <div className="team-name">{p.name_de}</div>
+                    <div className="team-meta">
+                      <div className="card-types">
+                        {(p.types || []).map((t) => (
+                          <span key={t} className="type-badge" style={{ background: TYPE_COLORS[t] || "#6d28d9" }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="team-avg">
+                        Ø {(() => {
+                          const arr = (p.stats || []).map((s) => s.value);
+                          const sum = arr.length ? arr.reduce((a, b) => a + b, 0) : (p.strength || 0);
+                          const n = arr.length || 1;
+                          return Math.round(sum / n);
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 );
               })}

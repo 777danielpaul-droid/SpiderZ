@@ -238,6 +238,21 @@
   color: var(--hud-lime);
   text-shadow: 0 0 14px rgba(182, 255, 59, 0.50);
 }
+/* Meta (Typen + Durchschnitts-Staerke) erscheint wie der Name beim Hover */
+.team-meta {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.team-card:hover .team-meta { opacity: 1; transform: translateY(0); }
+.team-card:not(.is-caught):hover .team-meta { opacity: 0.7; }
+.team-meta .card-types { margin-top: 0; }
+.team-avg {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 1.6vw, 20px); font-weight: 800; letter-spacing: 0.04em;
+  color: var(--hud-text);
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.45);
+}
 
 /* ---------- Final-Event Overlays ---------- */
 .reveal-flash {

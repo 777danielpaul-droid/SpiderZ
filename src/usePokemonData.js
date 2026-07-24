@@ -53,13 +53,19 @@ async function resolveQuery(raw) {
     return id;
   }
 
+  // Name-Suche: Teilnamen via Wildcards (z.B. "arach" -> "arachnex").
+  // Bester Treffer = kuerzester Name (exakteste Uebereinstimmung).
   const { data, error } = await supabase
     .from("nasamon")
-    .select("id")
-    .ilike("name_en", q)
-    .maybeSingle();
-  if (data) return data.id;
-  throw new Error(`Nicht gefunden – Nummer (1–${MAX_NASAMON}) oder englischer Name (z.B. arachnex).`);
+    .select("id, name_en")
+    .ilike("name_en", `%${q}%`)
+    .limit(5);
+  if (error) throw new Error(`Suche fehlgeschlagen: ${error.message}`);
+  if (data && data.length) {
+    const best = data.slice().sort((a, b) => a.name_en.length - b.name_en.length)[0];
+    return best.id;
+  }
+  throw new Error(`Nicht gefunden – Nummer (1–${MAX_NASAMON}) oder Name (z.B. arachnex, spider, glow).`);
 }
 
 export function usePokemonData(count = TOTAL_POKEMON) {
