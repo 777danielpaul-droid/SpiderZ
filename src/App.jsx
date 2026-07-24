@@ -73,10 +73,20 @@ export default function App() {
     // Bei der letzten Karte: direkt zur Team-Endcard (kein ueberfluessiger
     // Zwischenschritt — ein Druck reicht vom Final-Reveal zum Team).
     if (activeCard >= TOTAL_POKEMON - 1) {
-      // Zum absoluten Dokumentende scrollen -> Endcard komplett unten (kein
-      // 111px-Luftloch ueber der Endcard-Oberkante).
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      gsap.to(window, { scrollTo: maxY, duration: 0.9, ease: "power2.inOut" });
+      // Zum absoluten Dokumentende scrollen -> Endcard komplett unten.
+      // onComplete prueft erneut: falls Seite durch nachladende Bilder noch
+      // gewachsen ist, wird der Rest kurz nachgescrollt (kein Luftloch).
+      const toBottom = () => {
+        const maxY = document.documentElement.scrollHeight - window.innerHeight;
+        gsap.to(window, {
+          scrollTo: maxY, duration: 0.9, ease: "power2.inOut",
+          onComplete: () => {
+            const newMax = document.documentElement.scrollHeight - window.innerHeight;
+            if (newMax > maxY + 2) gsap.to(window, { scrollTo: newMax, duration: 0.3, ease: "power1.out" });
+          }
+        });
+      };
+      toBottom();
       setActiveCard(TOTAL_POKEMON);
       return;
     }
@@ -434,7 +444,7 @@ export default function App() {
                     <img
                       src={p.artwork}
                       alt={p.name_de}
-                      loading="lazy"
+                      loading="eager"
                       style={caught ? { filter: `drop-shadow(0 0 22px ${primary ? TYPE_COLORS[primary] : "#6d28d9"}aa)` } : { filter: "grayscale(1) opacity(0.35)" }}
                     />
                   </div>
