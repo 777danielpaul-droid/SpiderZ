@@ -27,6 +27,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
   const heroRef = useRef(null);
+  const headerRef = useRef(null);
   const [hudVisible, setHudVisible] = useState(false);
   const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
   const [dark, setDark] = useState(true);
@@ -36,6 +37,17 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
+
+  // Header faehrt beim Laden von links rein (technischer Reveal).
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from(headerRef.current, {
+        xPercent: -100, opacity: 0, duration: 0.9, ease: "power3.out", delay: 0.15,
+      });
+    });
+    return () => ctx.revert();
+  }, []);
 
   // Runde beendet (alle gefangen) -> in Pokedex + Rekord speichern.
   useEffect(() => {
@@ -364,8 +376,32 @@ export default function App() {
     setCaughtIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
   }, []);
 
+  // Sanfter Anker-Scroll ueber GSAP (konsistent mit ScrollTrigger-Architektur).
+  const scrollToId = useCallback((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 60; // Header-Hoehe abziehen
+    gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
+  }, []);
+
   return (
     <div className="app" ref={rootRef}>
+      <header className="site-header" ref={headerRef}>
+        <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ">SPIDER<span>Z</span></a>
+        <nav className="site-nav">
+          <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>
+          <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Story</a>
+        </nav>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={() => setDark((d) => !d)}
+          aria-label={dark ? "Hellen Modus" : "Dunklen Modus"}
+          title={dark ? "Hellen Modus" : "Dunklen Modus"}
+        >
+          <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
+        </button>
+      </header>
       <div className="reveal-flash" aria-hidden="true" />
       <HUD
         total={TOTAL_POKEMON}
@@ -393,23 +429,37 @@ export default function App() {
         <DexOverlay onClose={() => setHudView("records")} />
       )}
 
-      <header className="hero" ref={heroRef}>
+      <header className="hero" ref={heroRef} id="spiderz">
         <ScrubSection hintHidden={caughtIds.length > 0}>
           <div className="poke-logo" ref={logoRef} aria-label="SpiderZ">
             <span className="ball" aria-hidden="true" />
             <span className="word">SpiderZ</span>
           </div>
-          <button
-            type="button"
-            className="theme-toggle"
-            onClick={() => setDark((d) => !d)}
-            aria-label={dark ? "Hellen Modus" : "Dunklen Modus"}
-            title={dark ? "Hellen Modus" : "Dunklen Modus"}
-          >
-            <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
-          </button>
         </ScrubSection>
       </header>
+
+      {/* STORY-Sektion (Anker-Ziel #story) — technisches Milchglas-Panel */}
+      <section className="story" id="story">
+        <div className="story-grid">
+          <div className="story-tag">// DOSSIER_001</div>
+          <h2 className="story-title">DIE SPINNEN-SCHWARME</h2>
+          <p className="story-body">
+            Tief in den Neonschächten von New-Arachne erwachten die <strong>SpiderZ</strong> —
+            mutierte Arachniden, deren Typen in drei Fraktionen kollidieren:
+            <span className="story-hl schere">SCHERE</span>,
+            <span className="story-hl stein">STEIN</span>,
+            <span className="story-hl papier">PAPIER</span>.
+            Scanne sie, fange dein Team aus drei, verpasse einem das Steroid-Vial —
+            und schick es in die Arena gegen den RNG-Schwarm.
+          </p>
+          <ul className="story-stats">
+            <li><span>18</span> Spezies</li>
+            <li><span>3</span> Fraktionen</li>
+            <li><span>+100</span> Vial-Boost</li>
+            <li><span>1:1</span> Arena-Kampf</li>
+          </ul>
+        </div>
+      </section>
 
       {search.result || search.loading || search.error ? (
         <SearchResult

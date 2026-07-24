@@ -751,3 +751,98 @@
   box-shadow: 0 0 16px rgba(140, 255, 60, 0.7);
 }
 
+/* ---- FESTER SITE-HEADER (Milchglas, HUD-inspiriert, von links rein) ---- */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; gap: 20px;
+  height: 60px; padding: 0 clamp(14px, 3vw, 34px);
+  background: color-mix(in srgb, var(--hud-bg) 62%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--hud-border);
+  box-shadow: 0 6px 30px -16px var(--hud-cyan), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.site-logo {
+  font-family: var(--font-display); font-weight: 900; font-size: 20px; letter-spacing: 0.06em;
+  color: var(--hud-text); text-decoration: none; white-space: nowrap;
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.5);
+}
+.site-logo span { color: var(--hud-lime); }
+.site-nav { display: flex; gap: 6px; margin-left: auto; }
+.site-link {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--hud-dim);
+  text-decoration: none; padding: 7px 14px; border-radius: 8px;
+  border: 1px solid transparent; transition: all 0.18s ease;
+}
+.site-link:hover {
+  color: var(--hud-text);
+  border-color: var(--hud-border);
+  background: rgba(34, 211, 238, 0.08);
+  box-shadow: 0 0 16px -4px var(--hud-cyan);
+}
+/* Theme-Toggle (aus dem Hero uebernommen, hier neu positioniert) */
+.site-header .theme-toggle {
+  width: 40px; height: 40px; flex: none; cursor: pointer; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--hud-border);
+  color: var(--hud-text); font-size: 18px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+.site-header .theme-toggle:hover { filter: brightness(1.25); transform: scale(1.06); }
+
+/* Ausgleich: Inhalt beginnt unter dem festen Header */
+.app { padding-top: 60px; }
+
+/* ---- STORY-Sektion (technisches Milchglas-Panel) ---- */
+.story {
+  position: relative; z-index: 10;
+  max-width: 1080px; width: 92vw; margin: 40px auto;
+  padding: clamp(22px, 4vw, 44px);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px),
+    linear-gradient(165deg, color-mix(in srgb, var(--hud-bg-2) 90%, transparent), color-mix(in srgb, var(--hud-bg) 88%, transparent));
+  border: 1px solid var(--hud-border); border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 60px -24px rgba(34, 211, 238, 0.4);
+}
+.story-grid { max-width: 720px; }
+.story-tag {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--hud-cyan);
+  margin-bottom: 10px;
+}
+.story-title {
+  font-family: var(--font-display); font-weight: 900; letter-spacing: 0.05em;
+  font-size: clamp(24px, 4vw, 40px); margin: 0 0 16px;
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-lime));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.story-body { font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: var(--hud-text); font-weight: 500; }
+.story-body strong { color: var(--hud-lime); }
+.story-hl {
+  font-family: var(--font-mono); font-size: 0.82em; font-weight: 800; padding: 1px 8px; border-radius: 6px;
+  margin: 0 3px;
+}
+.story-hl.schere { color: #0c1024; background: linear-gradient(90deg, var(--hud-cyan), #7df9ff); }
+.story-hl.stein { color: #0c1024; background: linear-gradient(90deg, #9aa7ff, var(--hud-magenta)); }
+.story-hl.papier { color: #0c1024; background: linear-gradient(90deg, var(--hud-lime), #c6ff5a); }
+.story-stats {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 14px; margin: 22px 0 0; padding: 0;
+}
+.story-stats li {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--hud-dim);
+  padding: 8px 14px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--hud-border);
+}
+.story-stats span {
+  display: block; font-family: var(--font-display); font-size: 20px; font-weight: 900;
+  color: var(--hud-cyan); margin-bottom: 2px;
+}
+
+/* Hero kriegt oben Luft, damit der feste Header nicht klebt */
+.hero { padding-top: 40px; }
+
+@media (max-width: 560px) {
+  .site-nav { gap: 2px; }
+  .site-link { padding: 6px 9px; font-size: 11px; }
+  .site-logo { font-size: 17px; }
+}
+
