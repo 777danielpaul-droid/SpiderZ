@@ -77,13 +77,18 @@
 .card-pin {
   position: relative; height: 100vh; width: 100%;
   display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
+  /* overflow: hidden entfernt -> Typ-Glow (.card-bg) strahlt ueber die
+     Kartengrenze hinaus in den Folgebereich (der transparent ist),
+     statt am Pin-Rand hart abgeschnitten zu werden. */
 }
 .card-bg {
-  position: absolute; width: 70vmin; height: 70vmin;
+  position: absolute; width: 150vmin; height: 150vmin;
   border-radius: 50%; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  filter: blur(20px); pointer-events: none;
+  filter: blur(40px); pointer-events: none;
+  /* Glow ist bewusst gross -> ragt ueber die Section-Grenze (100vh) hinaus
+     und scheint weich in die Nachbar-Sektion (Karte/Endcard) hinein,
+     statt am Pin-Rand hart abgeschnitten zu werden. */
 }
 .card-num {
   position: absolute; top: 50%; left: 50%;
