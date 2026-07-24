@@ -96,7 +96,7 @@
 }
 
 .hud-mod-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 10px;
   letter-spacing: 0.26em;
   text-transform: uppercase;
@@ -257,7 +257,7 @@
 
 /* ---- AKTIVES TEAM ---- */
 .hud-team-empty {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
   font-size: 11px;
   color: var(--hud-dim);
   letter-spacing: 0.08em;

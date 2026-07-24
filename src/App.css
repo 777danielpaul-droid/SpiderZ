@@ -301,7 +301,7 @@
   height: 100vh; display: flex; align-items: center; justify-content: center;
   position: relative;
   background:
-    radial-gradient(circle at 50% 40%, rgba(192, 38, 211, 0.18), transparent 60%),
+    radial-gradient(circle at 50% 40%, rgba(34, 211, 238, 0.16), transparent 60%),
     var(--bg);
   overflow: hidden;
 }
@@ -320,21 +320,21 @@
 .scrub-locked, .scrub-loading {
   background: rgba(22, 17, 31, 0.88);
   backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(192, 38, 211, 0.30);
+  border: 1px solid var(--hud-border);
   color: var(--bone);
   border-radius: 18px; padding: 26px 32px;
-  box-shadow: 0 18px 50px rgba(80, 40, 120, 0.28);
+  --tc: var(--hud-magenta);
   max-width: 420px;
 }
 .scrub-lock-emoji { font-size: 48px; }
 .scrub-locked h2 {
-  background: var(--grad-cute);
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-lime));
   -webkit-background-clip: text; background-clip: text; color: transparent;
   margin: 8px 0 4px;
 }
 .scrub-locked p, .scrub-loading p { opacity: 0.8; font-weight: 600; margin: 0; }
 .scrub-load-bar { width: 220px; height: 8px; border-radius: 99px; background: rgba(255,255,255,0.12); overflow: hidden; margin: 0 auto 10px; }
-.scrub-load-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--neon), var(--neon-green)); transition: width 0.2s ease; }
+.scrub-load-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--hud-cyan), var(--hud-magenta)); transition: width 0.2s ease; }
 .scrub-hint {
   position: absolute; bottom: 26px;
   background: var(--grad-princess);
