@@ -24,6 +24,9 @@ export default function App() {
   const scrollFillRef = useRef(null);
   const stRef = useRef(null);
   const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
+  const endcardRef = useRef(null);   // Final-Event: Team-Reveal
+  const teamRefs = useRef({});       // DOM-Refs der Team-Karten
+  const revealPlayed = useRef(false); // Finale nur einmal abspielen
 
   // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
   // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
@@ -90,6 +93,119 @@ export default function App() {
     return () => cancelAnimationFrame(id);
   }, [data]);
 
+  // FINAL-EVENT: Team-Reveal. Laeuft erst, wenn die Team-Sektion wirklich
+  // in den View scrollt (nicht schon beim Fangen unten im Off).
+  function playTeamReveal() {
+    if (revealPlayed.current) return;
+    revealPlayed.current = true;
+
+    const cards = [...document.querySelectorAll(".team-card")];
+    const grid = document.querySelector(".team-grid");
+    const flash = document.querySelector(".reveal-flash");
+    const sweep = document.querySelector(".scanline-sweep");
+    if (!cards.length) return;
+
+    // Start: Karten aus einem Punkt unten, unsichtbar, leicht gedreht, blur+hell
+    gsap.set(cards, {
+      opacity: 0, scale: 0.15, y: 300,
+      rotateZ: () => gsap.utils.random(-45, 45),
+      transformOrigin: "50% 50%",
+      filter: "blur(10px) brightness(2.4)",
+    });
+    cards.forEach((c) => c.classList.add("reveal-glow"));
+
+    const tl = gsap.timeline();
+
+    // 1) Licht-Blast (Fullscreen-Flash)
+    if (flash) {
+      tl.fromTo(flash, { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power2.in" })
+        .to(flash, { opacity: 0, duration: 0.55, ease: "power2.out" });
+    }
+
+    // 2) Screen-Shake auf dem Grid
+    if (grid) {
+      tl.to(grid, {
+        keyframes: {
+          "0%": { x: 0, y: 0 }, "12%": { x: -16, y: 9 }, "24%": { x: 14, y: -11 },
+          "38%": { x: -11, y: 7 }, "52%": { x: 9, y: -6 }, "68%": { x: -6, y: 4 },
+          "84%": { x: 4, y: -2 }, "100%": { x: 0, y: 0 },
+        },
+        duration: 0.65, ease: "none",
+      }, 0.08);
+    }
+
+    // 3) Karten detonierten aus einem Punkt + Neon-Trail-Glow
+    tl.to(cards, {
+      opacity: 1, scale: 1, y: 0, rotateZ: 0,
+      filter: "blur(0px) brightness(1)",
+      duration: 0.95, ease: "back.out(2.2)", stagger: 0.14,
+    }, 0.18);
+
+    // 4) Pro Karte: Sprite-Zoom, Chromatic-Abberation, Glitch, Typed-Name, Stärke hoch
+    cards.forEach((card, i) => {
+      const img = card.querySelector("img");
+      const nameEl = card.querySelector(".team-name");
+      const strEl = card.querySelector(".team-strength");
+      const caught = card.classList.contains("is-caught");
+      const at = 0.45 + i * 0.14;
+
+      if (img) {
+        tl.fromTo(img, { scale: 1.8 }, { scale: 1, duration: 0.7, ease: "power3.out" }, at)
+          .fromTo(img,
+            { filter: "drop-shadow(8px 0 0 rgba(255,0,80,0.95)) drop-shadow(-8px 0 0 rgba(0,200,255,0.95)) brightness(2.4)" },
+            { filter: "drop-shadow(0 0 0 rgba(0,0,0,0)) brightness(1)", duration: 0.55, ease: "power2.out" }, at);
+      }
+      if (caught && nameEl) {
+        const target = data.find((p) => String(p.id) === card.dataset.id);
+        const fullName = target ? target.name_de : nameEl.textContent;
+        tl.call(() => {
+          nameEl.textContent = "";
+          nameEl.dataset.glitch = fullName;
+          nameEl.classList.add("glitch", "typing");
+          let n = 0;
+          const t = setInterval(() => {
+            n++;
+            nameEl.textContent = fullName.slice(0, n);
+            if (n >= fullName.length) { clearInterval(t); nameEl.classList.remove("glitch", "typing"); }
+          }, 40);
+        }, null, at + 0.15);
+        if (strEl) {
+          const strVal = target ? target.strength : 0;
+          const proxy = { v: 0 };
+          tl.to(proxy, {
+            v: strVal, duration: 0.7, ease: "power2.out",
+            onUpdate: () => { strEl.textContent = `STÄRKE ${Math.round(proxy.v)}`; },
+          }, at + 0.2);
+        }
+      }
+    });
+
+    // 5) Scanline-Sweep ueber die Sektion
+    if (sweep) {
+      tl.fromTo(sweep, { yPercent: -120 }, { yPercent: 120, duration: 0.75, ease: "power1.inOut" }, 0.28);
+    }
+
+    // Glow-Klasse nach Abklingen entfernen
+    tl.call(() => cards.forEach((c) => c.classList.remove("reveal-glow")), null, 1.5);
+  }
+
+  useEffect(() => {
+    if (!data) return;
+    const id = requestAnimationFrame(() => {
+      teamRefs.current = {};
+      document.querySelectorAll(".team-card").forEach((el) => {
+        teamRefs.current[el.dataset.id] = el;
+      });
+      ScrollTrigger.create({
+        trigger: endcardRef.current,
+        start: "top 65%",
+        once: true,
+        onEnter: () => playTeamReveal(),
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [data]);
+
   // Escape schließt das Such-Modal.
   useEffect(() => {
     const onKey = (e) => {
@@ -107,6 +223,7 @@ export default function App() {
 
   return (
     <div className="app" ref={rootRef}>
+      <div className="reveal-flash" aria-hidden="true" />
       <HUD
         total={TOTAL_POKEMON}
         caughtIds={caughtIds}
@@ -173,7 +290,8 @@ export default function App() {
             />
           ))}
 
-          <footer className="endcard">
+          <footer className="endcard" ref={endcardRef}>
+            <div className="scanline-sweep" aria-hidden="true" />
             <h2 className="end-title">
               {caughtIds.length >= TOTAL_POKEMON ? "Dein Team ist komplett" : "Dein Team"}
             </h2>
@@ -185,6 +303,8 @@ export default function App() {
                 return (
                   <div
                     key={p.name_en}
+                    data-id={p.id}
+                    ref={(el) => { if (el) teamRefs.current[p.id] = el; }}
                     className={`team-card${caught ? " is-caught" : ""}`}
                   >
                     <img

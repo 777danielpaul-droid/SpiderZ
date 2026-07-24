@@ -117,60 +117,117 @@
   letter-spacing: 0.5px; color: var(--bone);
 }
 
-/* ============ End-Card ============ */
+/* ============ End-Card (Team) ============ */
 .endcard {
   min-height: 80vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center; gap: 10px;
   background:
-    radial-gradient(circle at 50% 30%, rgba(192, 38, 211, 0.18), transparent 55%),
+    radial-gradient(circle at 50% 30%, rgba(34, 211, 238, 0.14), transparent 55%),
     var(--bg);
 }
 .end-title {
   font-size: clamp(32px, 6vw, 64px); margin: 0;
-  background: var(--grad-cute);
+  font-family: var(--font-display);
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-lime));
   -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));
 }
-.endcard strong { color: var(--lila); }
+.endcard strong { color: var(--hud-cyan); }
 .end-sub { opacity: 0.6; font-weight: 600; }
 
-/* 3er-Team-Raster am Ende */
+/* Team-Raster — Pokemon GROSS, gerade so nebeneinander */
 .team-grid {
-  display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
-  margin: 26px 0 6px;
+  position: relative;
+  display: flex; gap: clamp(20px, 3.5vw, 60px); justify-content: center; flex-wrap: wrap;
+  width: min(1400px, 96vw);
+  margin: 30px 0 6px;
+  perspective: 1200px;
 }
 .team-card {
-  width: clamp(120px, 26vw, 160px);
-  background: linear-gradient(160deg, rgba(22, 17, 31, 0.92), rgba(22, 17, 31, 0.82));
-  border: 1px solid rgba(192, 38, 211, 0.30);
-  border-radius: 18px; padding: 16px 14px 12px;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 18px 40px rgba(80, 40, 120, 0.25);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  flex: 1 1 0; max-width: min(440px, 44vw); min-width: 280px;
+  background: linear-gradient(160deg, rgba(14, 12, 28, 0.94), rgba(20, 16, 41, 0.88));
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 24px; padding: clamp(20px, 2.5vw, 34px) clamp(16px, 2vw, 28px) clamp(16px, 2vw, 26px);
+  display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 1.4vw, 18px);
+  box-shadow: inset0 1px 0 rgba(255,255,255,0.15), 0 24px 60px rgba(34, 211, 238, 0.12);
+  transition: border-color 0.2s ease, box-shadow 0.25s ease;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
 }
 .team-card.is-caught {
-  border-color: rgba(192, 38, 211, 0.60);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 0 26px rgba(192, 38, 211, 0.35);
+  border-color: rgba(34, 211, 238, 0.75);
+  box-shadow: inset0 1px 0 rgba(255,255,255,0.18), 0 0 40px rgba(34, 211, 238, 0.40);
 }
-.team-card img { width: 100%; height: auto; }
+/* Neon-Trail-Glow waehrend des Final-Reveals */
+.team-card.reveal-glow {
+  border-color: rgba(34, 211, 238, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    0 0 60px rgba(34, 211, 238, 0.65),
+    0 0 90px rgba(255, 53, 208, 0.35);
+}
+.team-card img {
+  width: 100%; max-width: min(360px, 38vw); height: auto;
+  filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.25));
+}
 .team-name {
-  font-weight: 800; font-size: 14px; color: var(--bone);
-  text-transform: uppercase; letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-weight: 800; font-size: clamp(20px, 2.4vw, 34px); color: var(--hud-text);
+  text-transform: none; letter-spacing: 0.01em;
+  text-shadow: 0 0 16px rgba(231, 227, 255, 0.40);
 }
 .team-card:not(.is-caught) .team-name { opacity: 0.45; }
 .team-strength {
-  font-family: var(--font-mono);
-  font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
-  color: var(--neon-green); opacity: 0.9;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.7vw, 22px); font-weight: 800; letter-spacing: 0.04em;
+  color: var(--hud-lime);
+  text-shadow: 0 0 14px rgba(182, 255, 59, 0.50);
+}
+
+/* ---------- Final-Event Overlays ---------- */
+.reveal-flash {
+  position: fixed; inset: 0; z-index: 300; pointer-events: none;
+  background: radial-gradient(circle at 50% 55%, rgba(255,255,255,0.95), rgba(34, 211, 238, 0.6) 35%, transparent 70%);
+  opacity: 0; mix-blend-mode: screen;
+}
+.scanline-sweep {
+  position: absolute; left: 0; right: 0; top: 0; height: 38%;
+  pointer-events: none; z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(34, 211, 238, 0.35) 45%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(34, 211, 238, 0.35) 55%,
+    transparent
+  );
+  filter: blur(1px);
+  opacity: 0.9;
+}
+/* Glitch-Typing für den Namen beim Final-Reveal */
+.team-name.glitch { position: relative; }
+.team-name.glitch::before,
+.team-name.glitch::after {
+  content: attr(data-glitch); position: absolute; inset: 0;
+  clip-path: inset(0 0 0 0); pointer-events: none;
+}
+.team-name.glitch::before { color: #ff0064; transform: translate(-2px, 0); mix-blend-mode: screen; animation: glitch-x 0.3s steps(2) infinite; }
+.team-name.glitch::after  { color: #00c8ff; transform: translate(2px, 0);  mix-blend-mode: screen; animation: glitch-x 0.3s steps(2) reverse infinite; }
+@keyframes glitch-x {
+  0% { clip-path: inset(0 0 80% 0); }
+  50% { clip-path: inset(50% 0 20% 0); }
+  100% { clip-path: inset(80% 0 0 0); }
 }
 .team-total {
   font-family: var(--font-display);
-  font-size: 18px; font-weight: 800; margin-top: 4px;
-  background: var(--grad-cute);
+  font-size: 20px; font-weight: 800; margin-top: 4px;
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-magenta));
   -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.30));
 }
 .strength-badge {
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
-  color: var(--neon-green);
+  color: var(--hud-lime);
 }
 
 /* ============ Scroll-Scrubbing-Sektion (Canvas) ============ */
