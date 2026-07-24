@@ -49,34 +49,41 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
         },
       });
 
+      // Reveal läuft über REVEAL-Anteil der Scroll-Strecke, danach HOLD (Dwell).
+      const REVEAL = 0.62;
+      const HOLD = 1 - REVEAL; // Karte bleibt am Ende kurz mittig stehen
+
       // Bild: von klein/gedreht/verschoben -> gross, gerade, schwebend
       tl.fromTo(
         imgRef.current,
         { scale: 0.55, rotate: -25 * dir, yPercent: 30, filter: "blur(8px)" },
-        { scale: 1.25, rotate: 8 * dir, yPercent: -12, filter: "blur(0px)", ease: "none" },
+        { scale: 1.25, rotate: 8 * dir, yPercent: -12, filter: "blur(0px)", ease: "none", duration: REVEAL },
         0
       );
       // Panel: von der Seite rein + Fade
       tl.fromTo(
         panelRef.current,
         { xPercent: 120 * dir, opacity: 0, rotateY: 35 * dir },
-        { xPercent: 0, opacity: 1, rotateY: 0, ease: "none" },
+        { xPercent: 0, opacity: 1, rotateY: 0, ease: "none", duration: REVEAL },
         0
       );
       // Grosse Nummer im Hintergrund: gegenlaeufiger Parallax
       tl.fromTo(
         numRef.current,
         { xPercent: -40 * dir, opacity: 0.15, scale: 1.4 },
-        { xPercent: 40 * dir, opacity: 0.35, scale: 1.0, ease: "none" },
+        { xPercent: 40 * dir, opacity: 0.35, scale: 1.0, ease: "none", duration: REVEAL },
         0
       );
       // Hintergrund-Akzent: Farbwechsel + radiale Ausdehnung (starker Typ-Glow)
       tl.fromTo(
         bgRef.current,
         { scale: 0.5, opacity: 0.5, background: `radial-gradient(circle, ${primary}77, transparent 72%)` },
-        { scale: 2.0, opacity: 1, background: `radial-gradient(circle, ${secondary}88, transparent 72%)`, ease: "none" },
+        { scale: 2.0, opacity: 1, background: `radial-gradient(circle, ${secondary}88, transparent 72%)`, ease: "none", duration: REVEAL },
         0
       );
+      // HOLD: leere Tween haelt den End-State (mittig) fuer den Rest der Strecke,
+      // damit die Karte vor dem Unpin kurz verweilt statt sofort weiterzulaufen.
+      tl.to({}, { duration: HOLD }, REVEAL);
     }, sectionRef);
 
     return () => ctx.revert();

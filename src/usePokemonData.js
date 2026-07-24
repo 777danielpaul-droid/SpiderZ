@@ -1,28 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TOTAL_POKEMON } from "./pokemonList";
+import { supabase } from "./lib/supabase";
 
 // In-Memory-Cache: verhindert Repeated-Fetch bei HMR/Reload des gleichen Sets.
-const pokeCache = new Map();   // id -> pokemon basis
-const nameCache = new Map();   // id -> deutscher name
+const cache = new Map(); // id -> nasamon datensatz
 
-// Staerke-Schaetzung aus den 6 Basis-Stats (gewichtet).
-// Angriff/SpAngriff zaehlen mehr, HP etwas weniger -> kampfnaeher Wert.
-// Ergebnis: Integer-Staerke (typisch ~220 bei schwach, ~520 bei stark).
-function computeStrength(stats) {
-  const map = {};
-  for (const s of stats) map[s.name] = s.value;
-  const raw =
-    (map["attack"] ?? 0) * 1.1 +
-    (map["special-attack"] ?? 0) * 1.1 +
-    (map["defense"] ?? 0) * 0.9 +
-    (map["special-defense"] ?? 0) * 0.9 +
-    (map["speed"] ?? 0) * 1.0 +
-    (map["hp"] ?? 0) * 0.6;
-  return Math.round(raw);
-}
-
-// Nationaler Dex: 1..1025 (alle Haupt-Spiele, inkl. DE-Namen).
-const MAX_POKEMON_ID = 1025;
+// Gesamtzahl der eigenen Monster (aus der DB; hier als Obergrenze für randomIds).
+const MAX_NASAMON = 18;
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -33,61 +17,49 @@ function shuffle(arr) {
   return a;
 }
 
-async function fetchGermanName(id) {
-  if (nameCache.has(id)) return nameCache.get(id);
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
-  if (!res.ok) throw new Error(`species ${id}: ${res.status}`);
-  const d = await res.json();
-  const de = d.names.find((n) => n.language.name === "de");
-  const name = de ? de.name : d.name; // Fallback auf EN
-  nameCache.set(id, name);
-  return name;
+// Liefert einen zufälligen Datensatz aus dem Cache (oder null).
+function getCached(id) {
+  return cache.get(id) || null;
 }
 
-async function fetchPokemon(id) {
-  if (pokeCache.has(id)) return pokeCache.get(id);
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  if (!res.ok) throw new Error(`pokemon ${id}: ${res.status}`);
-  const d = await res.json();
-  const data = {
-    id: d.id,
-    name_en: d.name,
-    artwork: d.sprites.other["official-artwork"].front_default,
-    types: d.types.map((t) => t.type.name),
-    stats: d.stats.map((s) => ({ name: s.stat.name, value: s.base_stat })),
-    height: d.height, // in dm
-    weight: d.weight, // in hg
-  };
-  pokeCache.set(id, data);
+async function fetchNasaMon(id) {
+  if (cache.has(id)) return cache.get(id);
+  const { data, error } = await supabase
+    .from("nasamon")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw new Error(`nasamon ${id}: ${error.message}`);
+  cache.set(id, data);
   return data;
 }
 
-// count zufällige eindeutige IDs aus dem gesamten nationalen Dex.
-function randomIds(count = TOTAL_POKEMON, max = MAX_POKEMON_ID) {
+// count zufällige eindeutige IDs aus dem gesamten NasaMon-Dex.
+function randomIds(count = TOTAL_POKEMON, max = MAX_NASAMON) {
   return shuffle(Array.from({ length: max }, (_, i) => i + 1)).slice(0, count);
 }
 
-// Such-Query -> gültige Pokemon-ID auflösen.
-// Akzeptiert: reine Zahl (1..1025) ODER englischen Namen (PokeAPI nativ).
+// Such-Query -> gültige NasaMon-ID auflösen.
+// Akzeptiert: reine Zahl (1..18) ODER englischer Name (name_en).
 async function resolveQuery(raw) {
   const q = String(raw).trim().toLowerCase();
   if (!q) throw new Error("Bitte eine Nummer oder einen Namen eingeben.");
 
   if (/^\d+$/.test(q)) {
     const id = parseInt(q, 10);
-    if (id < 1 || id > MAX_POKEMON_ID) {
-      throw new Error(`Nummer außerhalb des Bereichs 1–${MAX_POKEMON_ID}.`);
+    if (id < 1 || id > MAX_NASAMON) {
+      throw new Error(`Nummer außerhalb des Bereichs 1–${MAX_NASAMON}.`);
     }
     return id;
   }
 
-  // Englischer Name: PokeAPI löst /pokemon/{name} direkt auf.
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${q}`);
-  if (res.ok) {
-    const d = await res.json();
-    return d.id;
-  }
-  throw new Error("Nicht gefunden – Nummer (1–1025) oder englischer Name (z.B. pikachu).");
+  const { data, error } = await supabase
+    .from("nasamon")
+    .select("id")
+    .ilike("name_en", q)
+    .maybeSingle();
+  if (data) return data.id;
+  throw new Error(`Nicht gefunden – Nummer (1–${MAX_NASAMON}) oder englischer Name (z.B. arachnex).`);
 }
 
 export function usePokemonData(count = TOTAL_POKEMON) {
@@ -110,12 +82,9 @@ export function usePokemonData(count = TOTAL_POKEMON) {
       try {
         const results = [];
         for (let i = 0; i < ids.length; i++) {
-          const id = ids[i];
-          const [poke, deName] = await Promise.all([
-            fetchPokemon(id),
-            fetchGermanName(id),
-          ]);
-          results.push({ name_de: deName, strength: computeStrength(poke.stats), ...poke });
+          const mon = await fetchNasaMon(ids[i]);
+          // Shape 1:1 wie vorher: { id, name_en, name_de, artwork, types, strength, stats, height, weight }
+          results.push(mon);
           if (!cancelled) setProgress(Math.round(((i + 1) / ids.length) * 100));
         }
         if (!cancelled) setData(results);
@@ -139,11 +108,8 @@ export function usePokemonData(count = TOTAL_POKEMON) {
     setSearch({ loading: true, result: null, error: null });
     try {
       const id = await resolveQuery(query);
-      const [poke, deName] = await Promise.all([
-        fetchPokemon(id),
-        fetchGermanName(id),
-      ]);
-      setSearch({ loading: false, result: { name_de: deName, strength: computeStrength(poke.stats), ...poke }, error: null });
+      const mon = await fetchNasaMon(id);
+      setSearch({ loading: false, result: mon, error: null });
     } catch (e) {
       setSearch({ loading: false, result: null, error: e.message });
     }
