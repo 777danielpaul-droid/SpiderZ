@@ -842,9 +842,9 @@
   font-family: var(--font-mono); font-size: 0.82em; font-weight: 800; padding: 1px 8px; border-radius: 6px;
   margin: 0 3px;
 }
-.story-hl.schere { color: #0c1024; background: linear-gradient(90deg, var(--hud-cyan), #7df9ff); }
-.story-hl.stein { color: #0c1024; background: linear-gradient(90deg, #9aa7ff, var(--hud-magenta)); }
-.story-hl.papier { color: #0c1024; background: linear-gradient(90deg, var(--hud-lime), #c6ff5a); }
+.story-hl.git { color: #0c1024; background: linear-gradient(90deg, var(--hud-cyan), #7df9ff); }
+.story-hl.staerke { color: #0c1024; background: linear-gradient(90deg, #9aa7ff, var(--hud-magenta)); }
+.story-hl.verteidigung { color: #0c1024; background: linear-gradient(90deg, var(--hud-lime), #c6ff5a); }
 .story-stats {
   list-style: none; display: flex; flex-wrap: wrap; gap: 14px; margin: 22px 0 0; padding: 0;
 }

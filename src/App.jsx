@@ -345,7 +345,7 @@ export default function App() {
         <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ">SPIDER<span>Z</span></a>
         <nav className="site-nav">
           <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>
-          <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Story</a>
+          <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Spielregeln</a>
         </nav>
         <button
           type="button"
@@ -397,9 +397,9 @@ export default function App() {
           <p className="story-body">
             Tief in den Neonschächten von New-Arachne erwachten die <strong>SpiderZ</strong> —
             mutierte Arachniden, deren Typen in drei Fraktionen kollidieren:
-            <span className="story-hl schere">SCHERE</span>,
-            <span className="story-hl stein">STEIN</span>,
-            <span className="story-hl papier">PAPIER</span>.
+            <span className="story-hl git">GIT</span>,
+            <span className="story-hl staerke">STÄRKE</span>,
+            <span className="story-hl verteidigung">VERTEIDIGUNG</span>.
             Scanne sie, fange dein Team aus drei, verpasse einem das Steroid-Vial —
             und schick es in die Arena gegen den RNG-Schwarm.
           </p>
