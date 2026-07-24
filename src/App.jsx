@@ -318,6 +318,9 @@ export default function App() {
         visible={hudVisible}
         onRestart={handleRestart}
         onShowRecords={() => setHudView("records")}
+        onNext={goNext}
+        canNext={caughtIds.length > 0}
+        nextLabel={activeCard >= TOTAL_POKEMON ? "Zum Team ▾" : "Weiter ▸"}
       />
 
       {hudView === "records" && (
@@ -440,14 +443,6 @@ export default function App() {
           })()}
         </main>
       )}
-
-      <button
-        className={`next-btn${caughtIds.length > 0 ? "" : " hidden"}`}
-        onClick={goNext}
-        aria-label="Nächstes Pokémon"
-      >
-        {activeCard >= TOTAL_POKEMON ? "Zum Team ▾" : "Weiter ▸"}
-      </button>
     </div>
   );
 }

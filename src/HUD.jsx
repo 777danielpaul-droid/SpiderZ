@@ -11,7 +11,7 @@ import "./hud.css";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, onRestart, onShowRecords }) {
+export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, onRestart, onShowRecords, onNext, canNext, nextLabel }) {
   const caught = caughtIds.length;
 
   // Challenge-Score: Gesamtstaerke aller gefangenen Pokemon.
@@ -125,6 +125,11 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
           <div className="hud-actions">
             <button type="button" className="hud-btn" onClick={onRestart} title="Neue Runde">↻ NEUSTART</button>
             <button type="button" className="hud-btn" onClick={onShowRecords} title="Rekorde & Dex">★ REKORDE</button>
+            {canNext && (
+              <button type="button" className="hud-btn hud-btn-next" onClick={onNext} title="Zum nächsten Pokémon">
+                {nextLabel}
+              </button>
+            )}
           </div>
         </section>
 
