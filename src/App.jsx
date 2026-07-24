@@ -64,6 +64,7 @@ export default function App() {
   // ---- VIAL / STEROIDE: einmalig nutzbar, blockiert Arena bis vergeben ----
   const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
   const [boostedId, setBoostedId] = useState(null);    // Spinne mit +100 (null = noch nicht vergeben)
+  const [revealed, setRevealed] = useState(false);     // Team-Reveal abgeschlossen -> Vial darf erscheinen
 
   // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
   // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
@@ -105,6 +106,7 @@ export default function App() {
     setHudView("play");
     setVialTaken(false);
     setBoostedId(null);
+    setRevealed(false);
     revealPlayed.current = false;
     reset();
     window.scrollTo(0, 0);
@@ -297,6 +299,10 @@ export default function App() {
 
     // Glow-Klasse nach Abklingen entfernen
     tl.call(() => cards.forEach((c) => c.classList.remove("reveal-glow")), null, 1.5);
+
+    // Verzoegerung am Punkt des Team-Reveals: nach dem Effekt kurz Pause,
+    // DANN erst darf das Vial erscheinen.
+    tl.call(() => setRevealed(true), null, 1.5 + 0.8);
   }
 
   useEffect(() => {
@@ -501,10 +507,10 @@ export default function App() {
             </div>
           </footer>
 
-          {/* VIAL / STEROIDE: erscheint nach Team-Reveal, blockiert Arena bis vergeben */}
-          {data && caughtIds.length >= TOTAL_POKEMON && boostedId == null && (
+          {/* VIAL / STEROIDE: erscheint NACH dem Team-Reveal (verzoegert), blockiert Arena bis vergeben */}
+          {revealed && data && caughtIds.length >= TOTAL_POKEMON && boostedId == null && (
             <section className="vial-stage">
-              <h2 className="vial-title">STEROID-VAIL</h2>
+              <h2 className="vial-title">STEROID-VIAL</h2>
               <p className="vial-sub">Nimm das Vial und verpasse EINER deiner Spinnen +100 Stärke.</p>
               <div
                 className={`vial ${vialTaken ? "taken" : ""}`}
