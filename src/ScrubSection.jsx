@@ -13,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 const FRAME_COUNT = 59;
 const FRAME_BASE = "/scrub/frame_";
 const PAD = 3;
+const INTRO_LAST_FRAME = 27; // verkuerzte Intro: spielt 0..27 (vorher 58)
 
 export default function ScrubSection({ children, hintHidden }) {
   const [loaded, setLoaded] = useState(0);
@@ -92,12 +93,12 @@ export default function ScrubSection({ children, hintHidden }) {
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: () => "+=" + window.innerHeight * 3, // lange Scrub-Strecke
+          end: () => "+=" + window.innerHeight * 3 * (INTRO_LAST_FRAME / (FRAME_COUNT - 1)), // Scrub-Strecke proportional zur Frame-Range
           pin: pinRef.current,
           scrub: true, // butterweich, folgt Scroll exakt
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            targetRef.current = self.progress * (FRAME_COUNT - 1);
+            targetRef.current = Math.round(self.progress * INTRO_LAST_FRAME);
           },
         });
       }, sectionRef);
