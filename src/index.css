@@ -225,46 +225,11 @@ body {
 .bar-pulse { animation: pulse-bar 1.6s ease-in-out infinite; }
 
 /* ============================================================
-   SpiderZ — Sternenfeld (ersetzt Spinnweb-Overlay)
-   CSS-only, GPU-composited: je 1 Element pro Ebene, Sterne via
-   box-shadow (kein JS, kein Layout-Reflow). 3 Looks gemischt:
-   a) weiss/cyan  b) neon (cyan/magenta/lime)  c) goldene Funken.
+   SpiderZ — Sternenfeld (Holo-Effekt aus tausenden Sternen)
+   Gerendert per Canvas 2D in src/starfield.js (Engine in main.jsx
+   gestartet). CSS-only Container, kein box-shadow mehr.
    ============================================================ */
 .starfield {
-  position: fixed; inset: 0; z-index: 1000; pointer-events: none; overflow: hidden;
-}
-.stars {
-  position: absolute; top: 0; left: 0; width: 2px; height: 2px; border-radius: 50%;
-  background: #fff;
-  animation: star-twinkle 4s ease-in-out infinite;
-}
-/* a) weiss/cyan Sterne */
-.stars-white {
-  width: 3px; height: 3px;
-  box-shadow: 663px 308px 2px 0 #eaf6ff, 808px 98px 2px 0 #eaf6ff, 148px 192px 2px 0 #eaf6ff, 748px 118px 2px 0 #eaf6ff, 1863px 1039px 2px 0 #eaf6ff, 439px 76px 2px 0 #eaf6ff, 176px 888px 2px 0 #eaf6ff, 856px 143px 2px 0 #eaf6ff, 492px 185px 2px 0 #eaf6ff, 1128px 869px 2px 0 #eaf6ff, 121px 253px 2px 0 #eaf6ff, 457px 126px 2px 0 #eaf6ff, 1181px 812px 2px 0 #eaf6ff, 101px 452px 2px 0 #eaf6ff, 95px 272px 2px 0 #eaf6ff, 593px 858px 2px 0 #eaf6ff, 295px 241px 2px 0 #eaf6ff, 1169px 631px 2px 0 #eaf6ff, 1147px 370px 2px 0 #eaf6ff, 211px 384px 2px 0 #eaf6ff, 762px 199px 2px 0 #eaf6ff, 1121px 128px 2px 0 #eaf6ff, 1155px 122px 2px 0 #eaf6ff, 1267px 421px 2px 0 #eaf6ff, 1016px 875px 2px 0 #eaf6ff, 1591px 643px 2px 0 #eaf6ff, 953px 928px 2px 0 #eaf6ff, 740px 613px 2px 0 #eaf6ff, 508px 368px 2px 0 #eaf6ff, 1431px 499px 2px 0 #eaf6ff, 167px 614px 2px 0 #eaf6ff, 1075px 1013px 2px 0 #eaf6ff, 1792px 703px 2px 0 #eaf6ff, 1493px 919px 2px 0 #eaf6ff, 589px 149px 2px 0 #eaf6ff, 241px 1048px 2px 0 #eaf6ff, 856px 337px 2px 0 #eaf6ff, 1550px 700px 2px 0 #eaf6ff, 311px 1001px 2px 0 #eaf6ff, 863px 80px 2px 0 #eaf6ff, 1368px 158px 2px 0 #eaf6ff, 1565px 642px 2px 0 #eaf6ff, 696px 717px 2px 0 #eaf6ff, 1217px 1017px 2px 0 #eaf6ff, 1187px 934px 2px 0 #eaf6ff, 140px 191px 2px 0 #eaf6ff, 552px 970px 2px 0 #eaf6ff, 1427px 133px 2px 0 #eaf6ff, 124px 634px 2px 0 #eaf6ff, 1325px 912px 2px 0 #eaf6ff, 582px 790px 2px 0 #eaf6ff, 1816px 710px 2px 0 #eaf6ff, 46px 945px 2px 0 #eaf6ff, 727px 344px 2px 0 #eaf6ff, 1251px 239px 2px 0 #eaf6ff, 1011px 120px 2px 0 #eaf6ff, 446px 588px 2px 0 #eaf6ff, 264px 507px 2px 0 #eaf6ff, 814px 800px 2px 0 #eaf6ff, 1877px 1016px 2px 0 #eaf6ff;
-  animation-duration: 3.6s;
-}
-/* b) neon Sterne (cyan/magenta/lime gemischt) */
-.stars-neon {
-  width: 4px; height: 4px;
-  box-shadow: 165px 340px 2px 0 #22d3ee, 919px 822px 2px 0 #ff35d0, 1125px 569px 2px 0 #b6ff3b, 1809px 280px 2px 0 #22d3ee, 1677px 881px 2px 0 #ff35d0, 1769px 570px 2px 0 #b6ff3b, 1446px 850px 2px 0 #22d3ee, 734px 779px 2px 0 #ff35d0, 472px 309px 2px 0 #b6ff3b, 169px 360px 2px 0 #22d3ee, 309px 475px 2px 0 #ff35d0, 1348px 477px 2px 0 #b6ff3b, 24px 993px 2px 0 #22d3ee, 1702px 373px 2px 0 #ff35d0, 538px 577px 2px 0 #b6ff3b, 8px 298px 2px 0 #22d3ee, 858px 756px 2px 0 #ff35d0, 1248px 652px 2px 0 #b6ff3b, 257px 1055px 2px 0 #22d3ee, 1264px 110px 2px 0 #ff35d0, 935px 803px 2px 0 #b6ff3b, 815px 817px 2px 0 #22d3ee, 807px 212px 2px 0 #ff35d0, 986px 820px 2px 0 #b6ff3b, 127px 390px 2px 0 #22d3ee, 137px 427px 2px 0 #ff35d0, 902px 332px 2px 0 #b6ff3b, 225px 696px 2px 0 #22d3ee, 1230px 107px 2px 0 #ff35d0, 209px 0px 2px 0 #b6ff3b, 1160px 309px 2px 0 #22d3ee, 1098px 207px 2px 0 #ff35d0, 744px 52px 2px 0 #b6ff3b, 144px 425px 2px 0 #22d3ee, 1257px 770px 2px 0 #ff35d0, 304px 516px 2px 0 #b6ff3b, 711px 745px 2px 0 #22d3ee, 971px 251px 2px 0 #ff35d0, 236px 999px 2px 0 #b6ff3b, 954px 983px 2px 0 #22d3ee, 990px 638px 2px 0 #ff35d0, 175px 295px 2px 0 #b6ff3b, 209px 701px 2px 0 #22d3ee, 1516px 542px 2px 0 #ff35d0, 980px 330px 2px 0 #b6ff3b, 1057px 47px 2px 0 #22d3ee, 420px 740px 2px 0 #ff35d0, 300px 55px 2px 0 #b6ff3b;
-  animation-duration: 4.8s; animation-delay: -1.2s;
-}
-/* c) goldene Funken (etwas groesser) */
-.stars-gold {
-  width: 5px; height: 5px;
-  box-shadow: 1552px 610px 3px 0 #ffd76a, 1316px 186px 3px 0 #ffd76a, 1425px 534px 3px 0 #ffd76a, 1061px 751px 3px 0 #ffd76a, 1860px 342px 3px 0 #ffd76a, 728px 456px 3px 0 #ffd76a, 1090px 1029px 3px 0 #ffd76a, 675px 456px 3px 0 #ffd76a, 1255px 399px 3px 0 #ffd76a, 1650px 490px 3px 0 #ffd76a, 1675px 820px 3px 0 #ffd76a, 1515px 464px 3px 0 #ffd76a, 409px 1060px 3px 0 #ffd76a, 1009px 728px 3px 0 #ffd76a, 1497px 59px 3px 0 #ffd76a, 57px 572px 3px 0 #ffd76a, 967px 530px 3px 0 #ffd76a, 396px 705px 3px 0 #ffd76a, 915px 715px 3px 0 #ffd76a, 746px 164px 3px 0 #ffd76a, 451px 209px 3px 0 #ffd76a, 464px 962px 3px 0 #ffd76a, 402px 691px 3px 0 #ffd76a, 418px 988px 3px 0 #ffd76a, 1278px 3px 3px 0 #ffd76a, 981px 704px 3px 0 #ffd76a, 1637px 173px 3px 0 #ffd76a, 1709px 245px 3px 0 #ffd76a;
-  animation-duration: 5.6s; animation-delay: -2.4s;
-}
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.6; }
-  50%      { opacity: 1; }
-}
-/* Light-Mode: etwas dezenter */
-[data-theme="light"] .stars-white { opacity: 0.9; }
-[data-theme="light"] .stars-neon { opacity: 0.9; }
-[data-theme="light"] .stars-gold { opacity: 0.8; }
-@media (prefers-reduced-motion: reduce) {
-  .stars { animation: none; opacity: 0.85; }
+  position: fixed; inset: 0; z-index: 1000; pointer-events: none;
 }
 
