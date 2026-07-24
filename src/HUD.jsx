@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import "./hud.css";
 
 /**
- * Vertikales Cyberpunk-HUD für PokeScroll.
+ * Vertikales Cyberpunk-HUD für SpiderZ.
  *
  * Layout (strikt vertikal gestapelt):
  *   SYSTEM · TEAM-STÄRKE (+LV) · GEFANGEN · SCAN · AKTIVES TEAM

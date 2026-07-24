@@ -64,7 +64,7 @@ export default function App() {
   const endcardRef = useRef(null);   // Final-Event: Team-Reveal
   const teamRefs = useRef({});       // DOM-Refs der Team-Karten
   const revealPlayed = useRef(false); // Finale nur einmal abspielen
-  const logoRef = useRef(null);      // PikaChallenge-Wortmarke (Fade-in beim 1. Scroll)
+  const logoRef = useRef(null);      // SpiderZ-Wortmarke (Fade-in beim 1. Scroll)
 
   // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
   // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
@@ -247,7 +247,7 @@ export default function App() {
     return () => cancelAnimationFrame(id);
   }, [data]);
 
-  // PikaChallenge-Wortmarke: startet versteckt, Fade-in (wie Team-Cards)
+  // SpiderZ-Wortmarke: startet versteckt, Fade-in (wie Team-Cards)
   // wird durch die ERSTE Scroll-Interaktion ausgelöst.
   useEffect(() => {
     const el = logoRef.current;
@@ -332,9 +332,9 @@ export default function App() {
 
       <header className="hero" ref={heroRef}>
         <ScrubSection hintHidden={caughtIds.length > 0}>
-          <div className="poke-logo" ref={logoRef} aria-label="PikaChallenge">
+          <div className="poke-logo" ref={logoRef} aria-label="SpiderZ">
             <span className="ball" aria-hidden="true" />
-            <span className="word">PikaChallenge</span>
+            <span className="word">SpiderZ</span>
           </div>
           <button
             type="button"
