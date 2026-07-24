@@ -5,6 +5,12 @@
    Funktionalität unverändert — nur Optik.
    ============================================================ */
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap");
+/* Offizieller Pokémon-Logo-Font (Wortmarke) */
+@font-face {
+  font-family: "Pokemon Solid";
+  src: url("https://fonts.cdnfonts.com/s/17890/Pokemon Solid.woff") format("woff");
+  font-display: swap;
+}
 
 :root {
   /* Flächen */
@@ -182,4 +188,69 @@ body {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .sheen::after, .bg-theatre::before { animation: none; display: none; }
+}
+
+/* ============================================================
+   PikaChallenge — Pokémon-Logo-Wortmarke
+   Freistehend über Pikachus Bauch (im Hero-Scrub-Overlay),
+   kein eigener Hintergrund.
+   ============================================================ */
+.poke-logo {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 22px);
+  margin: 0;
+  user-select: none;
+  z-index: 3;
+  pointer-events: none;
+  text-shadow: 0 6px 24px rgba(10, 7, 18, 0.85);
+  /* Start: versteckt bis zum ersten Scrollen (kein Flash beim Reload).
+     GSAP ueberschreibt das beim Reveal. */
+  opacity: 0;
+  visibility: hidden;
+}
+.poke-logo .ball {
+  --r: clamp(34px, 6vw, 58px);
+  width: var(--r);
+  height: var(--r);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 33%, #fff 0 18%, transparent 19%),
+    linear-gradient(#fde047 0 50%, #1a1a1a 50% 100%);
+  border: clamp(3px, 0.6vw, 5px) solid #1a1a1a;
+  box-shadow:
+    0 0 0 clamp(2px, 0.4vw, 3px) #fff,
+    0 0 clamp(22px, 4vw, 40px) rgba(253, 224, 71, 0.55);
+  position: relative;
+  flex: 0 0 auto;
+}
+.poke-logo .ball::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 26%; height: 26%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fde047;
+  border: clamp(2px, 0.4vw, 3px) solid #1a1a1a;
+  box-shadow: 0 0 0 clamp(2px, 0.4vw, 3px) #fff;
+}
+.poke-logo .word {
+  font-family: "Pokemon Solid", "Fredoka", system-ui, sans-serif;
+  font-size: clamp(30px, 7vw, 72px);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  color: var(--lila);
+  -webkit-text-stroke: clamp(1px, 0.3vw, 2px) #1a1a1a;
+  text-shadow:
+    0 3px 0 #1a1a1a,
+    0 0 clamp(20px, 4vw, 38px) rgba(109, 40, 217, 0.55);
+}
+/* Fallback (Font nicht geladen): reiner Lila-Glow, kein hartes Stroke */
+@supports not (font-family: "Pokemon Solid") {
+  .poke-logo .word { -webkit-text-stroke: 0; }
 }

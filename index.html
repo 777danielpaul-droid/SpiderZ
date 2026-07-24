@@ -5,6 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pokescroll</title>
+    <script>
+      // Vor dem ersten Paint: Browser-Restoration aus + hart auf 0.
+      // (Im React-Effect wuerde scrollTo(0,0) einen scroll-Event feuern
+      //  und das PikaChallenge-Reveal beim Reload ausloesen.)
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -12,6 +12,10 @@ import "./App.css";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
+// Refresh: Browser-Restoration deaktivieren (muss vor nativem Restore laufen
+// -> Modul-Ebene, nicht erst im Effect).
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
 export default function App() {
   const { data, error, progress, search, runSearch, clearSearch } = usePokemonData(TOTAL_POKEMON);
   const [caughtIds, setCaughtIds] = useState([]);
@@ -27,6 +31,7 @@ export default function App() {
   const endcardRef = useRef(null);   // Final-Event: Team-Reveal
   const teamRefs = useRef({});       // DOM-Refs der Team-Karten
   const revealPlayed = useRef(false); // Finale nur einmal abspielen
+  const logoRef = useRef(null);      // PikaChallenge-Wortmarke (Fade-in beim 1. Scroll)
 
   // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
   // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
@@ -44,6 +49,9 @@ export default function App() {
     }
     setActiveCard(next);
   }, [activeCard, caughtIds.length]);
+
+  // Refresh: Browser-Restoration deaktivieren (Modul-Ebene, vor nativem Restore).
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
   // HUD sichtbar erst nach der Video-Animation (Held-Scrub durchgescrollt).
   useEffect(() => {
@@ -206,6 +214,51 @@ export default function App() {
     return () => cancelAnimationFrame(id);
   }, [data]);
 
+  // PikaChallenge-Wortmarke: startet versteckt, Fade-in (wie Team-Cards)
+  // wird durch die ERSTE Scroll-Interaktion ausgelöst.
+  useEffect(() => {
+    const el = logoRef.current;
+    if (!el) return;
+    const ball = el.querySelector(".ball");
+    const word = el.querySelector(".word");
+
+    // Start: winzig, unscharf, hell — wie die Team-Cards beim Reveal
+    gsap.set(el, { opacity: 0, scale: 0.4, y: 40, filter: "blur(10px) brightness(2.2)" });
+    gsap.set(ball, { scale: 0.3, opacity: 0 });
+    gsap.set(word, { opacity: 0, y: 18 });
+
+    let played = false;
+    const play = () => {
+      if (played) return;
+      played = true;
+      const tl = gsap.timeline();
+      tl.to(el, {
+        opacity: 1, scale: 1, y: 0,
+        filter: "blur(0px) brightness(1)",
+        duration: 0.85, ease: "back.out(1.8)",
+      })
+        .to(ball, { scale: 1, opacity: 1, duration: 0.55, ease: "back.out(2.2)" }, "<0.05")
+        .to(word, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, "<0.1");
+      // Sichtbarkeit (CSS: visibility:hidden) beim Reveal aufheben
+      el.style.visibility = "visible";
+      window.removeEventListener("wheel", play);
+      window.removeEventListener("touchstart", play);
+      window.removeEventListener("keydown", play);
+    };
+
+    // Erstes Scrollen (Mausrad, Touch, Pfeiltasten) triggert den Auftritt.
+    // KEIN 'scroll'-Event: das wuerde durch native Restore/Resize feuern
+    // und das Reveal beim Reload automatisch ausloesen.
+    window.addEventListener("wheel", play, { passive: true });
+    window.addEventListener("touchstart", play, { passive: true });
+    window.addEventListener("keydown", play);
+    return () => {
+      window.removeEventListener("wheel", play);
+      window.removeEventListener("touchstart", play);
+      window.removeEventListener("keydown", play);
+    };
+  }, []);
+
   // Escape schließt das Such-Modal.
   useEffect(() => {
     const onKey = (e) => {
@@ -234,6 +287,10 @@ export default function App() {
 
       <header className="hero" ref={heroRef}>
         <ScrubSection hintHidden={caughtIds.length > 0}>
+          <div className="poke-logo" ref={logoRef} aria-label="PikaChallenge">
+            <span className="ball" aria-hidden="true" />
+            <span className="word">PikaChallenge</span>
+          </div>
           <form
             className="hero-search"
             onSubmit={(e) => {
