@@ -5,8 +5,8 @@ import App from './App.jsx'
 import { initStarfield } from './starfield.js'
 
 const canvas = document.getElementById('starfield')
-// ~2500 Sterne => dichter Holo-Look, 60fps. Erhoehbar via setCount().
-const starfield = initStarfield(canvas, 2500)
+// ~8000 Sterne => krasser Holo-Look mit Parallax, 60fps. Erhoehbar via setCount().
+const starfield = initStarfield(canvas, 8000)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
