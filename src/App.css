@@ -791,8 +791,8 @@
 }
 .site-header .theme-toggle:hover { filter: brightness(1.25); transform: scale(1.06); }
 
-/* Ausgleich: Inhalt beginnt unter dem festen Header */
-.app { padding-top: 60px; }
+/* Ausgleich: Inhalt beginnt unter dem festen Header -> entfernt, damit das
+   Hero-Video bündig an der Oberkante klebt (Header liegt transparent drüber). */
 
 /* ---- STORY-Sektion (technisches Milchglas-Panel) ---- */
 .story {
@@ -837,8 +837,8 @@
   color: var(--hud-cyan); margin-bottom: 2px;
 }
 
-/* Hero kriegt oben Luft, damit der feste Header nicht klebt */
-.hero { padding-top: 40px; }
+/* Hero braucht oben KEINEN Abzug: Video klebt bündig an der Oberkante,
+   der feste (transparente) Header liegt darüber. */
 
 @media (max-width: 560px) {
   .site-nav { gap: 2px; }
