@@ -49,10 +49,15 @@ export default function App() {
     saveBestTeamStrength(teamStrength);
   }, [data, caughtIds]);
 
+  // ---- VIAL / STEROIDE: einmalig nutzbar, blockiert Arena bis vergeben ----
+  const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
+  const [boostedId, setBoostedId] = useState(null);    // Spinne mit +100 (null = noch nicht vergeben)
+
   // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
+  // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
   const [arenaOpponents, setArenaOpponents] = useState(null); // Array(3) oder null
   useEffect(() => {
-    if (!allData || caughtIds.length < TOTAL_POKEMON) { setArenaOpponents(null); return; }
+    if (!allData || caughtIds.length < TOTAL_POKEMON || boostedId == null) { setArenaOpponents(null); return; }
     const own = new Set(caughtIds);
     const pool = allData.filter((m) => !own.has(m.id));
     const shuffled = pool
@@ -61,14 +66,18 @@ export default function App() {
       .slice(0, TOTAL_POKEMON)
       .map((x) => x.m);
     setArenaOpponents(shuffled);
-  }, [allData, caughtIds]);
+  }, [allData, caughtIds, boostedId]);
 
   // Arena-Matches (1:1 in Reihenfolge) + Gesamt-Ergebnis.
+  // Geboostete Spinne bekommt +100 Stärke vor dem Match.
   const caughtTeam = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
+  const boostedTeam = caughtTeam.map((p) =>
+    p.id === boostedId ? { ...p, strength: (p.strength || 0) + 100 } : p
+  );
   const arenaMatches = [];
-  if (arenaOpponents && caughtTeam.length >= TOTAL_POKEMON) {
+  if (arenaOpponents && boostedTeam.length >= TOTAL_POKEMON) {
     for (let i = 0; i < TOTAL_POKEMON; i++) {
-      const a = caughtTeam[i];
+      const a = boostedTeam[i];
       const b = arenaOpponents[i];
       if (a && b) arenaMatches.push({ a, b, result: resolveMatch(a, b) });
     }
@@ -82,6 +91,8 @@ export default function App() {
     setCaughtIds([]);
     setActiveCard(0);
     setHudView("play");
+    setVialTaken(false);
+    setBoostedId(null);
     revealPlayed.current = false;
     reset();
     window.scrollTo(0, 0);
@@ -448,9 +459,14 @@ export default function App() {
                     key={p.name_en}
                     data-id={p.id}
                     ref={(el) => { if (el) teamRefs.current[p.id] = el; }}
-                    className={`team-card${caught ? " is-caught" : ""}`}
+                    className={`team-card${caught ? " is-caught" : ""}${p.id === boostedId ? " boosted" : ""}${vialTaken && boostedId == null && caught ? " vial-target" : ""}`}
                     style={{
                       "--tc": primary ? TYPE_COLORS[primary] : "var(--lila)",
+                    }}
+                    onClick={() => {
+                      if (vialTaken && boostedId == null && caughtIds.includes(p.id)) {
+                        setBoostedId(p.id);
+                      }
                     }}
                   >
                     <img
@@ -483,6 +499,31 @@ export default function App() {
             </div>
           </footer>
 
+          {/* VIAL / STEROIDE: erscheint nach Team-Reveal, blockiert Arena bis vergeben */}
+          {data && caughtIds.length >= TOTAL_POKEMON && boostedId == null && (
+            <section className="vial-stage">
+              <h2 className="vial-title">STEROID-VAIL</h2>
+              <p className="vial-sub">Nimm das Vial und verpasse EINER deiner Spinnen +100 Stärke.</p>
+              <div
+                className={`vial ${vialTaken ? "taken" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-label="Steroid-Vial aufnehmen"
+                onClick={() => setVialTaken(true)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setVialTaken(true); }}
+              >
+                <div className="vial-liquid" />
+                <div className="vial-glass" />
+                <div className="vial-cork" />
+              </div>
+              <p className="vial-hint">
+                {vialTaken
+                  ? "Wähle jetzt eine deiner Spinnen, um sie zu boosten."
+                  : "Klicke das Vial, um es aufzunehmen."}
+              </p>
+            </section>
+          )}
+
           {/* Cuteness-Overload: nur wenn Team komplett + Stärke < 1100 */}
           {data && caughtIds.length >= TOTAL_POKEMON && (() => {
             const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
@@ -505,6 +546,7 @@ export default function App() {
                         <div className="vs-name">{a.name_de}</div>
                         <div className="vs-strength">
                           {a.strength}
+                          {a.id === boostedId && <span className="boost-badge">+100</span>}
                           {result.bonusA > 0 && <span className="bonus-badge">+{BONUS}</span>}
                         </div>
                         <div className="card-types">
