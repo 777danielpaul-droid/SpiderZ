@@ -4,9 +4,33 @@
    erdbaeren2-Signature (aurora, grid, mono-label).
    ============================================================ */
 
-/* ============ Hero (nur Scrub-Container) ============ */
-.hero {
-  position: relative;
+/* ============ Typ-Backglow (Container leuchten in Typ-Farbe nach aussen) ============ */
+/* --tc = Primaer-Typ-Farbe (je Container via Inline-Style gesetzt).
+   Fallback (kein --tc): erdbaeren2-Lila. */
+.card-panel,
+.team-card,
+.search-card,
+.scrub-locked,
+.scrub-loading {
+  --tc: var(--lila);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 26px -6px var(--tc),
+    0 18px 50px -20px var(--tc);
+}
+/* Team-Card: Glow verstaerkt, wenn gefangen (is-caught) */
+.team-card.is-caught {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 40px -4px var(--tc),
+    0 18px 50px -16px var(--tc);
+}
+/* Reveal-Glow (Final-Event) behaelt cyan/magenta — nur verstaerken */
+.team-card.reveal-glow {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 60px rgba(34, 211, 238, 0.65),
+    0 0 90px rgba(255, 53, 208, 0.35);
 }
 .hero-inner { padding: 0 24px; }
 @keyframes bob {
@@ -88,9 +112,6 @@
   border-radius: 22px;
   padding: 26px 30px;
   border: 1px solid rgba(192, 38, 211, 0.30);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    0 18px 50px rgba(80, 40, 120, 0.28);
   will-change: transform, opacity;
 }
 .card-panel h2 {
@@ -149,7 +170,6 @@
   border: 1px solid rgba(34, 211, 238, 0.35);
   border-radius: 24px; padding: clamp(20px, 2.5vw, 34px) clamp(16px, 2vw, 28px) clamp(16px, 2vw, 26px);
   display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 1.4vw, 18px);
-  box-shadow: inset0 1px 0 rgba(255,255,255,0.15), 0 24px 60px rgba(34, 211, 238, 0.12);
   transition: border-color 0.2s ease, box-shadow 0.25s ease;
   transform-style: preserve-3d;
   will-change: transform, opacity, filter;
@@ -272,10 +292,10 @@
 .scrub-load-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--neon), var(--neon-green)); transition: width 0.2s ease; }
 .scrub-hint {
   position: absolute; bottom: 26px;
-  background: linear-gradient(90deg, var(--neon), var(--lila));
+  background: var(--grad-princess);
   color: #fff; font-weight: 700;
   padding: 8px 16px; border-radius: 99px;
-  box-shadow: 0 6px 16px -8px rgba(162, 28, 175, 0.9);
+  box-shadow: 0 6px 16px -8px rgba(255, 95, 200, 0.9);
   animation: bob 2.4s ease-in-out infinite;
 }
 .scrub-hint-text { transition: opacity 0.4s ease; }
@@ -286,15 +306,15 @@
 
 .hero-search {
   position: absolute;
-  top: 18px; left: 50%;
-  transform: translateX(-50%);
+  top: 18px; right: 18px; left: auto;
+  transform: none;
   display: flex; gap: 8px; width: min(360px, 78vw);
-  background: rgba(22, 17, 31, 0.72);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(192, 38, 211, 0.45);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 2px solid var(--princess-pink);
   border-radius: 999px; padding: 6px 6px 6px 18px;
-  box-shadow: 0 14px 40px -16px rgba(109, 40, 217, 0.7);
+  box-shadow: 0 14px 40px -16px rgba(255, 95, 200, 0.6);
 }
 /* Suche liegt im scrub-overlay: nicht von Pointer-Events des Hints blockieren */
 .scrub-overlay { pointer-events: none; }
@@ -302,18 +322,18 @@
 .search-input {
   flex: 1; border: none; background: transparent;
   font-family: var(--font-display);
-  font-size: 15px; font-weight: 600; color: var(--bone); outline: none; min-width: 0;
+  font-size: 15px; font-weight: 600; color: #6d28d9; outline: none; min-width: 0;
 }
-.search-input::placeholder { color: rgba(244, 241, 251, 0.45); }
+.search-input::placeholder { color: rgba(124, 58, 237, 0.5); }
 .search-btn {
   border: none; border-radius: 999px; padding: 10px 22px;
   font-family: var(--font-display);
   font-weight: 800; font-size: 14px; color: #fff;
-  background: linear-gradient(90deg, var(--neon), var(--neon-green));
-  cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 6px 16px -8px rgba(162, 28, 175, 0.9);
+  background: linear-gradient(90deg, var(--sky-blue-deep), var(--princess-pink-deep));
+  cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  box-shadow: 0 6px 16px -8px rgba(255, 95, 200, 0.9);
 }
-.search-btn:hover { transform: translateY(-1px); }
+.search-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
 .search-btn:active { transform: translateY(0); }
 
 /* ---------- Such-Modal ---------- */
@@ -332,6 +352,7 @@
   color: var(--bone);
   border-radius: 26px; padding: 30px 34px 26px;
   border: 1px solid rgba(192, 38, 211, 0.30);
+  --tc: var(--accent, var(--lila));
   box-shadow: 0 30px 80px rgba(31, 23, 51, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
   overflow: hidden;
 }

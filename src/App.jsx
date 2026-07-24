@@ -363,6 +363,9 @@ export default function App() {
                     data-id={p.id}
                     ref={(el) => { if (el) teamRefs.current[p.id] = el; }}
                     className={`team-card${caught ? " is-caught" : ""}`}
+                    style={{
+                      "--tc": primary ? TYPE_COLORS[primary] : "var(--lila)",
+                    }}
                   >
                     <img
                       src={p.artwork}

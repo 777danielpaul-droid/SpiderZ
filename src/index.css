@@ -36,6 +36,13 @@
   --grad-cute: linear-gradient(95deg, #a21caf 0%, #7c3aed 42%, #39ff14 100%);
   --neon-green: #39ff14;
 
+  /* Prinzessin-Pink + Himmelblau (Hero-Elemente: Suche + Scroll-Hinweis) */
+  --princess-pink: #ff8ed4;
+  --princess-pink-deep: #ff5fc8;
+  --sky-blue: #9fd8ff;
+  --sky-blue-deep: #5bb6ff;
+  --grad-princess: linear-gradient(95deg, #ff8ed4 0%, #ff5fc8 52%, #9fd8ff 100%);
+
   --shadow: 0 18px 50px -20px rgba(109, 40, 217, 0.4);
 
   /* HUD-Cyberpunk-Palette (vertikales HUD) */

@@ -107,7 +107,7 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
             </div>
           </div>
 
-          <div ref={panelRef} className="card-panel neon-border sheen">
+          <div ref={panelRef} className="card-panel neon-border sheen" style={{ "--tc": primary }}>
             <h2>{pokemon.name_de}</h2>
             <p className="card-sub">
               #{String(pokemon.id).padStart(3, "0")} · {pokemon.height / 10} m ·{" "}
