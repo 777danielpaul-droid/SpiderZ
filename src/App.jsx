@@ -70,15 +70,20 @@ export default function App() {
   // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
   const goNext = useCallback(() => {
     if (caughtIds.length === 0) return;
-    const next = Math.min(activeCard + 1, TOTAL_POKEMON);
+    // Bei der letzten Karte: direkt zur Team-Endcard (kein ueberfluessiger
+    // Zwischenschritt — ein Druck reicht vom Final-Reveal zum Team).
+    if (activeCard >= TOTAL_POKEMON - 1) {
+      const footer = document.querySelector(".endcard");
+      if (footer) gsap.to(window, { scrollTo: footer, duration: 0.9, ease: "power2.inOut" });
+      setActiveCard(TOTAL_POKEMON);
+      return;
+    }
+    const next = activeCard + 1;
     const trg = cardTrgRef.current[next];
     if (trg) {
       // ans Ende des naechsten Pokemons springen -> voll aufgedeckt
       const y = trg.end - window.innerHeight * 0.3;
       gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
-    } else if (next >= TOTAL_POKEMON) {
-      const footer = document.querySelector(".endcard");
-      if (footer) gsap.to(window, { scrollTo: footer, duration: 0.9, ease: "power2.inOut" });
     }
     setActiveCard(next);
   }, [activeCard, caughtIds.length]);
@@ -320,7 +325,7 @@ export default function App() {
         onShowRecords={() => setHudView("records")}
         onNext={goNext}
         canNext={caughtIds.length > 0}
-        nextLabel={activeCard >= TOTAL_POKEMON ? "Zum Team ▾" : "Weiter ▸"}
+        nextLabel={activeCard >= TOTAL_POKEMON - 1 ? "Zum Team ▾" : "Weiter ▸"}
       />
 
       {hudView === "records" && (
