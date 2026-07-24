@@ -6,6 +6,7 @@ import { usePokemonData } from "./usePokemonData";
 import { TOTAL_POKEMON, TYPE_COLORS } from "./pokemonList";
 import PokemonCard from "./PokemonCard";
 import ScrubSection from "./ScrubSection";
+import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
 import "./App.css";
@@ -407,6 +408,12 @@ export default function App() {
             </p>
             <p className="end-sub">Scroll zurück oder aktualisiere für eine neue zufällige Runde.</p>
           </footer>
+
+          {/* Cuteness-Overload: nur wenn Team komplett + Stärke < 1100 */}
+          {data && caughtIds.length >= TOTAL_POKEMON && (() => {
+            const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
+            return ts < 1100 ? <CutenessSection /> : null;
+          })()}
         </main>
       )}
 

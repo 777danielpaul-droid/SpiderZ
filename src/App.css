@@ -480,3 +480,41 @@
   box-shadow: 0 16px 38px -10px rgba(162, 28, 175, 1), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 .next-btn:active { transform: translateX(-50%) translateY(1px) scale(0.98); }
+
+/* ============ Cuteness-Overload (Sondersequenz) ============ */
+.cuteness-section { position: relative; }
+.cuteness-pin {
+  height: 100vh; display: flex; align-items: center; justify-content: center;
+  position: relative; opacity: 0; /* Fade-in via ScrollTrigger */
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 142, 212, 0.22), transparent 60%),
+    radial-gradient(circle at 50% 70%, rgba(159, 216, 255, 0.18), transparent 62%),
+    var(--bg);
+  overflow: hidden;
+}
+.cuteness-canvas {
+  position: absolute; inset: 0; width: 100vw; height: 100vh;
+  object-fit: cover; background: #0a0712;
+}
+.cuteness-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  pointer-events: none; text-align: center; padding: 24px;
+}
+.cuteness-loading {
+  background: rgba(22, 17, 31, 0.88);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--hud-border);
+  color: var(--bone); border-radius: 18px; padding: 26px 32px;
+  --tc: var(--princess-pink);
+  max-width: 420px;
+}
+.cuteness-load-bar { width: 220px; height: 8px; border-radius: 99px; background: rgba(255,255,255,0.12); overflow: hidden; margin: 0 auto 10px; }
+.cuteness-load-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--princess-pink), var(--sky-blue)); transition: width 0.2s ease; }
+.cuteness-loading p { opacity: 0.8; font-weight: 600; margin: 0; }
+.cuteness-badge {
+  background: var(--grad-princess);
+  color: #fff; font-weight: 700; font-family: var(--font-display);
+  padding: 10px 22px; border-radius: 99px;
+  box-shadow: 0 6px 16px -8px rgba(255, 95, 200, 0.9);
+  animation: bob 2.4s ease-in-out infinite;
+}
