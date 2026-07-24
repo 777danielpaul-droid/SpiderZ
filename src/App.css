@@ -210,10 +210,11 @@
   filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.25));
   transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), max-width 0.32s ease;
 }
-/* Hover: Bild vergroessert + fuellt den Rahmen (kein leerer Rand) */
+/* Hover: Bild vergroessert + fuellt den Rahmen (kein leerer Rand).
+   !important, da GSAP inline-transform auf dem img beim Reveal setzt. */
 .team-card:hover img {
   max-width: 100%;
-  transform: scale(1.07);
+  transform: scale(1.08) !important;
   filter: drop-shadow(0 0 34px rgba(34, 211, 238, 0.45));
 }
 .team-name {

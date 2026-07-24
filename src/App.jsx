@@ -430,6 +430,7 @@ export default function App() {
                       loading="eager"
                       style={caught ? { filter: `drop-shadow(0 0 22px ${primary ? TYPE_COLORS[primary] : "#6d28d9"}aa)` } : { filter: "grayscale(1) opacity(0.35)" }}
                     />
+                    <div className="team-name">{p.name_de}</div>
                   </div>
                 );
               })}
