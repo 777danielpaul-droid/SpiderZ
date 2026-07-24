@@ -12,6 +12,7 @@ import HUD from "./HUD";
 import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
+import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
 import "./App.css";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -21,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
-  const { data, error, progress, search, runSearch, clearSearch, reset } = usePokemonData(TOTAL_POKEMON);
+  const { data, error, progress, search, runSearch, clearSearch, reset, allData } = usePokemonData(TOTAL_POKEMON);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
@@ -47,6 +48,34 @@ export default function App() {
     })));
     saveBestTeamStrength(teamStrength);
   }, [data, caughtIds]);
+
+  // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
+  const [arenaOpponents, setArenaOpponents] = useState(null); // Array(3) oder null
+  useEffect(() => {
+    if (!allData || caughtIds.length < TOTAL_POKEMON) { setArenaOpponents(null); return; }
+    const own = new Set(caughtIds);
+    const pool = allData.filter((m) => !own.has(m.id));
+    const shuffled = pool
+      .map((m) => ({ m, r: Math.random() }))
+      .sort((a, b) => a.r - b.r)
+      .slice(0, TOTAL_POKEMON)
+      .map((x) => x.m);
+    setArenaOpponents(shuffled);
+  }, [allData, caughtIds]);
+
+  // Arena-Matches (1:1 in Reihenfolge) + Gesamt-Ergebnis.
+  const caughtTeam = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
+  const arenaMatches = [];
+  if (arenaOpponents && caughtTeam.length >= TOTAL_POKEMON) {
+    for (let i = 0; i < TOTAL_POKEMON; i++) {
+      const a = caughtTeam[i];
+      const b = arenaOpponents[i];
+      if (a && b) arenaMatches.push({ a, b, result: resolveMatch(a, b) });
+    }
+  }
+  const arenaWins = arenaMatches.filter((m) => m.result.winner === "a").length;
+  const arenaLosses = arenaMatches.filter((m) => m.result.winner === "b").length;
+  const arenaDraws = arenaMatches.filter((m) => m.result.winner === "draw").length;
 
   // Neustart: frische Runde + UI zuruecksetzen.
   const handleRestart = useCallback(() => {
@@ -459,6 +488,62 @@ export default function App() {
             const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
             return ts < 1100 ? <CutenessSection /> : null;
           })()}
+
+          {/* ARENA: 3 gefangene vs 3 RNG-Gegner (1:1, Typ-Advantage = +100) */}
+          {arenaMatches.length === TOTAL_POKEMON && (
+            <section className="arena">
+              <h2 className="arena-title">ARENA · DEIN TEAM VS RNG-SCHWARM</h2>
+              <div className="arena-battles">
+                {arenaMatches.map((m, i) => {
+                  const { a, b, result } = m;
+                  const pa = TYPE_COLORS[a.types[0]] || "#6d28d9";
+                  const pb = TYPE_COLORS[b.types[0]] || "#6d28d9";
+                  return (
+                    <div className="vs-row" key={`${a.id}-${b.id}`}>
+                      <div className={`vs-card own ${result.winner === "a" ? "win" : result.winner === "b" ? "lose" : "draw"}`} style={{ "--accent": pa }}>
+                        <img src={a.artwork} alt={a.name_de} loading="lazy" />
+                        <div className="vs-name">{a.name_de}</div>
+                        <div className="vs-strength">
+                          {a.strength}
+                          {result.bonusA > 0 && <span className="bonus-badge">+{BONUS}</span>}
+                        </div>
+                        <div className="card-types">
+                          {a.types.map((t) => (
+                            <span key={t} className="type-badge" style={{ background: TYPE_COLORS[t] || "#6d28d9" }}>{t}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="vs-mid">
+                        <span className="vs-vs">VS</span>
+                        <span className={`vs-result ${result.winner}`}>
+                          {result.winner === "a" ? "SIEG" : result.winner === "b" ? "NIEDERLAGE" : "UNENTSCHIEDEN"}
+                        </span>
+                        {result.hasTypeWin && <span className="vs-typewin">TYP-VORTEIL +{BONUS}</span>}
+                      </div>
+
+                      <div className={`vs-card foe ${result.winner === "b" ? "win" : result.winner === "a" ? "lose" : "draw"}`} style={{ "--accent": pb }}>
+                        <img src={b.artwork} alt={b.name_de} loading="lazy" />
+                        <div className="vs-name">{b.name_de}</div>
+                        <div className="vs-strength">
+                          {b.strength}
+                          {result.bonusB > 0 && <span className="bonus-badge">+{BONUS}</span>}
+                        </div>
+                        <div className="card-types">
+                          {b.types.map((t) => (
+                            <span key={t} className="type-badge" style={{ background: TYPE_COLORS[t] || "#6d28d9" }}>{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className={`arena-result ${arenaWins > arenaLosses ? "win" : arenaLosses > arenaWins ? "lose" : "draw"}`}>
+                GESAMT · {arenaWins} SIEGE — {arenaLosses} NIEDERLAGEN{arenaDraws ? ` — ${arenaDraws} UNENTSCHIEDEN` : ""}
+              </div>
+            </section>
+          )}
         </main>
       )}
     </div>

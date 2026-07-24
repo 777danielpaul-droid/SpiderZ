@@ -110,6 +110,24 @@ export function usePokemonData(count = TOTAL_POKEMON) {
 
   useEffect(() => loadIds(idsRef.current), [loadIds]);
 
+  // Alle 18 Spider (unabhängig vom 3er-Team) fuer die Arena/RNG-Gegner.
+  const [allData, setAllData] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const all = [];
+        for (let id = 1; id <= MAX_NASAMON; id++) {
+          all.push(await fetchNasaMon(id));
+        }
+        if (!cancelled) setAllData(all);
+      } catch {
+        /* nicht kritisch fuer das Hauptspiel */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const runSearch = useCallback(async (query) => {
     setSearch({ loading: true, result: null, error: null });
     try {
@@ -125,5 +143,5 @@ export function usePokemonData(count = TOTAL_POKEMON) {
     setSearch({ loading: false, result: null, error: null });
   }, []);
 
-  return { data, error, progress, search, runSearch, clearSearch, reset };
+  return { data, error, progress, search, runSearch, clearSearch, reset, allData };
 }
