@@ -144,7 +144,11 @@ export default function ScrubSection({ children, hintHidden }) {
           ) : (
             <div className="scrub-hint">
               <span className={`scrub-hint-text${hintHidden ? " hidden" : ""}`}>
-                ↓ Scrollen spult vor · ↑ zurück
+                <span className="scrub-hint-arrow" aria-hidden="true">↓</span>
+                Scrollen spult vor
+                <span className="scrub-hint-sep" aria-hidden="true">·</span>
+                <span className="scrub-hint-arrow" aria-hidden="true">↑</span>
+                zurück
               </span>
             </div>
           )}
