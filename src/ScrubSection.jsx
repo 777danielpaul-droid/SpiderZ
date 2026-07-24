@@ -13,7 +13,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 const FRAME_COUNT = 59;
 const FRAME_BASE = "/scrub/frame_";
 const PAD = 3;
-const INTRO_LAST_FRAME = 27; // verkuerzte Intro: spielt 0..27 (vorher 58)
+const INTRO_LAST_FRAME = 27;      // verkuerzte Intro: spielt 0..27 (vorher 58)
+const INTRO_REVERSE_FRAMES = 4;   // nach Frame 27: 27->23 rueckwaerts (Reverse-Zone)
 
 export default function ScrubSection({ children, hintHidden }) {
   const [loaded, setLoaded] = useState(0);
@@ -93,12 +94,18 @@ export default function ScrubSection({ children, hintHidden }) {
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: () => "+=" + window.innerHeight * 3 * (INTRO_LAST_FRAME / (FRAME_COUNT - 1)), // Scrub-Strecke proportional zur Frame-Range
+          end: () => "+=" + window.innerHeight * 3 * ((INTRO_LAST_FRAME + INTRO_REVERSE_FRAMES) / (FRAME_COUNT - 1)), // Strecke inkl. Reverse-Zone
           pin: pinRef.current,
           scrub: true, // butterweich, folgt Scroll exakt
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            targetRef.current = Math.round(self.progress * INTRO_LAST_FRAME);
+            const P = INTRO_LAST_FRAME, R = INTRO_REVERSE_FRAMES;
+            const seg = P / (P + R); // Anteil der Forward-Strecke an progress
+            const p = self.progress;
+            const frame = p <= seg
+              ? Math.round((p / seg) * P)                 // 0 -> P vorwaerts
+              : Math.round(P - ((p - seg) / (1 - seg)) * R); // P -> P-R rueckwaerts
+            targetRef.current = frame;
           },
         });
       }, sectionRef);
