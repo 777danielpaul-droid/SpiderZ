@@ -3,11 +3,10 @@ import { gsap } from "gsap";
 import "./hud.css";
 
 /**
- * Vertikales Cyberpunk-HUD für SpiderZ.
+ * Horizontales Cyberpunk-HUD für SpiderZ (unten, mittig).
  *
- * Layout (strikt vertikal gestapelt):
+ * Layout (horizontal nebeneinander, je Modul = Spalte Label/Readout):
  *   SYSTEM · TEAM-STÄRKE (+LV) · GEFANGEN · SCAN · AKTIVES TEAM
- * Labels oben, Zahlen/Counter horizontal als Readouts/Bars (sofort lesbar).
  *
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.

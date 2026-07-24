@@ -1,14 +1,16 @@
 /* ============================================================
-   SpiderZ — Vertikales Cyberpunk-HUD
-   Modulares Stylesheet (Flexbox/Grid, CSS-Vars, Animationen).
+   SpiderZ — Horizontales Cyberpunk-HUD (unten, mittig)
+   Modulares Stylesheet (Flexbox, CSS-Vars, Animationen).
    Palette: dunkles Glas + Neon Cyan / Magenta / Lime.
+   Layout: fixierte Leiste unten, Module horizontal nebeneinander
+   (je Modul = Spalte: Label oben, Readout unten).
    ============================================================ */
 
 .hud {
   position: fixed;
-  top: 50%;
-  right: 18px;
-  transform: translateY(-50%) translateX(48px);
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%) translateY(42px);
   z-index: 100;
   color: var(--hud-text);
   opacity: 0;
@@ -17,18 +19,20 @@
 }
 .hud-visible {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
-/* ---- Panel-Rahmen (vertikal gestapelt) ---- */
+/* ---- Panel-Rahmen (horizontal nebeneinander) ---- */
 .hud-frame {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 18px 18px 16px;
-  width: 232px;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 14px;
+  padding: 14px 20px;
+  width: auto;
+  max-width: calc(100vw - 24px);
   background: linear-gradient(165deg, var(--hud-bg-2), var(--hud-bg));
   border: 1px solid var(--hud-border);
   border-radius: 14px;
@@ -86,13 +90,15 @@
   filter: drop-shadow(0 0 4px var(--hud-glow-cyan));
 }
 
-/* ---- Module (vertikal untereinander) ---- */
+/* ---- Module (Spalte: Label oben, Readout unten) ---- */
 .hud-mod {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 7px;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
 .hud-mod-label {
@@ -112,19 +118,20 @@
   text-shadow: 0 0 6px var(--hud-glow-cyan);
 }
 
-/* ---- Divider ---- */
+/* ---- Divider (vertikal zwischen Modulen) ---- */
 .hud-divider {
   position: relative;
-  height: 1px;
+  width: 1px;
+  align-self: stretch;
   background: linear-gradient(
-    90deg,
+    180deg,
     transparent,
     var(--hud-border) 18%,
     rgba(34, 211, 238, 0.55) 50%,
     var(--hud-border) 82%,
     transparent
   );
-  margin: 2px 0;
+  margin: 0 2px;
 }
 .hud-divider::after {
   content: "";
@@ -184,6 +191,7 @@
   border-radius: 8px;
   padding: 6px 8px;
   cursor: pointer;
+  white-space: nowrap;
   transition: transform 0.12s ease, filter 0.2s ease, box-shadow 0.2s ease;
   animation: glow-pulse-soft 2.6s ease-in-out infinite;
 }
@@ -263,7 +271,7 @@
 .hud-bar {
   position: relative;
   height: 8px;
-  width: 100%;
+  width: 140px;
   border-radius: 999px;
   background: rgba(231, 227, 255, 0.10);
   border: 1px solid rgba(120, 80, 220, 0.40);
@@ -282,25 +290,28 @@
   box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
 }
 
-/* ---- AKTIVES TEAM ---- */
+/* ---- AKTIVES TEAM (horizontal nebeneinander) ---- */
 .hud-team-empty {
   font-family: var(--font-display);
   font-size: 11px;
   color: var(--hud-dim);
   letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 .hud-team-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 5px;
 }
 .hud-team-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   padding: 4px 9px;
   border-radius: 8px;
   background: rgba(34, 211, 238, 0.06);
@@ -311,6 +322,7 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--hud-text);
+  white-space: nowrap;
 }
 .hud-team-str {
   font-family: var(--font-mono);
@@ -321,10 +333,10 @@
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
 
-/* ---- Toast (+STÄRKE) ---- */
+/* ---- Toast (+STÄRKE) — steigt ueber dem Score-Modul auf ---- */
 .hud-toast {
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 0;
   width: 100%;
   height: 0;
@@ -378,12 +390,19 @@
   50%      { opacity: 1;  filter: brightness(1.12); }
 }
 
-/* ---- Responsiv ---- */
-@media (max-width: 720px) {
-  .hud { right: 10px; }
-  .hud-frame { width: 188px; padding: 13px 13px 11px; gap: 9px; }
-  .hud-score-val { font-size: 36px; }
+/* ---- Responsiv: auf schmalen Screens umbrechen + Dividers ausblenden ---- */
+@media (max-width: 860px) {
+  .hud { bottom: 10px; }
+  .hud-frame {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .hud-divider { display: none; }
+  .hud-score-val { font-size: 34px; }
   .hud-count-val { font-size: 26px; }
+  .hud-bar { width: 110px; }
   .hud-mod-label { font-size: 9px; letter-spacing: 0.2em; }
 }
 
