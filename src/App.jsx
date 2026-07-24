@@ -432,7 +432,7 @@ export default function App() {
       <header className="hero" ref={heroRef} id="spiderz">
         <ScrubSection hintHidden={caughtIds.length > 0}>
           <div className="poke-logo" ref={logoRef} aria-label="SpiderZ">
-            <span className="ball" aria-hidden="true" />
+            <span className="web" aria-hidden="true">🕸️</span>
             <span className="word">SpiderZ</span>
           </div>
         </ScrubSection>
