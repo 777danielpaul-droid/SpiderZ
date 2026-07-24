@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import "./hud.css";
 
 /**
- * Gamification-HUD (Side-Panel, rechts, ohne Container):
- * - Grosse "TEAM-STÄRKE"-Score-Zahl = Summe der Basis-Staerke aller gefangenen
- *   Pokemon. Das ist die zu knackende Challenge-Zahl.
- * - "Gefangen" = Anzahl freigeschalteter Pokemon (Pokeball-Zaehler).
- * - Flashige Loadbar: ein Segment pro Pokemon, leuchtet beim Reveal auf.
- * - Reward-Pop beim Aufdecken: Score zaehlt animiert hoch, Partikel-Burst,
- *   aufsteigender "+STÄRKE n"-Toast -> belohnendes "Level-Up"-Gefuehl.
+ * Vertikales Cyberpunk-HUD für PokeScroll.
+ *
+ * Layout (strikt vertikal gestapelt):
+ *   SYSTEM · TEAM-STÄRKE (+LV) · GEFANGEN · SCAN · AKTIVES TEAM
+ * Labels oben, Zahlen/Counter horizontal als Readouts/Bars (sofort lesbar).
+ *
+ * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
+ * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
 export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible }) {
   const caught = caughtIds.length;
@@ -17,12 +19,17 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
   const teamStrength = data
     ? data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0)
     : 0;
+  const level = Math.floor(teamStrength / 300) + 1;
+
+  const caughtPokemon = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
+  // Letzte 4 gefangene (neueste zuerst) fuer das Team-Readout.
+  const teamPreview = [...caughtPokemon].slice(-4).reverse();
 
   const [displayScore, setDisplayScore] = useState(teamStrength);
   const prevRef = useRef(teamStrength);
 
   const scoreRef = useRef(null);
-  const barRef = useRef(null);   // Loadbar-Container (Segment-Flash)
+  const barRef = useRef(null);   // Gefangen-Bar (Flash bei Reveal)
   const fxRef = useRef(null);    // Partikel-Container
   const toastRef = useRef(null); // aufsteigender "+STÄRKE"-Toast
 
@@ -32,20 +39,11 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
     const from = prevRef.current;
     const to = teamStrength;
 
-    // Segment-Flash
-    const seg = barRef.current?.querySelector(`.load-seg[data-i="${caught - 1}"]`);
-    if (seg) {
-      gsap.fromTo(
-        seg,
-        { "--seg-glow": 1 },
-        { "--seg-glow": 0, duration: 0.9, ease: "power2.out" }
-      );
-    }
-    // Balken-Glow-Puls
+    // Gefangen-Bar Glow-Puls
     if (barRef.current) {
       gsap.fromTo(
         barRef.current,
-        { filter: "brightness(1.7)" },
+        { filter: "brightness(1.9)" },
         { filter: "brightness(1)", duration: 0.7, ease: "power2.out" }
       );
     }
@@ -64,7 +62,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
       if (scoreRef.current) {
         gsap.fromTo(
           scoreRef.current,
-          { scale: 1.32, filter: "brightness(1.7)" },
+          { scale: 1.18, filter: "brightness(1.8)" },
           { scale: 1, filter: "brightness(1)", duration: 0.6, ease: "power2.out" }
         );
       }
@@ -112,33 +110,80 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
     prevRef.current = to;
   }, [caught, teamStrength]);
 
+  const caughtPct = total ? (caught / total) * 100 : 0;
+
   return (
     <div className={`hud${visible ? " hud-visible" : ""}`}>
-      <div className="hud-score" ref={scoreRef}>
-        <span className="hud-score-label mono-label">TEAM-STÄRKE</span>
-        <span className="hud-score-val">{displayScore}</span>
-        <div className="hud-fx" ref={fxRef} />
-        <div className="hud-toast" ref={toastRef} />
-      </div>
+      <div className="hud-frame">
+        {/* SYSTEM-Status */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">SYSTEM</div>
+          <div className="hud-status">
+            <span className="hud-dot hud-dot-live" /> ONLINE
+            <span className="hud-sep">·</span>
+            <span className="hud-dot hud-dot-sync" /> LINK
+          </div>
+        </section>
 
-      <div className="hud-caught">
-        <span className="ball">●</span> {caught}/{total} gefangen
-      </div>
+        <div className="hud-divider" />
 
-      <div className="loadbar" ref={barRef}>
-        <div className="loadbar-track">
-          {Array.from({ length: total }).map((_, i) => (
-            <span
-              key={i}
-              data-i={i}
-              className={`load-seg${i < caught ? " is-lit" : ""}`}
-            />
-          ))}
-        </div>
-      </div>
+        {/* TEAM-STÄRKE + LEVEL */}
+        <section className="hud-mod hud-mod-score">
+          <div className="hud-mod-label mono-label">TEAM-STÄRKE</div>
+          <div className="hud-score-readout" ref={scoreRef}>
+            <span className="hud-score-val">{displayScore}</span>
+            <div className="hud-fx" ref={fxRef} />
+          </div>
+          <div className="hud-level-row">
+            <span className="hud-lv-tag">LV</span>
+            <span className="hud-lv-val">{level}</span>
+          </div>
+          <div className="hud-toast" ref={toastRef} />
+        </section>
 
-      <div className="hud-scroll">
-        <div className="hud-scroll-fill" ref={scrollFillRef} style={{ width: "0%" }} />
+        <div className="hud-divider" />
+
+        {/* GEFANGEN */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">GEFANGEN</div>
+          <div className="hud-readout-row" ref={barRef}>
+            <span className="hud-count-val">{caught}</span>
+            <span className="hud-count-sep">/</span>
+            <span className="hud-count-max">{total}</span>
+          </div>
+          <div className="hud-bar">
+            <div className="hud-bar-fill" style={{ width: `${caughtPct}%` }} />
+          </div>
+        </section>
+
+        <div className="hud-divider" />
+
+        {/* SCAN (Scroll-Fortschritt) */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">SCAN</div>
+          <div className="hud-bar">
+            <div className="hud-bar-fill hud-scan-fill" ref={scrollFillRef} style={{ width: "0%" }} />
+          </div>
+        </section>
+
+        <div className="hud-divider" />
+
+        {/* AKTIVES TEAM (letzte 4) */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">AKTIVES TEAM</div>
+          {teamPreview.length === 0 ? (
+            <div className="hud-team-empty">— keine Daten —</div>
+          ) : (
+            <ul className="hud-team-list">
+              {teamPreview.map((p) => (
+                <li className="hud-team-item" key={p.id}>
+                  <span className="hud-team-name">{p.name_de}</span>
+                  <span className="hud-team-str">{p.strength}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   );

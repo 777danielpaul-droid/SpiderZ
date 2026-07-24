@@ -1,0 +1,335 @@
+/* ============================================================
+   PokeScroll — Vertikales Cyberpunk-HUD
+   Modulares Stylesheet (Flexbox/Grid, CSS-Vars, Animationen).
+   Palette: dunkles Glas + Neon Cyan / Magenta / Lime.
+   ============================================================ */
+
+.hud {
+  position: fixed;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%) translateX(48px);
+  z-index: 100;
+  color: var(--hud-text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hud-visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+}
+
+/* ---- Panel-Rahmen (vertikal gestapelt) ---- */
+.hud-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 18px 16px;
+  width: 232px;
+  background: linear-gradient(165deg, var(--hud-bg-2), var(--hud-bg));
+  border: 1px solid var(--hud-border);
+  border-radius: 14px;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(34, 211, 238, 0.10),
+    0 18px 50px -16px rgba(34, 211, 238, 0.28),
+    0 18px 50px -16px rgba(255, 53, 208, 0.20);
+  overflow: hidden;
+}
+/* Scanline-Overlay */
+.hud-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.035) 0px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+/* Eck-Brackets (Cyberpunk) */
+.hud-frame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 8px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 0 0 / 14px 2px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 0 0 / 2px 14px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 100% 0 / 14px 2px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 100% 0 / 2px 14px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 0 100% / 14px 2px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 0 100% / 2px 14px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 100% 100% / 14px 2px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 100% 100% / 2px 14px no-repeat;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 4px var(--hud-glow-cyan));
+}
+
+/* ---- Module (vertikal untereinander) ---- */
+.hud-mod {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.hud-mod-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--hud-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hud-mod-label::before {
+  content: "▸";
+  color: var(--hud-cyan);
+  font-size: 9px;
+  text-shadow: 0 0 6px var(--hud-glow-cyan);
+}
+
+/* ---- Divider ---- */
+.hud-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--hud-border) 18%,
+    rgba(34, 211, 238, 0.55) 50%,
+    var(--hud-border) 82%,
+    transparent
+  );
+  margin: 2px 0;
+}
+.hud-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--hud-cyan);
+  box-shadow: 0 0 8px var(--hud-glow-cyan);
+}
+
+/* ---- SYSTEM-Status ---- */
+.hud-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--hud-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hud-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.hud-dot-live {
+  background: var(--hud-lime);
+  box-shadow: 0 0 8px var(--hud-lime);
+  animation: hud-pulse-dot 1.6s ease-in-out infinite;
+}
+.hud-dot-sync {
+  background: var(--hud-cyan);
+  box-shadow: 0 0 8px var(--hud-glow-cyan);
+}
+.hud-sep { color: var(--hud-dim); }
+
+/* ---- TEAM-STÄRKE (grosse horizontale Zahl) ---- */
+.hud-mod-score { gap: 4px; }
+.hud-score-readout {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+}
+.hud-score-val {
+  font-family: var(--font-display);
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--hud-lime);
+  text-shadow: 0 0 18px rgba(182, 255, 59, 0.45), 0 0 4px rgba(182, 255, 59, 0.6);
+  letter-spacing: -0.01em;
+}
+.hud-fx {
+  position: absolute;
+  top: 0;
+  left: 14px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.hud-level-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.hud-lv-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--hud-dim);
+}
+.hud-lv-val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--hud-magenta);
+  text-shadow: 0 0 12px var(--hud-glow-magenta);
+}
+
+/* ---- GEFANGEN / Readouts ---- */
+.hud-readout-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 1;
+}
+.hud-count-val {
+  font-size: 32px;
+  color: var(--hud-cyan);
+  text-shadow: 0 0 16px var(--hud-glow-cyan);
+}
+.hud-count-sep { font-size: 22px; color: var(--hud-dim); }
+.hud-count-max { font-size: 22px; color: var(--hud-dim); }
+
+/* ---- Bars ---- */
+.hud-bar {
+  position: relative;
+  height: 8px;
+  width: 100%;
+  border-radius: 999px;
+  background: rgba(231, 227, 255, 0.10);
+  border: 1px solid rgba(120, 80, 220, 0.40);
+  overflow: hidden;
+}
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-magenta));
+  box-shadow: 0 0 12px var(--hud-glow-cyan), 0 0 12px var(--hud-glow-magenta);
+  transition: width 0.25s ease;
+}
+.hud-scan-fill {
+  background: linear-gradient(90deg, var(--hud-violet), var(--hud-lime));
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+}
+
+/* ---- AKTIVES TEAM ---- */
+.hud-team-empty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--hud-dim);
+  letter-spacing: 0.08em;
+}
+.hud-team-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.hud-team-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(34, 211, 238, 0.06);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+}
+.hud-team-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--hud-text);
+}
+.hud-team-str {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hud-lime);
+  text-shadow: 0 0 8px rgba(182, 255, 59, 0.4);
+}
+
+/* ---- Toast (+STÄRKE) ---- */
+.hud-toast {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+.hud-toast-item {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--hud-lime);
+  text-shadow: 0 0 12px rgba(182, 255, 59, 0.55);
+  white-space: nowrap;
+}
+
+/* ---- Partikel-Burst ---- */
+.fx-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, var(--hud-cyan));
+  box-shadow: 0 0 10px var(--hud-cyan);
+}
+
+/* ---- Pulse-Keyframes ---- */
+@keyframes hud-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.78); }
+}
+
+/* ---- Responsiv ---- */
+@media (max-width: 720px) {
+  .hud { right: 10px; }
+  .hud-frame { width: 188px; padding: 13px 13px 11px; gap: 9px; }
+  .hud-score-val { font-size: 36px; }
+  .hud-count-val { font-size: 26px; }
+  .hud-mod-label { font-size: 9px; letter-spacing: 0.2em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-dot-live { animation: none; }
+  .hud { transition: opacity 0.3s ease; }
+}
