@@ -342,6 +342,7 @@ export default function App() {
   return (
     <div className="app" ref={rootRef}>
       <header className="site-header" ref={headerRef}>
+      <span className="holo-glass" aria-hidden="true"></span>
         <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ">SPIDER<span>Z</span></a>
         <nav className="site-nav">
           <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>

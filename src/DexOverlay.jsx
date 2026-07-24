@@ -9,6 +9,7 @@ export default function DexOverlay({ onClose }) {
 
   return (
     <div className="overlay-backdrop" onClick={onClose}>
+      <span className="holo-glass" aria-hidden="true"></span>
       <div className="overlay-panel overlay-panel-wide" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="overlay-close" onClick={onClose} aria-label="Zurück">←</button>
         <h2 className="overlay-title">POKÉDEX</h2>

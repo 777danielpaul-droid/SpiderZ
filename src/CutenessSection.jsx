@@ -132,6 +132,7 @@ export default function CutenessSection() {
       <div ref={pinRef} className="cuteness-pin">
         <canvas ref={canvasRef} width={688} height={384} className="cuteness-canvas" />
         <div className="cuteness-overlay">
+          <span className="holo-glass" aria-hidden="true"></span>
           {!ready ? (
             <div className="cuteness-loading">
               <div className="cuteness-load-bar">

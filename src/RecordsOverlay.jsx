@@ -10,6 +10,7 @@ export default function RecordsOverlay({ onClose, onOpenDex }) {
 
   return (
     <div className="overlay-backdrop" onClick={onClose}>
+      <span className="holo-glass" aria-hidden="true"></span>
       <div className="overlay-panel" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="overlay-close" onClick={onClose} aria-label="Schließen">✕</button>
         <h2 className="overlay-title">REKORDE</h2>

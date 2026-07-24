@@ -134,6 +134,7 @@ export default function ScrubSection({ children, hintHidden }) {
           className="scrub-canvas"
         />
         <div className="scrub-overlay">
+          <span className="holo-glass" aria-hidden="true"></span>
           {!ready ? (
             <div className="scrub-loading">
               <div className="scrub-load-bar">
@@ -143,6 +144,7 @@ export default function ScrubSection({ children, hintHidden }) {
             </div>
           ) : (
             <div className="scrub-hint">
+              <span className="holo-glass" aria-hidden="true"></span>
               <span className={`scrub-hint-text${hintHidden ? " hidden" : ""}`}>
                 <span className="scrub-hint-arrow" aria-hidden="true">↓</span>
                 Scrollen spult vor

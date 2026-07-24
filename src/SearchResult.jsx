@@ -6,6 +6,7 @@ export default function SearchResult({ result, error, loading, onClose }) {
   if (loading) {
     return (
       <div className="search-modal" onClick={onClose}>
+        <span className="holo-glass" aria-hidden="true"></span>
         <div className="search-card" onClick={(e) => e.stopPropagation()}>
           <div className="search-spinner" />
           <p>Suche …</p>
@@ -17,6 +18,7 @@ export default function SearchResult({ result, error, loading, onClose }) {
   if (error) {
     return (
       <div className="search-modal" onClick={onClose}>
+        <span className="holo-glass" aria-hidden="true"></span>
         <div className="search-card" onClick={(e) => e.stopPropagation()}>
           <button className="search-close" onClick={onClose} aria-label="Schließen">×</button>
           <div className="search-emoji">🔍</div>
