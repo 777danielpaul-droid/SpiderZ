@@ -238,7 +238,8 @@ body {
    Eigenstaendiges Layer-Element (.holo-glass), als erstes Kind
    in Glas-Container eingefuegt. CSS-only, GPU-composited
    (nur opacity/transform animiert). Kein JS, kein Reflow.
-   VERSTAERKT: groessere Funken (3px) + Glow + hellerer Twinkle.
+   VERSTAERKT (a): 4px Funken + Glow(blur 1px) + 42 Funken/Element.
+   Glow auf 1px -> Paint billiger, FPS stabil.
    ============================================================ */
 .holo-glass {
   position: absolute; inset: 0; border-radius: inherit;
@@ -247,42 +248,39 @@ body {
 .holo-glass::before,
 .holo-glass::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
 
-/* (1) Holo-Glitter-Basis: filmischer Schimmer ueber dem Glas */
 .holo-glass::before {
   background:
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.35), transparent 42%),
-    radial-gradient(circle at 80% 70%, rgba(34,211,238,0.30), transparent 47%),
-    radial-gradient(circle at 60% 20%, rgba(255,53,208,0.24), transparent 42%),
-    radial-gradient(circle at 30% 80%, rgba(182,255,59,0.24), transparent 44%);
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.40), transparent 42%),
+    radial-gradient(circle at 80% 70%, rgba(34,211,238,0.34), transparent 47%),
+    radial-gradient(circle at 60% 20%, rgba(255,53,208,0.28), transparent 42%),
+    radial-gradient(circle at 30% 80%, rgba(182,255,59,0.28), transparent 44%);
   background-size: 200% 200%;
-  opacity: 0.85;
+  opacity: 0.9;
   mix-blend-mode: screen;
   animation: holo-glitter 6s ease-in-out infinite;
 }
 
-/* (2) Lokale Funken: ~28 helle Punkte mit Glow, staerker als globaler BG */
 .holo-glass::after {
-  width: 3px; height: 3px; border-radius: 50%;
+  width: 4px; height: 4px; border-radius: 50%;
   background: transparent;
-  box-shadow: 208px 99px 2px 0 #eaf6ff, 104px 155px 2px 0 #eaf6ff, 93px 60px 2px 0 #eaf6ff, 129px 36px 2px 0 #eaf6ff, 46px 66px 2px 0 #eaf6ff, 198px 137px 2px 0 #eaf6ff, 277px 24px 2px 0 #eaf6ff, 252px 53px 2px 0 #eaf6ff, 217px 186px 2px 0 #eaf6ff, 112px 97px 2px 0 #eaf6ff, 200px 176px 2px 0 #eaf6ff, 110px 40px 2px 0 #eaf6ff, 238px 171px 2px 0 #eaf6ff, 93px 147px 2px 0 #ff35d0, 175px 23px 2px 0 #b6ff3b, 272px 175px 2px 0 #22d3ee, 46px 122px 2px 0 #ff35d0, 163px 105px 2px 0 #b6ff3b, 23px 70px 2px 0 #22d3ee, 287px 3px 2px 0 #ff35d0, 219px 54px 2px 0 #b6ff3b, 187px 138px 2px 0 #22d3ee, 43px 120px 2px 0 #ff35d0, 267px 52px 2px 0 #ffd76a, 238px 15px 2px 0 #ffd76a, 185px 35px 2px 0 #ffd76a, 112px 185px 2px 0 #ffd76a, 84px 193px 2px 0 #ffd76a;
-  animation: holo-spark 1.8s ease-in-out infinite;
+  box-shadow: 167px 40px 1px 0 #eaf6ff, 204px 168px 1px 0 #eaf6ff, 26px 20px 1px 0 #eaf6ff, 276px 26px 1px 0 #eaf6ff, 189px 151px 1px 0 #eaf6ff, 31px 131px 1px 0 #eaf6ff, 111px 11px 1px 0 #eaf6ff, 46px 113px 1px 0 #eaf6ff, 216px 19px 1px 0 #eaf6ff, 125px 25px 1px 0 #eaf6ff, 284px 110px 1px 0 #eaf6ff, 32px 213px 1px 0 #eaf6ff, 291px 33px 1px 0 #eaf6ff, 116px 163px 1px 0 #eaf6ff, 323px 151px 1px 0 #eaf6ff, 33px 149px 1px 0 #eaf6ff, 301px 103px 1px 0 #eaf6ff, 27px 58px 1px 0 #eaf6ff, 25px 144px 1px 0 #eaf6ff, 70px 76px 1px 0 #ff35d0, 216px 38px 1px 0 #b6ff3b, 278px 32px 1px 0 #22d3ee, 294px 80px 1px 0 #ff35d0, 288px 210px 1px 0 #b6ff3b, 94px 28px 1px 0 #22d3ee, 299px 148px 1px 0 #ff35d0, 329px 50px 1px 0 #b6ff3b, 192px 26px 1px 0 #22d3ee, 282px 184px 1px 0 #ff35d0, 34px 146px 1px 0 #b6ff3b, 32px 160px 1px 0 #22d3ee, 107px 129px 1px 0 #ff35d0, 274px 111px 1px 0 #b6ff3b, 162px 121px 1px 0 #22d3ee, 301px 118px 1px 0 #ff35d0, 187px 78px 1px 0 #ffd76a, 129px 205px 1px 0 #ffd76a, 94px 180px 1px 0 #ffd76a, 126px 22px 1px 0 #ffd76a, 296px 78px 1px 0 #ffd76a, 270px 128px 1px 0 #ffd76a, 177px 188px 1px 0 #ffd76a;
+  animation: holo-spark 1.6s ease-in-out infinite;
 }
 
-/* Inhalt der Glas-Container bleibt ueber den Funken */
 .site-header > *, .card-panel > *, .scrub-overlay > *,
 .scrub-hint > *, .search-modal > *, .cuteness-overlay > *,
 .overlay-backdrop > *, .glass > * { position: relative; z-index: 1; }
 
 @keyframes holo-glitter {
-  0%, 100% { background-position: 0% 0%; opacity: 0.6; }
-  50%      { background-position: 100% 100%; opacity: 0.95; }
+  0%, 100% { background-position: 0% 0%; opacity: 0.65; }
+  50%      { background-position: 100% 100%; opacity: 1; }
 }
 @keyframes holo-spark {
-  0%, 100% { opacity: 0.45; }
+  0%, 100% { opacity: 0.5; }
   50%      { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .holo-glass::before, .holo-glass::after { animation: none; }
-  .holo-glass::after { opacity: 0.8; }
-  .holo-glass::before { opacity: 0.7; }
+  .holo-glass::after { opacity: 0.85; }
+  .holo-glass::before { opacity: 0.75; }
 }
