@@ -208,14 +208,29 @@
 .team-card img {
   width: 100%; max-width: min(360px, 38vw); height: auto;
   filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.25));
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), max-width 0.32s ease;
+}
+/* Hover: Bild vergroessert + fuellt den Rahmen (kein leerer Rand) */
+.team-card:hover img {
+  max-width: 100%;
+  transform: scale(1.07);
+  filter: drop-shadow(0 0 34px rgba(34, 211, 238, 0.45));
 }
 .team-name {
   font-family: var(--font-display);
   font-weight: 800; font-size: clamp(20px, 2.4vw, 34px); color: var(--hud-text);
   text-transform: none; letter-spacing: 0.01em;
   text-shadow: 0 0 16px rgba(231, 227, 255, 0.40);
+  /* Standard versteckt -> erscheint beim Hover der Karte */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.team-card:not(.is-caught) .team-name { opacity: 0.45; }
+.team-card:hover .team-name {
+  opacity: 1;
+  transform: translateY(0);
+}
+.team-card:not(.is-caught):hover .team-name { opacity: 0.7; }
 .team-strength {
   font-family: var(--font-display);
   font-size: clamp(15px, 1.7vw, 22px); font-weight: 800; letter-spacing: 0.04em;
