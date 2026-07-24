@@ -164,7 +164,7 @@
 }
 .end-title {
   font-size: clamp(32px, 6vw, 64px); margin: 0;
-  font-family: var(--font-display);
+  font-family: "Pokemon Solid", var(--font-display);
   background: linear-gradient(90deg, var(--hud-cyan), var(--hud-lime));
   -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.35));

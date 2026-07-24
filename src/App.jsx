@@ -365,7 +365,7 @@ export default function App() {
           <footer className="endcard" ref={endcardRef}>
             <div className="scanline-sweep" aria-hidden="true" />
             <h2 className="end-title">
-              {caughtIds.length >= TOTAL_POKEMON ? "Dein Team ist komplett" : "Dein Team"}
+              {caughtIds.length >= TOTAL_POKEMON ? "Dein TEAM!" : "Dein Team"}
             </h2>
 
             <div className="team-grid">
