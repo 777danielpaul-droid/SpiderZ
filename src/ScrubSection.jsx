@@ -9,12 +9,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *   gekoppelt an die Scroll-Position (ScrollTrigger + scrub).
  * - Mobil-optimiert: Frames nur bei Aenderung auf Canvas gezeichnet,
  *   rAF-gedrosselt, JPEG-Sequence statt Video (kein Decoding-Jank).
+ * - Framequelle: Spider-Animation (frame_000..frame_192 aus
+ *   NasaMon/spider_full_body_16x9.mp4 extrahiert).
  */
-const FRAME_COUNT = 59;
+const FRAME_COUNT = 193;            // Spider-Video: 193 Frames (24fps, 8.1s)
 const FRAME_BASE = "/scrub/frame_";
 const PAD = 3;
-const INTRO_LAST_FRAME = 27;      // verkuerzte Intro: spielt 0..27 (vorher 58)
-const INTRO_REVERSE_FRAMES = 4;   // nach Frame 27: 27->23 rueckwaerts (Reverse-Zone)
+// Reine Vorwaerts-Scrub: Scroll 0..1 -> Frame 0..FRAME_COUNT-1 (kein Reverse).
+const FIRST_FRAME = 0;
+const LAST_FRAME = FRAME_COUNT - 1;
 
 export default function ScrubSection({ children, hintHidden }) {
   const [loaded, setLoaded] = useState(0);
@@ -94,17 +97,13 @@ export default function ScrubSection({ children, hintHidden }) {
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: () => "+=" + window.innerHeight * 3 * ((INTRO_LAST_FRAME + INTRO_REVERSE_FRAMES) / (FRAME_COUNT - 1)), // Strecke inkl. Reverse-Zone
+          end: () => "+=" + window.innerHeight * 4, // Scrub-Strecke (langer, satter Scroll)
           pin: pinRef.current,
           scrub: true, // butterweich, folgt Scroll exakt
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            const P = INTRO_LAST_FRAME, R = INTRO_REVERSE_FRAMES;
-            const seg = P / (P + R); // Anteil der Forward-Strecke an progress
-            const p = self.progress;
-            const frame = p <= seg
-              ? Math.round((p / seg) * P)                 // 0 -> P vorwaerts
-              : Math.round(P - ((p - seg) / (1 - seg)) * R); // P -> P-R rueckwaerts
+            // Reine Vorwaerts-Scrub: progress 0..1 -> Frame FIRST..LAST
+            const frame = Math.round(self.progress * (LAST_FRAME - FIRST_FRAME) + FIRST_FRAME);
             targetRef.current = frame;
           },
         });
