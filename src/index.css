@@ -101,6 +101,14 @@ body {
   overflow-x: hidden;
   /* CLS: Layout-Sprünge beim Reveal minimieren. */
   text-rendering: optimizeLegibility;
+  /* Durchgehender Hintergrund-Verlauf (Violett oben -> Teal unten, weich).
+     Sektionen sind transparent -> keine harten Kanten beim Bereichswechsel,
+     Glows scheinen ueber diesen Verlauf hinweg. */
+  background:
+    radial-gradient(1100px 700px at 50% -5%, rgba(139, 92, 246, 0.28), transparent 55%),
+    radial-gradient(1000px 700px at 50% 105%, rgba(34, 211, 238, 0.22), transparent 55%),
+    linear-gradient(180deg, #1b1033 0%, #0c0a18 48%, #06121f 100%);
+  background-attachment: fixed;
 }
 
 #root { position: relative; z-index: 1; }
