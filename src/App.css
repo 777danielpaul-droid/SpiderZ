@@ -344,57 +344,66 @@
 /* "Weiter"-Button: erst sichtbar nach erstem gefangenen Pokemon */
 .next-btn.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(14px); }
 
-.hero-search {
-  position: absolute;
-  top: 18px; right: 18px; left: auto;
-  transform: none;
-  display: flex; gap: 8px; width: min(360px, 78vw);
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 2px solid var(--princess-pink);
-  border-radius: 999px; padding: 6px 6px 6px 18px;
-  box-shadow: 0 14px 40px -16px rgba(255, 95, 200, 0.6);
-}
 /* Suche liegt im scrub-overlay: nicht von Pointer-Events des Hints blockieren */
 .scrub-overlay { pointer-events: none; }
 .scrub-overlay-children { pointer-events: auto; }
-.search-input {
-  flex: 1; border: none; background: transparent;
-  font-family: var(--font-display);
-  font-size: 15px; font-weight: 600; color: #6d28d9; outline: none; min-width: 0;
-}
-.search-input::placeholder { color: rgba(124, 58, 237, 0.5); }
-.search-btn {
-  border: none; border-radius: 999px; padding: 10px 22px;
-  font-family: var(--font-display);
-  font-weight: 800; font-size: 14px; color: #fff;
-  background: linear-gradient(90deg, var(--sky-blue-deep), var(--princess-pink-deep));
-  cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-  box-shadow: 0 6px 16px -8px rgba(255, 95, 200, 0.9);
-}
-.search-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
-.search-btn:active { transform: translateY(0); }
 
-/* ---------- Such-Modal ---------- */
+/* ---------- Such-Modal (HUD-Glas-Stil) ---------- */
 .search-modal {
   position: fixed; inset: 0; z-index: 200;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(31, 23, 51, 0.6);
+  background: rgba(8, 6, 18, 0.7);
   backdrop-filter: blur(8px); padding: 24px;
   animation: fadeIn 0.18s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .search-card {
   position: relative; width: min(560px, 92vw);
-  background: linear-gradient(160deg, rgba(22, 17, 31, 0.94), rgba(22, 17, 31, 0.88));
-  backdrop-filter: blur(18px) saturate(140%);
-  color: var(--bone);
-  border-radius: 26px; padding: 30px 34px 26px;
-  border: 1px solid rgba(192, 38, 211, 0.30);
+  /* HUD-Glas-Look: Verlauf + Scanline + Rahmen + Neon-Shadow */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(165deg, var(--hud-bg-2), var(--hud-bg));
+  color: var(--hud-text);
+  border-radius: 14px; padding: 30px 34px 26px;
+  border: 1px solid var(--hud-border);
   --tc: var(--accent, var(--lila));
-  box-shadow: 0 30px 80px rgba(31, 23, 51, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(34, 211, 238, 0.10),
+    0 18px 50px -16px rgba(34, 211, 238, 0.28),
+    0 18px 50px -16px rgba(255, 53, 208, 0.20);
   overflow: hidden;
+  animation: hud-backglow 3.4s ease-in-out infinite;
+}
+/* Neon-Gradient Backglow hinter der Karte */
+.search-card::after {
+  content: "";
+  position: absolute; inset: -40%;
+  background:
+    radial-gradient(60% 55% at 22% 30%, rgba(34, 211, 238, 0.30), transparent 70%),
+    radial-gradient(60% 55% at 80% 78%, rgba(255, 53, 208, 0.28), transparent 70%);
+  filter: blur(26px); z-index: -1; opacity: 0.85; pointer-events: none;
+}
+/* Eck-Brackets (Cyberpunk) */
+.search-card::before {
+  content: "";
+  position: absolute; inset: 6px; border-radius: 8px; pointer-events: none;
+  background:
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 0 0 / 14px 2px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 0 0 / 2px 14px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 100% 0 / 14px 2px no-repeat,
+    linear-gradient(var(--hud-cyan), var(--hud-cyan)) 100% 0 / 2px 14px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 0 100% / 14px 2px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 0 100% / 2px 14px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 100% 100% / 14px 2px no-repeat,
+    linear-gradient(var(--hud-magenta), var(--hud-magenta)) 100% 100% / 2px 14px no-repeat;
+  opacity: 0.7; filter: drop-shadow(0 0 4px var(--hud-glow-cyan));
 }
 .search-bg {
   position: absolute; width: 80vmin; height: 80vmin;
@@ -403,17 +412,18 @@
 }
 .search-num {
   position: absolute; top: 8px; right: 26px;
+  font-family: var(--font-display);
   font-size: 28vmin; font-weight: 900;
-  color: var(--accent, var(--neon-soft)); opacity: 0.12;
+  color: var(--accent, var(--neon-soft)); opacity: 0.10;
   pointer-events: none; line-height: 1; z-index: 0;
 }
 .search-close {
   position: absolute; top: 14px; left: 16px; z-index: 3;
   width: 34px; height: 34px; border: none; border-radius: 50%;
-  background: rgba(192, 38, 211, 0.18); color: var(--neon-soft);
+  background: rgba(34, 211, 238, 0.18); color: var(--hud-cyan);
   font-size: 22px; font-weight: 700; line-height: 1; cursor: pointer;
 }
-.search-close:hover { background: rgba(192, 38, 211, 0.32); }
+.search-close:hover { background: rgba(34, 211, 238, 0.32); }
 .search-body { position: relative; z-index: 2; display: flex; align-items: center; gap: 28px; }
 .search-art { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; }
 .search-art img {
@@ -423,16 +433,17 @@
 .search-panel { flex: 1; min-width: 0; }
 .search-panel h2 {
   margin: 0; font-size: clamp(26px, 5vw, 42px); font-weight: 900;
-  color: var(--bone);
-  background: var(--grad-cute);
-  -webkit-background-clip: text; background-clip: text;
+  font-family: var(--font-display);
+  color: var(--hud-text);
+  text-shadow: 0 0 16px rgba(34, 211, 238, 0.4);
+  -webkit-background-clip: initial; background-clip: initial;
 }
 .search-alt { position: relative; z-index: 2; margin-top: 16px; font-size: 13px; font-weight: 700; opacity: 0.7; }
 .search-emoji { font-size: 46px; margin-bottom: 8px; }
 .search-error { font-weight: 700; color: #f87171; }
 .search-spinner {
   width: 42px; height: 42px; margin: 0 auto 14px;
-  border: 4px solid rgba(192, 38, 211, 0.2); border-top-color: var(--neon-soft);
+  border: 4px solid rgba(34, 211, 238, 0.2); border-top-color: var(--hud-cyan);
   border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

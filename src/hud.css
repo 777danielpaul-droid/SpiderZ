@@ -333,6 +333,41 @@
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
 
+/* ---- SUCHE (HUD-Input + Button) ---- */
+.hud-search-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hud-input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--hud-text);
+  background: rgba(10, 8, 24, 0.55);
+  border: 1px solid rgba(34, 211, 238, 0.30);
+  border-radius: 8px;
+  padding: 6px 9px;
+  width: 130px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.hud-input::placeholder {
+  color: var(--hud-dim);
+  letter-spacing: 0.04em;
+}
+.hud-input:focus {
+  border-color: var(--hud-cyan);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.4), 0 0 14px rgba(34, 211, 238, 0.35);
+}
+.hud-search-btn {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+}
+.hud-search-btn:hover {
+  box-shadow: 0 0 14px rgba(192, 38, 211, 0.45);
+}
+
 /* ---- Toast (+STÄRKE) — steigt ueber dem Score-Modul auf ---- */
 .hud-toast {
   position: absolute;

@@ -338,6 +338,9 @@ export default function App() {
         onNext={goNext}
         canNext={caughtIds.length > 0}
         nextLabel={activeCard >= TOTAL_POKEMON - 1 ? "Zum Team ▾" : "Weiter ▸"}
+        onSearch={runSearch}
+        searchQuery={query}
+        setSearchQuery={setQuery}
       />
 
       {hudView === "records" && (
@@ -365,26 +368,6 @@ export default function App() {
           >
             <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
           </button>
-          <form
-            className="hero-search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (query.trim()) runSearch(query);
-            }}
-          >
-            <input
-              className="search-input"
-              type="text"
-              inputMode="text"
-              placeholder="Nummer (1–1025) oder Name (z.B. pikachu)"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Pokémon suchen"
-            />
-            <button className="search-btn" type="submit">
-              Suchen
-            </button>
-          </form>
         </ScrubSection>
       </header>
 

@@ -11,7 +11,7 @@ import "./hud.css";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, onRestart, onShowRecords, onNext, canNext, nextLabel }) {
+export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery }) {
   const caught = caughtIds.length;
 
   // Challenge-Score: Gesamtstaerke aller gefangenen Pokemon.
@@ -191,6 +191,34 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
               ))}
             </ul>
           )}
+        </section>
+
+        <div className="hud-divider" />
+
+        {/* SUCHE (NasaMon-DB) */}
+        <section className="hud-mod hud-mod-search">
+          <div className="hud-mod-label mono-label">SUCHE</div>
+          <form
+            className="hud-search-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = (searchQuery || "").trim();
+              if (q && onSearch) onSearch(q);
+            }}
+          >
+            <input
+              className="hud-input"
+              type="text"
+              inputMode="text"
+              placeholder="Nr (1–18) / Name"
+              value={searchQuery || ""}
+              onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+              aria-label="Spider-Monster suchen"
+            />
+            <button className="hud-btn hud-search-btn" type="submit" title="Suchen">
+              SUCHEN
+            </button>
+          </form>
         </section>
       </div>
     </div>
