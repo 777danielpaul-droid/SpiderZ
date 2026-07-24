@@ -73,8 +73,10 @@ export default function App() {
     // Bei der letzten Karte: direkt zur Team-Endcard (kein ueberfluessiger
     // Zwischenschritt — ein Druck reicht vom Final-Reveal zum Team).
     if (activeCard >= TOTAL_POKEMON - 1) {
-      const footer = document.querySelector(".endcard");
-      if (footer) gsap.to(window, { scrollTo: footer, duration: 0.9, ease: "power2.inOut" });
+      // Zum absoluten Dokumentende scrollen -> Endcard komplett unten (kein
+      // 111px-Luftloch ueber der Endcard-Oberkante).
+      const maxY = document.documentElement.scrollHeight - window.innerHeight;
+      gsap.to(window, { scrollTo: maxY, duration: 0.9, ease: "power2.inOut" });
       setActiveCard(TOTAL_POKEMON);
       return;
     }
