@@ -32,6 +32,22 @@
     0 0 60px rgba(34, 211, 238, 0.65),
     0 0 90px rgba(255, 53, 208, 0.35);
 }
+
+/* Sanftes Pulsieren ALLER Container-Glows (Staerke + Groesse schwanken).
+   scale = Groesse, brightness = Glow-Intensitaet.
+   .card-panel bewusst NICHT: GSAP steuert dessen transform (Pin/Reveal). */
+.team-card,
+.search-card,
+.scrub-locked,
+.scrub-loading {
+  animation: container-glow 3.6s ease-in-out infinite;
+}
+.team-card.reveal-glow { animation: container-glow 1.6s ease-in-out infinite; }
+
+@keyframes container-glow {
+  0%, 100% { transform: scale(1); filter: brightness(0.97); }
+  50%      { transform: scale(1.012); filter: brightness(1.06); }
+}
 .hero-inner { padding: 0 24px; }
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
@@ -249,6 +265,35 @@
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em;
   color: var(--hud-lime);
 }
+
+/* ============ Theme-Toggle (Dark/Light) ============ */
+.theme-toggle {
+  position: absolute;
+  top: 18px; left: 18px;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--princess-pink);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  color: #6d28d9;
+  cursor: pointer;
+  box-shadow: 0 10px 28px -12px rgba(255, 95, 200, 0.7);
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  z-index: 5;
+  pointer-events: auto;
+}
+.theme-toggle:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.theme-toggle:active { transform: translateY(0) scale(0.96); }
+.theme-toggle-icon { font-size: 20px; line-height: 1; }
+[data-theme="dark"] .theme-toggle {
+  background: rgba(20, 16, 41, 0.6);
+  color: var(--princess-pink);
+  border-color: var(--sky-blue-deep);
+  box-shadow: 0 10px 28px -12px rgba(91, 182, 255, 0.7);
+}
+.theme-toggle { animation: glow-pulse-soft 3s ease-in-out infinite; }
 
 /* ============ Scroll-Scrubbing-Sektion (Canvas) ============ */
 .scrub-section { position: relative; }

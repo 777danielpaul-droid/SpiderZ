@@ -24,6 +24,12 @@ export default function App() {
   const heroRef = useRef(null);
   const [hudVisible, setHudVisible] = useState(false);
   const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
+  const [dark, setDark] = useState(true);
+
+  // Theme auf <html data-theme> spiegeln (CSS reagiert via [data-theme="dark"])
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  }, [dark]);
 
   const scrollFillRef = useRef(null);
   const stRef = useRef(null);
@@ -291,6 +297,15 @@ export default function App() {
             <span className="ball" aria-hidden="true" />
             <span className="word">PikaChallenge</span>
           </div>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setDark((d) => !d)}
+            aria-label={dark ? "Hellen Modus" : "Dunklen Modus"}
+            title={dark ? "Hellen Modus" : "Dunklen Modus"}
+          >
+            <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
+          </button>
           <form
             className="hero-search"
             onSubmit={(e) => {

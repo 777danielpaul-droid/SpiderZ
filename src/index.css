@@ -62,6 +62,30 @@
   --font-mono: "Space Mono", ui-monospace, monospace;
 }
 
+/* ============ Dark Mode ============ */
+[data-theme="dark"] {
+  /* Flächen -> tiefes Violettschwarz */
+  --bg: #0c0a18;
+  --bg-soft: #141029;
+  --panel: #16111f;
+  --bone: #f4f1fb;
+
+  /* Text -> hell */
+  --ink: #f4f1fb;
+  --ink-soft: #c9c0e8;
+
+  /* Akzente leuchtender */
+  --lila: #8b5cf6;
+  --lila-soft: #a78bfa;
+  --neon: #e051c8;
+  --neon-soft: #d946ef;
+  --cyan: #22d3ee;
+  --gold: #e0b341;
+  --gold-soft: #c8992a;
+
+  --shadow: 0 18px 50px -16px rgba(0, 0, 0, 0.7);
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root {
