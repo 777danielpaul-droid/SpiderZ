@@ -166,6 +166,33 @@
 }
 .hud-sep { color: var(--hud-dim); }
 
+/* ---- HUD-Actions (Neustart / Rekorde) ---- */
+.hud-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.hud-btn {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--hud-text);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  animation: glow-pulse-soft 2.6s ease-in-out infinite;
+}
+.hud-btn:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.4);
+}
+.hud-btn:active { transform: scale(0.96); }
+
 /* ---- TEAM-STÄRKE (grosse horizontale Zahl) ---- */
 .hud-mod-score { gap: 4px; }
 .hud-score-readout {

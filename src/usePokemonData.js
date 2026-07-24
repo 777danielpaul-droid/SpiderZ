@@ -101,28 +101,39 @@ export function usePokemonData(count = TOTAL_POKEMON) {
   const idsRef = useRef(null);
   if (idsRef.current === null) idsRef.current = randomIds(count);
 
-  useEffect(() => {
+  const loadIds = useCallback((ids) => {
     let cancelled = false;
-    async function load() {
+    setError(null);
+    setProgress(0);
+    setData(null);
+    (async () => {
       try {
         const results = [];
-        for (let i = 0; i < idsRef.current.length; i++) {
-          const id = idsRef.current[i];
+        for (let i = 0; i < ids.length; i++) {
+          const id = ids[i];
           const [poke, deName] = await Promise.all([
             fetchPokemon(id),
             fetchGermanName(id),
           ]);
           results.push({ name_de: deName, strength: computeStrength(poke.stats), ...poke });
-          if (!cancelled) setProgress(Math.round(((i + 1) / idsRef.current.length) * 100));
+          if (!cancelled) setProgress(Math.round(((i + 1) / ids.length) * 100));
         }
         if (!cancelled) setData(results);
       } catch (e) {
         if (!cancelled) setError(e.message);
       }
-    }
-    load();
+    })();
     return () => { cancelled = true; };
   }, []);
+
+  // Neue Runde: frische zufaellige IDs ziehen + neu laden.
+  const reset = useCallback(() => {
+    const ids = randomIds(count);
+    idsRef.current = ids;
+    loadIds(ids);
+  }, [count, loadIds]);
+
+  useEffect(() => loadIds(idsRef.current), [loadIds]);
 
   const runSearch = useCallback(async (query) => {
     setSearch({ loading: true, result: null, error: null });
@@ -142,5 +153,5 @@ export function usePokemonData(count = TOTAL_POKEMON) {
     setSearch({ loading: false, result: null, error: null });
   }, []);
 
-  return { data, error, progress, search, runSearch, clearSearch };
+  return { data, error, progress, search, runSearch, clearSearch, reset };
 }

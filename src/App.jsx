@@ -9,6 +9,9 @@ import ScrubSection from "./ScrubSection";
 import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
+import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength } from "./storage";
+import RecordsOverlay from "./RecordsOverlay";
+import DexOverlay from "./DexOverlay";
 import "./App.css";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -18,7 +21,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
-  const { data, error, progress, search, runSearch, clearSearch } = usePokemonData(TOTAL_POKEMON);
+  const { data, error, progress, search, runSearch, clearSearch, reset } = usePokemonData(TOTAL_POKEMON);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
@@ -26,11 +29,34 @@ export default function App() {
   const [hudVisible, setHudVisible] = useState(false);
   const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
   const [dark, setDark] = useState(true);
+  const [hudView, setHudView] = useState("play");   // 'play' | 'records' | 'dex'
 
   // Theme auf <html data-theme> spiegeln (CSS reagiert via [data-theme="dark"])
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
+
+  // Runde beendet (alle gefangen) -> in Pokedex + Rekord speichern.
+  useEffect(() => {
+    if (!data || caughtIds.length < TOTAL_POKEMON) return;
+    const caught = data.filter((p) => caughtIds.includes(p.id));
+    if (caught.length === 0) return;
+    const teamStrength = caught.reduce((s, p) => s + (p.strength || 0), 0);
+    saveCaught(caught.map((p) => ({
+      id: p.id, name_de: p.name_de, types: p.types, artwork: p.artwork, strength: p.strength,
+    })));
+    saveBestTeamStrength(teamStrength);
+  }, [data, caughtIds]);
+
+  // Neustart: frische Runde + UI zuruecksetzen.
+  const handleRestart = useCallback(() => {
+    setCaughtIds([]);
+    setActiveCard(0);
+    setHudView("play");
+    revealPlayed.current = false;
+    reset();
+    window.scrollTo(0, 0);
+  }, [reset]);
 
   const scrollFillRef = useRef(null);
   const stRef = useRef(null);
@@ -290,7 +316,19 @@ export default function App() {
         data={data}
         scrollFillRef={scrollFillRef}
         visible={hudVisible}
+        onRestart={handleRestart}
+        onShowRecords={() => setHudView("records")}
       />
+
+      {hudView === "records" && (
+        <RecordsOverlay
+          onClose={() => setHudView("play")}
+          onOpenDex={() => setHudView("dex")}
+        />
+      )}
+      {hudView === "dex" && (
+        <DexOverlay onClose={() => setHudView("records")} />
+      )}
 
       <header className="hero" ref={heroRef}>
         <ScrubSection hintHidden={caughtIds.length > 0}>
