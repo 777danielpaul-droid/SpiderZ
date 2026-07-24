@@ -233,7 +233,7 @@ body {
 .web-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: 0;
   pointer-events: none;
   opacity: 0.5;
   animation: webShimmer 9s ease-in-out infinite alternate;
