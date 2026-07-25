@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SpiderZ · Booster Open (Demo)</title>
+<style>
+  :root{
+    --lila:#6d28d9; --cyan:#22d3ee; --magenta:#ff35d0; --lime:#b6ff3b;
+    --bg0:#07050d; --bg1:#160d2b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; height:100%;}
+  body{
+    background:radial-gradient(130% 100% at 50% -10%, var(--bg1) 0%, var(--bg0) 60%, #000 100%);
+    color:#e8e2ff; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100dvh; padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+    overflow:hidden; user-select:none;
+  }
+  .stage{ position:relative; width:min(420px,92vw); height:min(620px,80dvh); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+  /* ---- BOOSTER PACK ---- */
+  .pack{
+    position:relative; width:200px; height:290px; cursor:pointer;
+    transform-origin:50% 100%;
+    animation:idle 2.6s ease-in-out infinite;
+    transition:filter .2s;
+  }
+  .pack:active{ filter:brightness(1.15); }
+  @keyframes idle{ 0%,100%{transform:translateY(0) rotate(-1.5deg);} 50%{transform:translateY(-10px) rotate(1.5deg);} }
+  .pack-body{
+    position:absolute; inset:0; border-radius:14px; overflow:hidden;
+    background:
+      linear-gradient(160deg, #2a1452, #160a2e 60%, #0c0618);
+    border:1px solid rgba(34,211,238,.4);
+    box-shadow:0 0 0 1px rgba(255,53,208,.25), 0 24px 60px -18px rgba(109,40,217,.8), inset 0 0 40px rgba(34,211,238,.12);
+  }
+  /* foil shimmer */
+  .pack-foil{
+    position:absolute; inset:-50%;
+    background:linear-gradient(115deg, transparent 30%, rgba(34,211,238,.18) 45%, rgba(255,53,208,.18) 55%, transparent 70%);
+    animation:foil 3.2s linear infinite; mix-blend-mode:screen;
+  }
+  @keyframes foil{ from{transform:translateX(-30%);} to{transform:translateX(30%);} }
+  .pack-logo{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    font-weight:800; letter-spacing:.18em;
+  }
+  .pack-logo .big{ font-size:34px; color:#fff; text-shadow:0 0 18px var(--cyan), 0 0 30px var(--magenta); }
+  .pack-logo .sub{ font-size:11px; color:var(--lime); letter-spacing:.3em; }
+  .pack-top{ position:absolute; top:0; left:0; right:0; height:34px; background:linear-gradient(180deg, rgba(34,211,238,.25), transparent); border-radius:14px 14px 0 0; }
+  .pack-perf{ position:absolute; left:50%; top:-2px; width:64px; height:46px; transform:translateX(-50%); background:linear-gradient(180deg,#3a1d70,#1a0d36); border:1px solid rgba(255,53,208,.5); border-radius:8px; box-shadow:0 0 16px rgba(255,53,208,.4); }
+
+  .hint{ margin-top:26px; font-size:13px; letter-spacing:.25em; color:#b9a8e8; opacity:.85; animation:pulse 1.6s ease-in-out infinite; text-align:center;}
+  @keyframes pulse{ 0%,100%{opacity:.45;} 50%{opacity:1;} }
+
+  /* ---- OPEN STATE ---- */
+  .stage.opening .pack{ animation:packPop .5s ease forwards; }
+  @keyframes packPop{ 0%{transform:scale(1);} 40%{transform:scale(1.08) rotate(2deg);} 100%{transform:scale(.2) translateY(-40px); opacity:0;} }
+
+  .burst{ position:absolute; inset:0; pointer-events:none; opacity:0; }
+  .stage.opening .burst{ animation:burst .7s ease-out forwards; }
+  @keyframes burst{ 0%{opacity:0; transform:scale(.4);} 35%{opacity:1; transform:scale(1);} 100%{opacity:0; transform:scale(1.5);} }
+  .burst svg{ width:100%; height:100%; }
+
+  /* flakes */
+  .flake{ position:absolute; top:42%; left:50%; width:8px; height:8px; border-radius:2px; opacity:0; pointer-events:none; }
+
+  /* ---- CARDS ---- */
+  .cards{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:10px; pointer-events:none; opacity:0; }
+  .stage.revealed .cards{ opacity:1; pointer-events:auto; }
+  .card{
+    width:104px; height:150px; border-radius:12px; position:relative;
+    transform:translateY(40px) rotateY(90deg) scale(.8); opacity:0;
+    background:linear-gradient(165deg,#1c1038,#0e0720);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 18px 40px -14px rgba(0,0,0,.8), inset 0 0 24px rgba(34,211,238,.1);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    transition:transform .15s;
+  }
+  .card .icon{ font-size:40px; filter:drop-shadow(0 0 10px currentColor); }
+  .card .label{ font-size:11px; font-weight:700; letter-spacing:.08em; text-align:center; line-height:1.2; }
+  .card .rarity{ font-size:9px; letter-spacing:.2em; opacity:.7; }
+  .card.type-spider{ color:var(--cyan); border-color:rgba(34,211,238,.6); }
+  .card.type-vial{ color:var(--magenta); border-color:rgba(255,53,208,.6); }
+  .card.type-psa{ color:var(--lime); border-color:rgba(182,255,59,.6); }
+  .card.shimmer::after{
+    content:""; position:absolute; inset:0; border-radius:12px; pointer-events:none;
+    background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%);
+    mix-blend-mode:screen; animation:foil 2.4s linear infinite;
+  }
+  .stage.revealed .card{ animation:dealIn .6s cubic-bezier(.2,.8,.2,1) forwards; }
+  .stage.revealed .card:nth-child(1){ animation-delay:.05s; }
+  .stage.revealed .card:nth-child(2){ animation-delay:.18s; }
+  .stage.revealed .card:nth-child(3){ animation-delay:.31s; }
+  @keyframes dealIn{ to{ transform:translateY(0) rotateY(0) scale(1); opacity:1; } }
+  .stage.revealed .card:hover{ transform:translateY(-8px) scale(1.04); }
+
+  .reset{ margin-top:18px; font-size:12px; letter-spacing:.2em; color:#8c7bb8; background:none; border:1px solid #3a2a5e; border-radius:8px; padding:8px 14px; cursor:pointer; }
+  .title{ position:absolute; top:max(16px,env(safe-area-inset-top)); font-size:12px; letter-spacing:.4em; color:#7c6aa8; }
+</style>
+</head>
+<body>
+  <div class="title">SPIDERZ · BOOSTER</div>
+  <div class="stage" id="stage">
+    <!-- Booster -->
+    <div class="pack" id="pack" role="button" aria-label="Booster öffnen" tabindex="0">
+      <div class="pack-body">
+        <div class="pack-perf"></div>
+        <div class="pack-top"></div>
+        <div class="pack-foil"></div>
+        <div class="pack-logo">
+          <div class="big">SPIDER<span style="color:var(--magenta)">Z</span></div>
+          <div class="sub">BOOSTER</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="burst" id="burst">
+      <svg viewBox="0 0 200 200"><g fill="none" stroke="url(#g)" stroke-width="3">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#ff35d0"/></linearGradient></defs>
+        <path d="M100 10 L100 60 M100 140 L100 190 M10 100 L60 100 M140 100 L190 100 M37 37 L73 73 M127 127 L163 163 M163 37 L127 73 M73 127 L37 163"/>
+      </g></svg>
+    </div>
+
+    <!-- Karten -->
+    <div class="cards" id="cards">
+      <div class="card type-spider shimmer"><div class="icon">🕷️</div><div class="label">NEUE SPINNE</div><div class="rarity">FREIGESCHALTET</div></div>
+      <div class="card type-vial shimmer"><div class="icon">💉</div><div class="label">STEROID-VIAL</div><div class="rarity">+1 DOPEN</div></div>
+      <div class="card type-psa shimmer"><div class="icon">🏆</div><div class="label">PSA 10</div><div class="rarity">SAMMEL-ITEM</div></div>
+    </div>
+
+    <div class="hint" id="hint">TIPPE ZUM ÖFFNEN</div>
+  </div>
+
+  <button class="reset" id="reset">↻ NEU</button>
+
+<script>
+  const stage = document.getElementById('stage');
+  const pack = document.getElementById('pack');
+  const hint = document.getElementById('hint');
+  const burst = document.getElementById('burst');
+
+  function open(){
+    if(stage.classList.contains('opening')) return;
+    // haptic
+    if(navigator.vibrate) navigator.vibrate(30);
+    stage.classList.add('opening');
+    hint.style.opacity = 0;
+    // flakes
+    const cols = ['#22d3ee','#ff35d0','#b6ff3b','#6d28d9'];
+    for(let i=0;i<14;i++){
+      const f = document.createElement('div');
+      f.className='flake';
+      f.style.background = cols[i%cols.length];
+      burst.parentElement.appendChild(f);
+      const ang = Math.random()*Math.PI*2, dist = 80+Math.random()*120;
+      const dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist - 40;
+      f.animate([
+        {transform:`translate(0,0) rotate(0)`, opacity:1},
+        {transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*540-270}deg)`, opacity:0}
+      ], {duration:700+Math.random()*300, easing:'cubic-bezier(.2,.7,.3,1)'});
+      setTimeout(()=>f.remove(), 1100);
+    }
+    setTimeout(()=> stage.classList.add('revealed'), 520);
+  }
+  pack.addEventListener('click', open);
+  pack.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); open();} });
+
+  document.getElementById('reset').addEventListener('click', ()=>{
+    stage.classList.remove('opening','revealed');
+    hint.style.opacity = 1;
+  });
+</script>
+</body>
+</html>
