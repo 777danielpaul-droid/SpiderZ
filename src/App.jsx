@@ -439,7 +439,7 @@ export default function App() {
           <p className="story-body">
             Tief in den Neonschächten von New-Arachne erwachten die <strong>SpiderZ</strong> —
             mutierte Arachniden, deren Typen in drei Fraktionen kollidieren:
-            <span className="story-hl git">GIT</span>,
+            <span className="story-hl gift">GIFT</span>,
             <span className="story-hl staerke">STÄRKE</span>,
             <span className="story-hl verteidigung">VERTEIDIGUNG</span>.
             Scanne sie, fange dein Team aus drei, verpasse einem das Steroid-Vial —
