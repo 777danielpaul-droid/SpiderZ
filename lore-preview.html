@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lore Preview — Chronik von Paaway Kaka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --gold:#d9b25f;
+    --gold-bright:#f2d79a;
+    --ink:#e8dcc0;
+    --ink-dim:#b7a988;
+    --parchment:#171310;
+    --accent:#6d28d9;      /* SpiderZ Neon-Purple */
+    --accent-2:#22d3ee;    /* cyan */
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:
+      radial-gradient(120% 90% at 50% -10%, #2a1830 0%, #0c0a10 55%, #060507 100%);
+    color:var(--ink);
+    font-family:"EB Garamond", Georgia, serif;
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;padding:40px 18px;
+  }
+  /* antikes Manuskript-Blatt */
+  .manuscript{
+    position:relative;
+    max-width:760px;width:100%;
+    padding:54px 60px 64px;
+    background:
+      linear-gradient(180deg, rgba(40,28,18,.82), rgba(18,12,8,.92)),
+      repeating-linear-gradient(0deg, rgba(255,240,200,.015) 0 2px, transparent 2px 4px);
+    border:1px solid rgba(217,178,95,.32);
+    border-radius:6px;
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.6),
+      0 30px 80px rgba(0,0,0,.7),
+      inset 0 0 80px rgba(0,0,0,.55),
+      inset 0 0 24px rgba(217,178,95,.08);
+    /* Holo-Glass-Funkeln dezent */
+    overflow:hidden;
+  }
+  .manuscript::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(60% 40% at 20% 10%, rgba(34,211,238,.06), transparent 60%),
+               radial-gradient(50% 40% at 85% 90%, rgba(109,40,217,.08), transparent 60%);
+    mix-blend-mode:screen;opacity:.7;
+  }
+  .ornament{
+    text-align:center;font-family:"Cinzel",serif;color:var(--gold);
+    letter-spacing:.35em;font-size:13px;margin-bottom:6px;
+    text-shadow:0 0 14px rgba(217,178,95,.35);
+  }
+  .rule{
+    height:1px;width:70%;margin:14px auto 26px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    opacity:.6;
+  }
+  h1{
+    font-family:"Cinzel",serif;font-weight:700;
+    text-align:center;color:var(--gold-bright);
+    font-size:clamp(26px,4.4vw,40px);line-height:1.15;margin:0 0 6px;
+    letter-spacing:.04em;
+    text-shadow:0 0 22px rgba(217,178,95,.25), 0 2px 0 #000;
+  }
+  .subtitle{
+    text-align:center;color:var(--ink-dim);font-style:italic;
+    font-size:15px;margin-bottom:30px;letter-spacing:.02em;
+  }
+  p{
+    font-size:18px;line-height:1.75;color:var(--ink);
+    margin:0 0 18px;text-align:justify;
+    text-shadow:0 1px 1px rgba(0,0,0,.5);
+  }
+  p:first-letter{ /* dezente Initiale */
+    font-family:"Cinzel",serif;font-size:3.1em;line-height:.8;
+    float:left;margin:6px 12px 0 0;color:var(--gold-bright);
+    text-shadow:0 0 18px rgba(217,178,95,.4);
+  }
+  .drop-accent{color:var(--accent-2);}
+  .seal{
+    margin:34px auto 0;width:84px;height:84px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid rgba(217,178,95,.5);
+    color:var(--gold);font-family:"Cinzel",serif;font-size:30px;
+    box-shadow:0 0 26px rgba(109,40,217,.35), inset 0 0 18px rgba(217,178,95,.12);
+    text-shadow:0 0 12px rgba(217,178,95,.5);
+  }
+  .close-hint{
+    position:fixed;top:20px;right:24px;font-family:"Cinzel",serif;
+    color:var(--gold-dim,#9c8a5e);font-size:12px;letter-spacing:.2em;opacity:.5;
+  }
+</style>
+</head>
+<body>
+  <div class="close-hint">Lore · ESC ZUM SCHLIESSEN</div>
+  <article class="manuscript">
+    <div class="ornament">❧ CHRONIK ❧</div>
+    <div class="rule"></div>
+    <h1>Die Chronik von Paaway Kaka</h1>
+    <div class="subtitle">— der eiserne Kodex auf dem Bambus —</div>
+
+    <p>Auf den ländlichen Pfaden der Philippinen erhebt sich seit Generationen ein ungeschriebenes Gesetz: das der Arena auf dem Bambusstab. Dies ist keine Sage aus alten Mythen, sondern ein überliefertes Ritual der Jugend – eine reale Tradition, in der die Natur selbst zur Bühne wird.</p>
+
+    <p>Aus den Wipfeln der Bäume und von den Drähten des Dorfes werden die Kriegerinnen erwählt: agile Radnetzspinnen der Gattung Neoscona. In hölzernen Kammern und Streichholzschachteln geborgen, erhalten sie Nahrung und Stärkungen, von Nektar bis hin zu süßen Essenzen, auf dass ihr Panzer härte und ihr Gift die Klinge schärfe.</p>
+
+    <p>Wenn die Stunde schlägt, treffen die Champions aufeinander. Auf schmalem Grat, Auge in Auge, entbrennt der kurze, erbarmungslose Eid des Stahls. Kein Raum für Zögern, nur der Sieg der Klauen oder das Fallen in den Staub. So lebt die jahrzehntelange Legende von <span class="drop-accent">spiderZ</span> im wahren Leben weiter – als eiserner Kodex auf dem Bambus.</p>
+
+    <div class="seal">✦</div>
+  </article>
+</body>
+</html>

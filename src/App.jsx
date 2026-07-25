@@ -65,6 +65,7 @@ export default function App() {
   const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
   const [boostedId, setBoostedId] = useState(null);    // Spinne mit +100 (null = noch nicht vergeben)
   const [revealed, setRevealed] = useState(false);     // Team-Reveal abgeschlossen -> Vial darf erscheinen
+  const [loreOpen, setLoreOpen] = useState(false);     // Lore-Modal (Chronik)
 
   // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
   // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
@@ -326,16 +327,16 @@ export default function App() {
     };
   }, [data]);
 
-  // Escape schließt das Such-Modal.
+  // Escape schließt Such-Modal und Lore-Modal.
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape" && (search.result || search.loading || search.error)) {
-        clearSearch();
-      }
+      if (e.key !== "Escape") return;
+      if (loreOpen) { setLoreOpen(false); return; }
+      if (search.result || search.loading || search.error) clearSearch();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [search.result, search.loading, search.error, clearSearch]);
+  }, [search.result, search.loading, search.error, clearSearch, loreOpen]);
 
   const handleReveal = useCallback((id) => {
     setCaughtIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -357,6 +358,7 @@ export default function App() {
         <nav className="site-nav">
           <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>
           <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Spielregeln</a>
+          <button type="button" className="site-link lore-link" onClick={() => setLoreOpen(true)}>Lore</button>
         </nav>
         <button
           type="button"
@@ -431,6 +433,34 @@ export default function App() {
           onClose={clearSearch}
         />
       ) : null}
+
+      {/* LORE / CHRONIK: Modal im Seiten-Stil (dunkles Glas + Gold + Serif) */}
+      {loreOpen && (
+        <div
+          className="lore-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Die Chronik von Paaway Kaka"
+          onClick={(e) => { if (e.target === e.currentTarget) setLoreOpen(false); }}
+        >
+          <span className="holo-glass" aria-hidden="true"></span>
+          <article className="lore-scroll">
+            <div className="lore-ornament">❧ CHRONIK ❧</div>
+            <div className="lore-rule" />
+            <h1 className="lore-title">Die Chronik von Paaway Kaka</h1>
+            <div className="lore-sub">— der eiserne Kodex auf dem Bambus —</div>
+
+            <p>Auf den ländlichen Pfaden der Philippinen erhebt sich seit Generationen ein ungeschriebenes Gesetz: das der Arena auf dem Bambusstab. Dies ist keine Sage aus alten Mythen, sondern ein überliefertes Ritual der Jugend – eine reale Tradition, in der die Natur selbst zur Bühne wird.</p>
+
+            <p>Aus den Wipfeln der Bäume und von den Drähten des Dorfes werden die Kriegerinnen erwählt: agile Radnetzspinnen der Gattung Neoscona. In hölzernen Kammern und Streichholzschachteln geborgen, erhalten sie Nahrung und Stärkungen, von Nektar bis hin zu süßen Essenzen, auf dass ihr Panzer härte und ihr Gift die Klinge schärfe.</p>
+
+            <p>Wenn die Stunde schlägt, treffen die Champions aufeinander. Auf schmalem Grat, Auge in Auge, entbrennt der kurze, erbarmungslose Eid des Stahls. Kein Raum für Zögern, nur der Sieg der Klauen oder das Fallen in den Staub. So lebt die jahrzehntelange Legende von <span className="lore-accent">spiderZ</span> im wahren Leben weiter – als eiserner Kodex auf dem Bambus.</p>
+
+            <div className="lore-seal">✦</div>
+          </article>
+          <button type="button" className="lore-close" onClick={() => setLoreOpen(false)} aria-label="Lore schließen">✕</button>
+        </div>
+      )}
 
       {error && (
         <div className="loader error">Fehler beim Laden: {error}</div>
