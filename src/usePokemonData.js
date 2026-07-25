@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TOTAL_POKEMON } from "./pokemonList";
-import { supabase } from "./lib/supabase";
+import { supabase, isSupabaseReady } from "./lib/supabase";
 
-// In-Memory-Cache: verhindert Repeated-Fetch bei HMR/Reload des gleichen Sets.
-const cache = new Map(); // id -> nasamon datensatz
+// Wenn keine Supabase-Credentials da sind (z.B. Pages ohne Secrets),
+// direkt einen klaren Fehler liefern statt auf null.from() zu crashen.
+const NO_SUPABASE = "SpiderZ braucht eine Supabase-Verbindung. Bitte .env konfigurieren.";
 
 // Gesamtzahl der eigenen Monster (aus der DB; hier als Obergrenze für randomIds).
 const MAX_NASAMON = 18;
@@ -23,6 +24,7 @@ function getCached(id) {
 }
 
 async function fetchNasaMon(id) {
+  if (!isSupabaseReady) throw new Error(NO_SUPABASE);
   if (cache.has(id)) return cache.get(id);
   const { data, error } = await supabase
     .from("nasamon")
@@ -55,6 +57,7 @@ async function resolveQuery(raw) {
 
   // Name-Suche: Teilnamen via Wildcards (z.B. "arach" -> "arachnex").
   // Bester Treffer = kuerzester Name (exakteste Uebereinstimmung).
+  if (!isSupabaseReady) throw new Error(NO_SUPABASE);
   const { data, error } = await supabase
     .from("nasamon")
     .select("id, name_en")
