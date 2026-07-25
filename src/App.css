@@ -339,6 +339,20 @@
   object-fit: cover;
   background: transparent;
 }
+/* CapCut-Wasserzeichen aus den Video-Frames ueberdecken (oben links + rechts) */
+.scrub-pin::before,
+.scrub-pin::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 16vw;
+  height: 9vh;
+  background: #0f0a1a;
+  z-index: 2;
+  pointer-events: none;
+}
+.scrub-pin::before { left: 0; }
+.scrub-pin::after { right: 0; }
 .scrub-overlay {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   pointer-events: none; text-align: center; padding: 24px;
