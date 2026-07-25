@@ -861,9 +861,18 @@
    der feste (transparente) Header liegt darüber. */
 
 @media (max-width: 560px) {
-  .site-nav { gap: 2px; }
-  .site-link { padding: 6px 9px; font-size: 11px; }
+  .site-header {
+    height: auto; flex-wrap: wrap; gap: 8px 14px;
+    padding: 10px clamp(12px, 3vw, 20px);
+  }
   .site-logo { font-size: 17px; }
+  .site-nav {
+    gap: 4px; margin-left: 0;
+    order: 3; width: 100%; flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .site-link { padding: 6px 9px; font-size: 11px; }
+  .site-header .theme-toggle { margin-left: auto; }
 }
 
 /* ===== LORE / CHRONIK MODAL (Seiten-Stil: dunkles Glas + Gold + Serif) ===== */

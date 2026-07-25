@@ -111,6 +111,11 @@ body {
   background-attachment: fixed;
 }
 
+/* iOS-Safari ignoriert background-attachment:fixed (repaint-jank) -> abschalten */
+@media (hover:none) and (pointer:coarse){
+  body{ background-attachment: scroll; }
+}
+
 #root { position: relative; z-index: 1; }
 
 ::selection {
