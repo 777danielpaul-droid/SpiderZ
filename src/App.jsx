@@ -390,6 +390,8 @@ export default function App() {
           <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>
           <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Spielregeln</a>
           <button type="button" className="site-link lore-link" onClick={() => setLoreOpen(true)}>Lore</button>
+          <a className="site-link" href="/datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+          <a className="site-link" href="/impressum.html" target="_blank" rel="noopener">Impressum</a>
         </nav>
         <button
           type="button"
@@ -685,6 +687,15 @@ export default function App() {
           {boosterOpen && arenaWins >= 2 && (
             <BoosterScreen onClose={() => setBoosterOpen(false)} />
           )}
+
+          <footer className="site-footer">
+            <span className="site-footer-brand">SPIDER<span>Z</span></span>
+            <nav className="site-footer-nav">
+              <a href="/datenschutz.html" target="_blank" rel="noopener">Datenschutz</a>
+              <a href="/impressum.html" target="_blank" rel="noopener">Impressum</a>
+            </nav>
+            <span className="site-footer-copy">© 2026 · New-Arachne</span>
+          </footer>
         </main>
       )}
     </div>

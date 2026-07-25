@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Datenschutz — SpiderZ</title>
+  <style>
+    :root{
+      --hud-bg:#0c0a18; --hud-bg-2:#141029; --hud-border:rgba(120,80,220,.45);
+      --hud-text:#e7e3ff; --hud-dim:#8a83b8; --hud-cyan:#22d3ee; --hud-magenta:#ff35d0; --hud-lime:#b6ff3b;
+      --font-mono:"Space Mono",ui-monospace,monospace;
+      --font-display:"Pokemon Solid","Fredoka","Space Grotesk",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      min-height:100vh; color:var(--hud-text);
+      font-family:var(--font-mono); line-height:1.7; font-size:15px;
+      background:
+        radial-gradient(1100px 700px at 50% -5%, rgba(139,92,246,.28), transparent 55%),
+        radial-gradient(1000px 700px at 50% 105%, rgba(34,211,238,.22), transparent 55%),
+        linear-gradient(180deg,#1b1033 0%,#0c0a18 48%,#06121f 100%);
+      background-attachment:fixed;
+      padding:0 0 60px;
+    }
+    .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+    header{padding:48px 0 8px;}
+    .back{
+      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+      color:var(--hud-cyan); font-weight:700; letter-spacing:.08em; font-size:13px;
+      border:1px solid var(--hud-border); padding:8px 14px; border-radius:99px;
+      background:color-mix(in srgb, var(--hud-bg) 55%, transparent);
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    }
+    .back:hover{filter:brightness(1.2);}
+    h1{
+      font-family:var(--font-display); font-size:clamp(28px,5vw,46px); margin:24px 0 4px;
+      background:linear-gradient(90deg,var(--hud-cyan),var(--hud-magenta));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      letter-spacing:.02em;
+    }
+    .sub{color:var(--hud-dim); font-size:13px; letter-spacing:.06em; margin-bottom:32px;}
+    h2{
+      font-family:var(--font-display); font-size:clamp(18px,3vw,24px); color:var(--hud-text);
+      margin:36px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--hud-border);
+    }
+    h2 .dot{color:var(--hud-magenta);}
+    p{margin:10px 0; color:#d9d3f5;}
+    a.inline{color:var(--hud-cyan); text-decoration:underline; text-underline-offset:3px;}
+    ul{margin:10px 0; padding-left:20px; color:#d9d3f5;}
+    li{margin:6px 0;}
+    .card{
+      background:color-mix(in srgb, var(--hud-bg) 55%, transparent);
+      border:1px solid var(--hud-border); border-radius:14px; padding:18px 20px; margin:18px 0;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .tag{color:var(--hud-lime); font-weight:700; letter-spacing:.05em;}
+    .updated{color:var(--hud-dim); font-size:12px; margin-top:40px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="back" href="./">&larr; ZURÜCK ZU SPIDERZ</a>
+      <h1>DATENSCHUTZ</h1>
+      <div class="sub">// DOSSIER_PRIVACY — Stand: Juli 2026</div>
+    </header>
+
+    <div class="card">
+      <p><span class="tag">TL;DR</span> SpiderZ ist ein reines Spielerlebnis. Es gibt <strong>kein Konto</strong>,
+      <strong>keine Zahlung</strong> und <strong>keine hochgeladenen Nutzerdaten</strong>. Dein Spielstand liegt
+      ausschließlich lokal in deinem Browser. Die einzige externe Komponente ist ein YouTube-Video im Lore-Bereich.</p>
+    </div>
+
+    <h2><span class="dot">▸</span> 1. Verantwortlicher</h2>
+    <p>Verantwortlich für die Datenverarbeitung auf dieser Seite ist der Betreiber des Projekts
+      SpiderZ (Daniel Paul). Kontakt über das GitHub-Profil
+      <a class="inline" href="https://github.com/777danielpaul-droid" target="_blank" rel="noopener">777danielpaul-droid</a>.</p>
+
+    <h2><span class="dot">▸</span> 2. Welche Daten verarbeitet werden</h2>
+    <ul>
+      <li><strong>LocalStorage (dein Gerät):</strong> SpiderZ speichert deinen Spielstand — gefangene Monster,
+        Team, Rekorde und Einstellungen — ausschließlich lokal in deinem Browser. Diese Daten verlassen dein
+        Gerät <strong>nicht</strong> und werden von uns nicht abgerufen.</li>
+      <li><strong>Monster-Daten (Supabase):</strong> Beim Spielen werden öffentliche, statische Monster-Daten
+        (<code>nasamon</code>-Tabelle) per Lesezugriff geladen. Es werden <strong>keine</strong> personenbezogenen
+        Daten an die Datenbank gesendet.</li>
+      <li><strong>YouTube-Embed (Google):</strong> Im Lore-Modal ist ein YouTube-Video eingebettet
+        (<code>youtube-nocookie.com</code>). Beim Öffnen des Modals kann Google Cookies setzen und Daten
+        verarbeiten. Mehr dazu in Abschnitt 4.</li>
+    </ul>
+
+    <h2><span class="dot">▸</span> 3. Rechtsgrundlage (DSGVO)</h2>
+    <p>Die lokale Speicherung im LocalStorage erfolgt zur Bereitstellung der Spielfunktion auf Grundlage von
+      <strong>Art. 6 Abs. 1 lit. b DSGVO</strong> (Vertragsanbahnung/-durchführung). Das Einbetten von YouTube
+      stützt sich auf <strong>Art. 6 Abs. 1 lit. a DSGVO</strong> (Einwilligung durch Interaktion mit dem Lore-Modal).</p>
+
+    <h2><span class="dot">▸</span> 4. Externe Dienste</h2>
+    <p>Die Einbettung des YouTube-Videos erfolgt über die <em>enhanced privacy</em>-Domain
+      (<code>www.youtube-nocookie.com</code>). Erst beim Öffnen des Lore-Modals baut der Browser eine Verbindung
+      zu Google auf. Anbieter: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.
+      Datenschutzerklärung: <a class="inline" href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>.</p>
+
+    <h2><span class="dot">▸</span> 5. Deine Rechte</h2>
+    <p>Nach DSGVO hast du das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17),
+      Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20). Da wir keine personenbezogenen
+      Daten von dir speichern, kannst du deinen lokalen Spielstand jederzeit selbst löschen, indem du in deinem
+      Browser die Website-Daten von SpiderZ entfernst.</p>
+
+    <h2><span class="dot">▸</span> 6. Cookies</h2>
+    <p>SpiderZ selbst setzt <strong>keine</strong> Cookies. Drittanbieter-Cookies (YouTube/Google) können erst
+      durch Interaktion mit dem Lore-Modal gesetzt werden.</p>
+
+    <p class="updated">Stand: Juli 2026 · Diese Erklärung gilt ausschließlich für die Anwendung SpiderZ.</p>
+  </div>
+</body>
+</html>

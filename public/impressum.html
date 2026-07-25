@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Impressum — SpiderZ</title>
+  <style>
+    :root{
+      --hud-bg:#0c0a18; --hud-bg-2:#141029; --hud-border:rgba(120,80,220,.45);
+      --hud-text:#e7e3ff; --hud-dim:#8a83b8; --hud-cyan:#22d3ee; --hud-magenta:#ff35d0; --hud-lime:#b6ff3b;
+      --font-mono:"Space Mono",ui-monospace,monospace;
+      --font-display:"Pokemon Solid","Fredoka","Space Grotesk",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      min-height:100vh; color:var(--hud-text);
+      font-family:var(--font-mono); line-height:1.7; font-size:15px;
+      background:
+        radial-gradient(1100px 700px at 50% -5%, rgba(139,92,246,.28), transparent 55%),
+        radial-gradient(1000px 700px at 50% 105%, rgba(34,211,238,.22), transparent 55%),
+        linear-gradient(180deg,#1b1033 0%,#0c0a18 48%,#06121f 100%);
+      background-attachment:fixed;
+      padding:0 0 60px;
+    }
+    .wrap{max-width:760px; margin:0 auto; padding:0 20px;}
+    header{padding:48px 0 8px;}
+    .back{
+      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+      color:var(--hud-cyan); font-weight:700; letter-spacing:.08em; font-size:13px;
+      border:1px solid var(--hud-border); padding:8px 14px; border-radius:99px;
+      background:color-mix(in srgb, var(--hud-bg) 55%, transparent);
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    }
+    .back:hover{filter:brightness(1.2);}
+    h1{
+      font-family:var(--font-display); font-size:clamp(28px,5vw,46px); margin:24px 0 4px;
+      background:linear-gradient(90deg,var(--hud-cyan),var(--hud-magenta));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      letter-spacing:.02em;
+    }
+    .sub{color:var(--hud-dim); font-size:13px; letter-spacing:.06em; margin-bottom:32px;}
+    h2{
+      font-family:var(--font-display); font-size:clamp(18px,3vw,24px); color:var(--hud-text);
+      margin:36px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--hud-border);
+    }
+    h2 .dot{color:var(--hud-magenta);}
+    p{margin:10px 0; color:#d9d3f5;}
+    .card{
+      background:color-mix(in srgb, var(--hud-bg) 55%, transparent);
+      border:1px solid var(--hud-border); border-radius:14px; padding:18px 20px; margin:18px 0;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .tag{color:var(--hud-lime); font-weight:700; letter-spacing:.05em;}
+    .row{display:flex; flex-direction:column; gap:2px; padding:8px 0;}
+    .row .k{color:var(--hud-dim); font-size:12px; letter-spacing:.06em;}
+    .row .v{color:var(--hud-text); font-size:15px;}
+    .note{color:var(--hud-dim); font-size:13px; margin-top:8px;}
+    .updated{color:var(--hud-dim); font-size:12px; margin-top:40px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="back" href="./">&larr; ZURÜCK ZU SPIDERZ</a>
+      <h1>IMPRESSUM</h1>
+      <div class="sub">// DOSSIER_IMPRESSUM — Stand: Juli 2026</div>
+    </header>
+
+    <div class="card">
+      <p><span class="tag">Angaben gemäß § 5 TMG</span></p>
+      <div class="row">
+        <span class="k">BETREIBER</span>
+        <span class="v">Daniel Paul</span>
+      </div>
+      <div class="row">
+        <span class="k">PROJEKT</span>
+        <span class="v">SpiderZ — Monster-Catcher aus New-Arachne</span>
+      </div>
+      <div class="row">
+        <span class="k">KONTAKT</span>
+        <span class="v">GitHub: <a class="inline" href="https://github.com/777danielpaul-droid" target="_blank" rel="noopener" style="color:var(--hud-cyan);text-decoration:underline;">777danielpaul-droid</a></span>
+      </div>
+      <p class="note">Vollständige Kontaktdaten (Anschrift, E-Mail) auf Anfrage über das GitHub-Profil.</p>
+    </div>
+
+    <h2><span class="dot">▸</span> Verantwortlich für den Inhalt</h2>
+    <p>Verantwortlich für die Inhalte nach § 55 Abs. 2 RStV ist der oben genannte Betreiber.</p>
+
+    <h2><span class="dot">▸</span> Haftungshinweise</h2>
+    <p><strong>Haftung für Inhalte:</strong> Als Diensteanbieter bin ich für eigene Inhalte auf diesen Seiten
+      nach den allgemeinen Gesetzen verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder
+      gespeicherte fremde Informationen zu überwachen.</p>
+    <p><strong>Haftung für Links:</strong> Mein Angebot enthält Links zu externen Webseiten Dritter, auf deren
+      Inhalte ich keinen Einfluss habe. Für diese fremden Inhalte wird keine Gewähr übernommen.</p>
+
+    <h2><span class="dot">▸</span> Urheberrecht</h2>
+    <p>Die durch den Betreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem Urheberrecht.
+      Externe Marken (YouTube/Google) bleiben Eigentum ihrer jeweiligen Inhaber.</p>
+
+    <p class="updated">Stand: Juli 2026</p>
+  </div>
+</body>
+</html>

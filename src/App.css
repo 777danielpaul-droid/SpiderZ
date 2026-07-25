@@ -1060,3 +1060,30 @@
   box-shadow: 0 0 12px -2px var(--hud-magenta);
 }
 
+/* SITE-FOOTER: Datenschutz + Impressum (liegt ueber HUD, z-index 100) */
+.site-footer{
+  position: relative; z-index: 110;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: space-between;
+  margin-top: 60px; padding: 22px 26px;
+  border-top: 1px solid var(--hud-border);
+  background: color-mix(in srgb, var(--hud-bg) 60%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em;
+  color: var(--hud-dim);
+}
+.site-footer-brand{
+  font-family: var(--font-display); font-weight: 800; font-size: 16px; letter-spacing: .04em;
+  background: linear-gradient(90deg, var(--hud-cyan), var(--hud-magenta));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.site-footer-brand span{ color: var(--hud-magenta); -webkit-text-fill-color: var(--hud-magenta); }
+.site-footer-nav{ display: inline-flex; gap: 16px; }
+.site-footer-nav a{
+  color: var(--hud-text); text-decoration: none; opacity: .8; transition: color .2s, opacity .2s;
+}
+.site-footer-nav a:hover{ color: var(--hud-cyan); opacity: 1; }
+.site-footer-copy{ font-size: 11px; opacity: .7; }
+@media (max-width: 560px){
+  .site-footer{ flex-direction: column; align-items: flex-start; gap: 12px; text-align: left; }
+}
+
