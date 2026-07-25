@@ -27,66 +27,55 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
   const dir = index % 2 === 0 ? 1 : -1; // abwechselnd links/rechts
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top top",
-          // Explizite Pixel-Distanz (250% der Viewport-Hoehe) statt "%",
-          // weil ScrollTrigger "%" bei end:"+=X%" nicht zuverlaessig auf
-          // die Viewport-Hoehe bezieht -> sonst zu kurze Karten + Overlap.
-          end: () => "+=" + window.innerHeight * 4,
-          pin: pinRef.current,
-          scrub: 1,            // Scroll-getrieben, weich nachziehend
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            if (!revealedRef.current && self.progress > 0.08) {
-              revealedRef.current = true;
-              onReveal?.(pokemon.id);
-            }
-          },
+    const section = sectionRef.current;
+    const pin = pinRef.current;
+    if (!section || !pin) return;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: "top top",
+        end: () => "+=" + window.innerHeight * 4,
+        pin: pin,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (!revealedRef.current && self.progress > 0.08) {
+            revealedRef.current = true;
+            onReveal?.(pokemon.id);
+          }
         },
-      });
+      },
+    });
 
-      // Reveal läuft über REVEAL-Anteil der Scroll-Strecke, danach HOLD (Dwell).
-      const REVEAL = 0.62;
-      const HOLD = 1 - REVEAL; // Karte bleibt am Ende kurz mittig stehen
+    const REVEAL = 0.62;
+    const HOLD = 1 - REVEAL;
 
-      // Bild: von klein/gedreht/verschoben -> gross, gerade, schwebend
-      tl.fromTo(
-        imgRef.current,
-        { scale: 0.55, rotate: -25 * dir, yPercent: 30, filter: "blur(8px)" },
-        { scale: 1.25, rotate: 8 * dir, yPercent: -12, filter: "blur(0px)", ease: "none", duration: REVEAL },
-        0
-      );
-      // Panel: von der Seite rein + Fade
-      tl.fromTo(
-        panelRef.current,
-        { xPercent: 120 * dir, opacity: 0, rotateY: 35 * dir },
-        { xPercent: 0, opacity: 1, rotateY: 0, ease: "none", duration: REVEAL },
-        0
-      );
-      // Grosse Nummer im Hintergrund: gegenlaeufiger Parallax
-      tl.fromTo(
-        numRef.current,
-        { xPercent: -40 * dir, opacity: 0.15, scale: 1.4 },
-        { xPercent: 40 * dir, opacity: 0.35, scale: 1.0, ease: "none", duration: REVEAL },
-        0
-      );
-      // Hintergrund-Akzent: Farbwechsel + radiale Ausdehnung (starker Typ-Glow)
-      tl.fromTo(
-        bgRef.current,
-        { scale: 0.5, opacity: 0.5, background: `radial-gradient(circle, ${primary}77, transparent 72%)` },
-        { scale: 2.0, opacity: 1, background: `radial-gradient(circle, ${secondary}88, transparent 72%)`, ease: "none", duration: REVEAL },
-        0
-      );
-      // HOLD: leere Tween haelt den End-State (mittig) fuer den Rest der Strecke,
-      // damit die Karte vor dem Unpin kurz verweilt statt sofort weiterzulaufen.
-      tl.to({}, { duration: HOLD }, REVEAL);
-    }, sectionRef);
+    tl.fromTo(imgRef.current,
+      { scale: 0.55, rotate: -25 * dir, yPercent: 30, filter: "blur(8px)" },
+      { scale: 1.25, rotate: 8 * dir, yPercent: -12, filter: "blur(0px)", ease: "none", duration: REVEAL }, 0);
+    tl.fromTo(panelRef.current,
+      { xPercent: 120 * dir, opacity: 0, rotateY: 35 * dir },
+      { xPercent: 0, opacity: 1, rotateY: 0, ease: "none", duration: REVEAL }, 0);
+    tl.fromTo(numRef.current,
+      { xPercent: -40 * dir, opacity: 0.15, scale: 1.4 },
+      { xPercent: 40 * dir, opacity: 0.35, scale: 1.0, ease: "none", duration: REVEAL }, 0);
+    tl.fromTo(bgRef.current,
+      { scale: 0.5, opacity: 0.5, background: `radial-gradient(circle, ${primary}77, transparent 72%)` },
+      { scale: 2.0, opacity: 1, background: `radial-gradient(circle, ${secondary}88, transparent 72%)`, ease: "none", duration: REVEAL }, 0);
+    tl.to({}, { duration: HOLD }, REVEAL);
 
-    return () => ctx.revert();
+    const img = imgRef.current;
+    const onLoad = () => ScrollTrigger.refresh();
+    if (img && !img.complete) img.addEventListener("load", onLoad, { once: true });
+    else requestAnimationFrame(() => ScrollTrigger.refresh());
+
+    return () => {
+      if (img) img.removeEventListener("load", onLoad);
+      tl.scrollTrigger && tl.scrollTrigger.kill();
+      tl.kill();
+    };
   }, [pokemon, index, dir, primary, secondary, onReveal]);
 
   const total = pokemon.stats.reduce((s, x) => s + x.value, 0);

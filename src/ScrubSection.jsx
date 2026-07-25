@@ -13,7 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *   NasaMon/spider_full_body_16x9.mp4 extrahiert).
  */
 const FRAME_COUNT = 193;            // Spider-Video: 193 Frames (24fps, 8.1s)
-const FRAME_BASE = "/scrub/frame_";
+const FRAME_BASE = import.meta.env.BASE_URL + "scrub/frame_";
 const PAD = 3;
 // Reine Vorwaerts-Scrub: Scroll 0..1 -> Frame 0..FRAME_COUNT-1 (kein Reverse).
 const FIRST_FRAME = 0;

@@ -10,7 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  * - Vor + zurueck (hoch = rueckwaerts), gekoppelt an Scroll-Position.
  */
 const FRAME_COUNT = 141;
-const FRAME_BASE = "/cuteness/frame_";
+const FRAME_BASE = import.meta.env.BASE_URL + "cuteness/frame_";
 const PAD = 3;
 
 export default function CutenessSection() {
