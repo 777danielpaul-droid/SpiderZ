@@ -345,8 +345,8 @@
   content: "";
   position: absolute;
   top: 0;
-  width: 16vw;
-  height: 9vh;
+  width: 120px;
+  height: 34px;
   background: #0f0a1a;
   z-index: 2;
   pointer-events: none;
