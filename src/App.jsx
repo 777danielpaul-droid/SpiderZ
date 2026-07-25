@@ -67,6 +67,7 @@ export default function App() {
   const [revealed, setRevealed] = useState(false);     // Team-Reveal abgeschlossen -> Vial darf erscheinen
   const [loreOpen, setLoreOpen] = useState(false);     // Lore-Modal (Chronik)
   const [boosterOpen, setBoosterOpen] = useState(false); // Booster-Screen nach Arena-Sieg
+  const [boosterCta, setBoosterCta] = useState(false);   // "Booster öffnen"-Button nach Durchscrollen
 
   // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
   // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
@@ -116,7 +117,7 @@ export default function App() {
         trigger: el,
         start: "top 90%", // erreichbar: feuert, sobald die Ergebnis-Zeile im unteren Viewport erscheint
         once: true,
-        onEnter: () => { boostShown.current = true; setBoosterOpen(true); },
+        onEnter: () => { boostShown.current = true; setBoosterCta(true); },
       });
       // Fallback: falls bei Mount schon sichtbar (sehr hoher Viewport) -> sofort öffnen.
       if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
@@ -135,6 +136,7 @@ export default function App() {
     setBoostedId(null);
     setRevealed(false);
     setBoosterOpen(false);
+    setBoosterCta(false);
     boostShown.current = false;
     revealPlayed.current = false;
     reset();
@@ -668,7 +670,18 @@ export default function App() {
             </section>
           )}
 
-          {/* BOOSTER-SCREEN: nach Arena-Sieg (Mechanik folgt spaeter) */}
+          {/* BOOSTER-CTA: nach Durchscrollen der Ergebnisse, vor dem Booster-Screen */}
+          {boosterCta && arenaWins >= 2 && !boosterOpen && (
+            <div className="booster-cta-wrap">
+              <button type="button" className="booster-cta" onClick={() => setBoosterOpen(true)}>
+                <span className="booster-cta-arrow" aria-hidden="true">⬡</span>
+                BOOSTER ÖFFNEN
+                <span className="booster-cta-arrow" aria-hidden="true">⬡</span>
+              </button>
+            </div>
+          )}
+
+          {/* BOOSTER-SCREEN: nach Klick auf CTA */}
           {boosterOpen && arenaWins >= 2 && (
             <BoosterScreen onClose={() => setBoosterOpen(false)} />
           )}
