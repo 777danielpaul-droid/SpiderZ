@@ -457,6 +457,16 @@ export default function App() {
             <p>Wenn die Stunde schlägt, treffen die Champions aufeinander. Auf schmalem Grat, Auge in Auge, entbrennt der kurze, erbarmungslose Eid des Stahls. Kein Raum für Zögern, nur der Sieg der Klauen oder das Fallen in den Staub. So lebt die jahrzehntelange Legende von <span className="lore-accent">spiderZ</span> im wahren Leben weiter – als eiserner Kodex auf dem Bambus.</p>
 
             <div className="lore-seal">✦</div>
+            <div className="lore-video">
+              <iframe
+                src="https://www.youtube.com/embed/xg6dom7xZ1Y?start=198"
+                title="Paaway Kaka — Feldaufnahme"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+            <div className="lore-video-cap">Feldaufnahme · Paaway Kaka</div>
           </article>
           <button type="button" className="lore-close" onClick={() => setLoreOpen(false)} aria-label="Lore schließen">✕</button>
         </div>
