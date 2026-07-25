@@ -391,7 +391,7 @@ export default function App() {
           <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Spielregeln</a>
           <button type="button" className="site-link lore-link" onClick={() => setLoreOpen(true)}>Lore</button>
           <a className="site-link" href={import.meta.env.BASE_URL + "datenschutz.html"} target="_blank" rel="noopener">Datenschutz</a>
-          <a className="site-link" href="/impressum.html" target="_blank" rel="noopener">Impressum</a>
+          <a className="site-link" href={import.meta.env.BASE_URL + "impressum.html"} target="_blank" rel="noopener">Impressum</a>
         </nav>
         <button
           type="button"
