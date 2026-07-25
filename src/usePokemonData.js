@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { TOTAL_POKEMON } from "./pokemonList";
 import { supabase, isSupabaseReady } from "./lib/supabase";
 
+// In-Memory-Cache: verhindert Repeated-Fetch bei HMR/Reload des gleichen Sets.
+const cache = new Map(); // id -> nasamon datensatz
+
 // Wenn keine Supabase-Credentials da sind (z.B. Pages ohne Secrets),
 // direkt einen klaren Fehler liefern statt auf null.from() zu crashen.
 const NO_SUPABASE = "SpiderZ braucht eine Supabase-Verbindung. Bitte .env konfigurieren.";
