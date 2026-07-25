@@ -339,12 +339,13 @@
   object-fit: cover;
   background: transparent;
 }
-/* CapCut-Wasserzeichen aus den Video-Frames ueberdecken (oben links + rechts) */
+/* CapCut-Wasserzeichen aus den Video-Frames ueberdecken (oben links + rechts),
+   beginnt erst UNTER dem Header, damit es nicht rausschaut */
 .scrub-pin::before,
 .scrub-pin::after {
   content: "";
   position: absolute;
-  top: 0;
+  top: 64px;
   width: 120px;
   height: 34px;
   background: #0f0a1a;
