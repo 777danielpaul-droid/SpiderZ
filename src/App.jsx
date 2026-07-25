@@ -101,10 +101,30 @@ export default function App() {
   const arenaLosses = arenaMatches.filter((m) => m.result.winner === "b").length;
   const arenaDraws = arenaMatches.filter((m) => m.result.winner === "draw").length;
 
-  // Booster-Screen nach Sieg (Mechanik folgt spaeter - hier nur Anzeige).
+  // Booster-Screen erst, wenn die Arena-Ergebnisse durchgescrollt wurden (nicht direkt bei Sieg).
+  // arena-result ist das letzte Element -> start muss erreichbar sein (nicht "top 70%",
+  // sonst wird die Zeile am Scroll-Ende nie so weit hochgeschoben).
+  const boostShown = useRef(false);
   useEffect(() => {
-    if (arenaMatches.length === TOTAL_POKEMON && arenaWins >= 2) setBoosterOpen(true);
-  }, [arenaMatches, arenaWins]);
+    if (arenaWins < 2 || arenaMatches.length !== TOTAL_POKEMON) return;
+    if (!arenaEndRef.current || boostShown.current) return;
+    const id = requestAnimationFrame(() => {
+      // Layout (async Spider-Bilder) erst finalisieren, dann Trigger vermessen.
+      ScrollTrigger.refresh();
+      const el = arenaEndRef.current;
+      const trigger = ScrollTrigger.create({
+        trigger: el,
+        start: "top 90%", // erreichbar: feuert, sobald die Ergebnis-Zeile im unteren Viewport erscheint
+        once: true,
+        onEnter: () => { boostShown.current = true; setBoosterOpen(true); },
+      });
+      // Fallback: falls bei Mount schon sichtbar (sehr hoher Viewport) -> sofort öffnen.
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
+        boostShown.current = true; setBoosterOpen(true); trigger.kill();
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [arenaWins, arenaMatches.length]);
 
   // Neustart: frische Runde + UI zuruecksetzen.
   const handleRestart = useCallback(() => {
@@ -115,6 +135,7 @@ export default function App() {
     setBoostedId(null);
     setRevealed(false);
     setBoosterOpen(false);
+    boostShown.current = false;
     revealPlayed.current = false;
     reset();
     window.scrollTo(0, 0);
@@ -124,6 +145,7 @@ export default function App() {
   const stRef = useRef(null);
   const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
   const endcardRef = useRef(null);   // Final-Event: Team-Reveal
+  const arenaEndRef = useRef(null);  // Arena-Ergebnis -> Booster-Screen nach Durchscrollen
   const teamRefs = useRef({});       // DOM-Refs der Team-Karten
   const revealPlayed = useRef(false); // Finale nur einmal abspielen
   const logoRef = useRef(null);      // SpiderZ-Wortmarke (Fade-in beim 1. Scroll)
@@ -640,7 +662,7 @@ export default function App() {
                   );
                 })}
               </div>
-              <div className={`arena-result ${arenaWins > arenaLosses ? "win" : arenaLosses > arenaWins ? "lose" : "draw"}`}>
+              <div ref={arenaEndRef} className={`arena-result ${arenaWins > arenaLosses ? "win" : arenaLosses > arenaWins ? "lose" : "draw"}`}>
                 GESAMT · {arenaWins} SIEGE — {arenaLosses} NIEDERLAGEN{arenaDraws ? ` — ${arenaDraws} UNENTSCHIEDEN` : ""}
               </div>
             </section>
