@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spiderz2 · 375px Mobile-Test</title>
+  <style>
+    body { margin: 0; background: #111; color: #fff; font-family: monospace; }
+    h1 { font-size: 14px; padding: 8px 12px; margin: 0; background: #1a1a1a; }
+    #frame {
+      width: 375px; height: 820px; border: 2px solid #6d28d9; display: block;
+    }
+    #out { padding: 10px 12px; white-space: pre-wrap; font-size: 12px; }
+    .ok { color: #b6ff3b; } .bad { color: #ff5fa8; }
+  </style>
+</head>
+<body>
+  <h1>Spiderz2 @ 375px — horizontal-overflow check</h1>
+  <iframe id="frame" src="/SpiderZ/"></iframe>
+  <div id="out">Lade App im 375px-Rahmen…</div>
+  <script>
+    const frame = document.getElementById('frame');
+    const out = document.getElementById('out');
+    frame.addEventListener('load', () => {
+      // App braucht etwas Zeit (Frames/React mount). Messe nach 2.5s erneut.
+      let tries = 0;
+      const check = () => {
+        tries++;
+        const doc = frame.contentDocument;
+        if (!doc) { out.textContent = 'Kein Zugriff auf iframe-Dokument'; return; }
+        const de = doc.documentElement;
+        const sw = de.scrollWidth;
+        const cw = frame.clientWidth; // = 375
+        const overflow = sw - cw;
+        const lines = [];
+        lines.push('iframe-Breite (clientWidth): ' + cw + 'px');
+        lines.push('scrollWidth (Dokument): ' + sw + 'px');
+        lines.push('Horizontal-Overflow: ' + overflow + 'px ' + (overflow > 1 ? '❌ SCROLLBAR!' : '✅ keine'));
+        // alle Elemente finden, die breiter als 375 sind
+        const wide = [];
+        doc.querySelectorAll('*').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.width > cw + 1) wide.push((el.className || el.tagName) + ' → ' + Math.round(r.width) + 'px');
+        });
+        lines.push('Elemente breiter als 375px: ' + wide.length);
+        if (wide.length) lines.push(wide.slice(0, 12).join('\n'));
+        const cls = overflow > 1 ? 'bad' : 'ok';
+        out.className = cls;
+        out.textContent = lines.join('\n');
+        if (tries < 3) setTimeout(check, 1500);
+      };
+      setTimeout(check, 2500);
+      // ARENA-PREVIEW: testweise .arena mit 2 .vs-row in die App injizieren,
+      // damit die Mobile-Sichtbarkeit geprueft werden kann (im echten Spiel
+      // erscheint die Arena erst nach komplettem Durchlauf).
+      setTimeout(() => {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc) return;
+          const main = doc.querySelector('main.cards');
+          if (!main) return;
+          if (doc.getElementById('arena-preview')) return;
+          const sec = doc.createElement('section');
+          sec.id = 'arena-preview';
+          sec.className = 'arena';
+          sec.innerHTML = `
+            <h2 class="arena-title">ARENA · DEIN TEAM VS RNG-SCHWARM</h2>
+            <div class="arena-battles">
+              <div class="vs-row">
+                <div class="vs-card own win" style="--accent:#22d3ee">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" alt="Test" loading="lazy" />
+                  <div class="vs-name">Beispiel-A</div>
+                  <div class="vs-strength">120<span class="boost-badge">+100</span></div>
+                  <div class="card-types"><span class="type-badge" style="background:#6d28d9">GIFT</span></div>
+                </div>
+                <div class="vs-card" style="--accent:#ff5fd4">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" alt="Test" loading="lazy" />
+                  <div class="vs-name">Gegner-X</div>
+                  <div class="vs-strength">90</div>
+                  <div class="card-types"><span class="type-badge" style="background:#6d28d9">STÄRKE</span></div>
+                </div>
+              </div>
+            </div>`;
+          main.appendChild(sec);
+        } catch (e) { /* ignorieren */ }
+      }, 3500);
+    });
+  </script>
+</body>
+</html>

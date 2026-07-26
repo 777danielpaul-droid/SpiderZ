@@ -688,14 +688,6 @@ export default function App() {
             <BoosterScreen onClose={() => setBoosterOpen(false)} />
           )}
 
-          <footer className="site-footer">
-            <span className="site-footer-brand">SPIDER<span>Z</span></span>
-            <nav className="site-footer-nav">
-              <a href={import.meta.env.BASE_URL + "datenschutz.html"} target="_blank" rel="noopener">Datenschutz</a>
-              <a href={import.meta.env.BASE_URL + "impressum.html"} target="_blank" rel="noopener">Impressum</a>
-            </nav>
-            <span className="site-footer-copy">© 2026 · New-Arachne</span>
-          </footer>
         </main>
       )}
     </div>
