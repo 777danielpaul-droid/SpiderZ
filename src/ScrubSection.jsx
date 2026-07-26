@@ -19,7 +19,7 @@ const PAD = 3;
 const FIRST_FRAME = 0;
 const LAST_FRAME = FRAME_COUNT - 1;
 
-export default function ScrubSection({ children, hintHidden }) {
+export default function ScrubSection({ children, hintHidden, onReady }) {
   const [loaded, setLoaded] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -57,6 +57,10 @@ export default function ScrubSection({ children, hintHidden }) {
     framesRef.current = imgs;
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (ready && onReady) onReady();
+  }, [ready, onReady]);
 
   // Frame zeichnen (nur bei Aenderung + gueltigem Bild).
   const draw = (idx) => {

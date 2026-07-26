@@ -281,4 +281,39 @@
     max-width: 94vw !important;
   }
   .records-grid { gap: 12px !important; }
+
+  /* ---- HEADER: Mobile-Toggle nach HUD-Vorbild ---- */
+  .site-header {
+    max-height: 340px !important;   /* offen: Logo + Nav + Toggle passen rein */
+  }
+  .header-strip {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    height: 34px !important;
+    padding: 0 14px !important;
+    margin-left: 12px !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    color: #c4b5fd !important;
+    background: linear-gradient(180deg, rgba(40, 20, 70, 0.96), rgba(20, 10, 38, 0.98)) !important;
+    border: 1px solid #6d28d9 !important;
+    border-top: 1px solid rgba(139, 92, 246, 0.6) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 14px rgba(109, 40, 217, 0.45), inset 0 1px 0 rgba(167, 139, 250, 0.15) !important;
+    font: 700 11px/1 ui-monospace, "SFMono-Regular", monospace !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+  }
+  .header-strip-chevron {
+    font-size: 12px !important;
+    line-height: 1 !important;
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.8) !important;
+  }
+  /* Collapsed: nur die Strip bleibt (Logo/Nav/Theme versteckt) */
+  .site-header.header-collapsed { max-height: 44px !important; }
+  .site-header.header-collapsed .site-logo,
+  .site-header.header-collapsed .site-nav,
+  .site-header.header-collapsed .theme-toggle { display: none !important; }
 }

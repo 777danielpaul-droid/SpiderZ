@@ -31,6 +31,15 @@ export default function App() {
   const [hudVisible, setHudVisible] = useState(false);
   const [hudCollapsed, setHudCollapsed] = useState(false); // Mobile: HUD zu schmaler Kante einklappen
   const toggleHud = useCallback(() => setHudCollapsed((c) => !c), []);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false); // Mobile: Header nach Intro auto-einfahren
+  const toggleHeader = useCallback(() => setHeaderCollapsed((c) => !c), []);
+  const handleScrubReady = useCallback(() => {
+    // Nur mobil: nach der Frame2Frame-Animation automatisch einfahren.
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      const t = setTimeout(() => setHeaderCollapsed(true), 2600);
+      return () => clearTimeout(t);
+    }
+  }, []);
   const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
   const [dark, setDark] = useState(true);
   const [hudView, setHudView] = useState("play");   // 'play' | 'records' | 'dex'
@@ -385,7 +394,7 @@ export default function App() {
 
   return (
     <div className="app" ref={rootRef}>
-      <header className="site-header" ref={headerRef}>
+      <header className={`site-header${headerCollapsed ? " header-collapsed" : ""}`} ref={headerRef}>
       <span className="holo-glass" aria-hidden="true"></span>
         <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ">SPIDER<span>Z</span></a>
         <nav className="site-nav">
@@ -404,6 +413,18 @@ export default function App() {
         >
           <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
         </button>
+        {/* Integrierte Top-Leiste: einziger Header-Toggle (Mobile, HUD-Look) */}
+        <div
+          className="header-strip"
+          role="button"
+          tabIndex={0}
+          onClick={toggleHeader}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleHeader(); } }}
+          aria-label="Header ein-/ausfahren"
+        >
+          <span className="header-strip-label">MENÜ</span>
+          <span className="header-strip-chevron">{headerCollapsed ? "▾" : "▴"}</span>
+        </div>
       </header>
       <div className="reveal-flash" aria-hidden="true" />
       <HUD
@@ -434,8 +455,8 @@ export default function App() {
         <DexOverlay onClose={() => setHudView("records")} />
       )}
 
-      <header className="hero" ref={heroRef} id="spiderz">
-        <ScrubSection hintHidden={caughtIds.length > 0}>
+      <header className={`hero`} ref={heroRef} id="spiderz">
+        <ScrubSection hintHidden={caughtIds.length > 0} onReady={handleScrubReady}>
         </ScrubSection>
       </header>
 
