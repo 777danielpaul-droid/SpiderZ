@@ -61,15 +61,6 @@
   font-weight: 700; color: var(--ink-soft);
 }
 .loader.error { color: #dc2626; }
-.loader-bar {
-  width: min(420px, 80vw); height: 16px;
-  background: rgba(124, 58, 237, 0.15);
-  border-radius: 999px; overflow: hidden;
-}
-.loader-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--neon), var(--neon-green));
-}
 
 /* ============ Karten / Scroll-Transformation ============ */
 .cards { position: relative; }

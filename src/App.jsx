@@ -22,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
-  const { data, error, progress, search, runSearch, clearSearch, reset, allData } = usePokemonData(TOTAL_POKEMON);
+  const { data, error, search, runSearch, clearSearch, reset, allData } = usePokemonData(TOTAL_POKEMON);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
@@ -511,15 +511,6 @@ export default function App() {
 
       {error && (
         <div className="loader error">Fehler beim Laden: {error}</div>
-      )}
-
-      {!data && !error && (
-        <div className="loader">
-          <div className="loader-bar">
-            <div className="loader-fill" style={{ width: `${progress}%` }} />
-          </div>
-          <p>Lade Pokémon-Daten … {progress}%</p>
-        </div>
       )}
 
       {data && (
