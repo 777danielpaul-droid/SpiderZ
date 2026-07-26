@@ -113,15 +113,6 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
 
   return (
     <div className={`hud${visible ? " hud-visible" : ""}${collapsed ? " hud-collapsed" : ""}`}>
-      <button
-        type="button"
-        className="hud-toggle"
-        onClick={onToggle}
-        aria-label={collapsed ? "HUD aufklappen" : "HUD einklappen"}
-        title={collapsed ? "HUD aufklappen" : "HUD einklappen"}
-      >
-        {collapsed ? "▲ HUD" : "▼"}
-      </button>
       <div className="hud-frame">
         {/* SYSTEM-Status */}
         <section className="hud-mod">
@@ -229,6 +220,20 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
             </button>
           </form>
         </section>
+      </div>
+
+      {/* Integrierte Bottom-Leiste: einziger Toggle-Trigger (Mobile) */}
+      <div
+        className="hud-strip"
+        role="button"
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } }}
+        aria-label={collapsed ? "HUD ausfahren" : "HUD einklappen"}
+        aria-expanded={!collapsed}
+      >
+        <span className="hud-strip-label">HUD</span>
+        <span className="hud-strip-chevron">{collapsed ? "▲" : "▼"}</span>
       </div>
     </div>
   );
