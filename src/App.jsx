@@ -29,7 +29,7 @@ export default function App() {
   const heroRef = useRef(null);
   const headerRef = useRef(null);
   const [hudVisible, setHudVisible] = useState(false);
-  const [hudCollapsed, setHudCollapsed] = useState(false); // Mobile: HUD zu schmaler Kante einklappen
+  const [hudCollapsed, setHudCollapsed] = useState(true); // Mobile: HUD startet eingefahren (nur Kante), per Tap ausfahren
   const toggleHud = useCallback(() => setHudCollapsed((c) => !c), []);
   const [headerCollapsed, setHeaderCollapsed] = useState(false); // Mobile: Header nach Intro auto-einfahren
   const toggleHeader = useCallback(() => setHeaderCollapsed((c) => !c), []);
