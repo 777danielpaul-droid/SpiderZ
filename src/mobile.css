@@ -164,8 +164,37 @@
     max-height: 30vh !important;     /* Deckel: flach bleiben, nie "alles" verdecken */
     overflow-y: auto !important;
     transform: none !important;
+    z-index: 50 !important;          /* ueber Scrub-Canvas, damit Toggle klickbar bleibt */
   }
   .hud-visible { transform: none !important; }
+  /* Toggle-Button: immer sichtbar (auch wenn HUD eingeklappt), oben rechts */
+  .hud-toggle {
+    position: absolute !important;
+    top: -32px !important;
+    right: 6px !important;
+    z-index: 60 !important;          /* ueber Canvas + HUD */
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 4px 10px !important;
+    font: 700 11px/1 ui-monospace, monospace !important;
+    letter-spacing: 1px !important;
+    color: #c4b5fd !important;
+    background: rgba(20, 12, 38, 0.92) !important;
+    border: 1px solid #6d28d9 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 10px rgba(109, 40, 217, 0.5) !important;
+    cursor: pointer !important;
+  }
+  /* Eingeklappt: schmale Kante (~40px) mit Button, Frame versteckt -> verdeckt nichts */
+  .hud.hud-collapsed {
+    max-height: 40px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    overflow: visible !important;
+  }
+  .hud.hud-collapsed .hud-frame { display: none !important; }
+  .hud.hud-collapsed .hud-toggle { top: 5px !important; }
   .hud-frame {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;  /* 2 Spalten -> halb so hoch wie vorher */

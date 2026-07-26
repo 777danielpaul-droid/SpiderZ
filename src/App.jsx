@@ -29,6 +29,8 @@ export default function App() {
   const heroRef = useRef(null);
   const headerRef = useRef(null);
   const [hudVisible, setHudVisible] = useState(false);
+  const [hudCollapsed, setHudCollapsed] = useState(false); // Mobile: HUD zu schmaler Kante einklappen
+  const toggleHud = useCallback(() => setHudCollapsed((c) => !c), []);
   const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
   const [dark, setDark] = useState(true);
   const [hudView, setHudView] = useState("play");   // 'play' | 'records' | 'dex'
@@ -410,6 +412,8 @@ export default function App() {
         data={data}
         scrollFillRef={scrollFillRef}
         visible={hudVisible}
+        collapsed={hudCollapsed}
+        onToggle={toggleHud}
         onRestart={handleRestart}
         onShowRecords={() => setHudView("records")}
         onNext={goNext}

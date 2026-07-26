@@ -11,7 +11,7 @@ import "./hud.css";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery }) {
+export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery }) {
   const caught = caughtIds.length;
 
   // Challenge-Score: Gesamtstaerke aller gefangenen Pokemon.
@@ -112,7 +112,16 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
   const caughtPct = total ? (caught / total) * 100 : 0;
 
   return (
-    <div className={`hud${visible ? " hud-visible" : ""}`}>
+    <div className={`hud${visible ? " hud-visible" : ""}${collapsed ? " hud-collapsed" : ""}`}>
+      <button
+        type="button"
+        className="hud-toggle"
+        onClick={onToggle}
+        aria-label={collapsed ? "HUD aufklappen" : "HUD einklappen"}
+        title={collapsed ? "HUD aufklappen" : "HUD einklappen"}
+      >
+        {collapsed ? "▲ HUD" : "▼"}
+      </button>
       <div className="hud-frame">
         {/* SYSTEM-Status */}
         <section className="hud-mod">
