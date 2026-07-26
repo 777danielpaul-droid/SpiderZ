@@ -277,23 +277,24 @@ export default function App() {
         .to(flash, { opacity: 0, duration: 0.55, ease: "power2.out" });
     }
 
-    // 2) Screen-Shake auf dem Grid
+    // 2) Screen-Shake auf dem Grid (dezent, nicht heftig)
     if (grid) {
       tl.to(grid, {
         keyframes: {
-          "0%": { x: 0, y: 0 }, "12%": { x: -16, y: 9 }, "24%": { x: 14, y: -11 },
-          "38%": { x: -11, y: 7 }, "52%": { x: 9, y: -6 }, "68%": { x: -6, y: 4 },
-          "84%": { x: 4, y: -2 }, "100%": { x: 0, y: 0 },
+          "0%": { x: 0, y: 0 }, "12%": { x: -7, y: 4 }, "24%": { x: 6, y: -5 },
+          "38%": { x: -5, y: 3 }, "52%": { x: 4, y: -2 }, "68%": { x: -3, y: 1 },
+          "100%": { x: 0, y: 0 },
         },
-        duration: 0.65, ease: "none",
+        duration: 0.5, ease: "none",
       }, 0.08);
     }
 
-    // 3) Karten detonierten aus einem Punkt + Neon-Trail-Glow
+    // 3) Jede Karte einzeln nacheinander revealed (grosser Stagger =
+    //    Spotlight-Effekt: eine Spinne nach der anderen kommt in den Fokus)
     tl.to(cards, {
       opacity: 1, scale: 1, y: 0, rotateZ: 0,
       filter: "blur(0px) brightness(1)",
-      duration: 0.95, ease: "back.out(2.2)", stagger: 0.14,
+      duration: 0.7, ease: "power2.out", stagger: 0.5,
     }, 0.18);
 
     // 4) Pro Karte: Sprite-Zoom, Chromatic-Abberation, Glitch, Typed-Name, Stärke hoch
@@ -302,13 +303,13 @@ export default function App() {
       const nameEl = card.querySelector(".team-name");
       const strEl = card.querySelector(".team-strength");
       const caught = card.classList.contains("is-caught");
-      const at = 0.45 + i * 0.14;
+      const at = 0.4 + i * 0.5;
 
       if (img) {
-        tl.fromTo(img, { scale: 1.8 }, { scale: 1, duration: 0.7, ease: "power3.out" }, at)
+        tl.fromTo(img, { scale: 1.3 }, { scale: 1, duration: 0.6, ease: "power2.out" }, at)
           .fromTo(img,
-            { filter: "drop-shadow(8px 0 0 rgba(255,0,80,0.95)) drop-shadow(-8px 0 0 rgba(0,200,255,0.95)) brightness(2.4)" },
-            { filter: "drop-shadow(0 0 0 rgba(0,0,0,0)) brightness(1)", duration: 0.55, ease: "power2.out" }, at);
+            { filter: "drop-shadow(4px 0 0 rgba(255,0,80,0.6)) drop-shadow(-4px 0 0 rgba(0,200,255,0.6)) brightness(1.8)" },
+            { filter: "drop-shadow(0 0 0 rgba(0,0,0,0)) brightness(1)", duration: 0.45, ease: "power2.out" }, at);
       }
       if (caught && nameEl) {
         const target = data.find((p) => String(p.id) === card.dataset.id);
@@ -322,8 +323,8 @@ export default function App() {
             n++;
             nameEl.textContent = fullName.slice(0, n);
             if (n >= fullName.length) { clearInterval(t); nameEl.classList.remove("glitch", "typing"); }
-          }, 40);
-        }, null, at + 0.15);
+          }, 32);
+        }, null, at + 0.12);
         if (strEl) {
           const strVal = target ? target.strength : 0;
           const proxy = { v: 0 };

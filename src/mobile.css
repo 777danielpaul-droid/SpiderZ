@@ -282,6 +282,36 @@
   }
   .records-grid { gap: 12px !important; }
 
+  /* ---- LESBARKEIT MOBILE: Namen/Badges/Glow weicher + groesser ---- */
+  /* Team-Name: mobil IMMER sichtbar (kein Hover) + groesser + weicher Glow */
+  .team-name {
+    opacity: 1 !important;
+    transform: none !important;
+    font-size: clamp(22px, 5.2vw, 30px) !important;
+    letter-spacing: 0.01em !important;
+    text-shadow: 0 0 10px rgba(231, 227, 255, 0.30), 0 1px 2px rgba(0,0,0,0.6) !important;
+  }
+  .team-card { line-height: 1.3 !important; }
+  .team-meta { gap: 8px !important; font-size: 14px !important; }
+  .team-avg { font-weight: 800 !important; }
+  /* Typ-Badges groesser + lesbarer */
+  .type-badge {
+    font-size: 12px !important; padding: 5px 14px !important;
+    letter-spacing: 0.6px !important; box-shadow: 0 2px 8px -4px rgba(0,0,0,0.5) !important;
+  }
+  /* Card-Panel-Text luftiger + groesser */
+  .card-sub { font-size: 15px !important; line-height: 1.5 !important; opacity: 0.85 !important; }
+  .stat-row { font-size: 14px !important; grid-template-columns: 96px 1fr 40px !important; }
+  .stat-total { font-size: 20px !important; }
+  .story-body { font-size: 16px !important; line-height: 1.65 !important; }
+  .site-link { font-size: 12px !important; }
+  /* Glow dezenter (weicher, weniger hartes Leuchten) */
+  .team-card.reveal-glow {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18),
+      0 0 30px rgba(34, 211, 238, 0.35), 0 0 50px rgba(255, 53, 208, 0.18) !important;
+  }
+  .team-card img { filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.22)) !important; }
+
   /* ---- HEADER: Mobile-Toggle nach HUD-Vorbild ---- */
   .site-header {
     max-height: 340px !important;   /* offen: Logo + Nav + Toggle passen rein */
