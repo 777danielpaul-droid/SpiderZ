@@ -316,4 +316,7 @@
   .site-header.header-collapsed .site-logo,
   .site-header.header-collapsed .site-nav,
   .site-header.header-collapsed .theme-toggle { display: none !important; }
+  /* Eingefahren: MENUE-Strip mittig zentrieren (statt rechts) */
+  .site-header.header-collapsed .header-strip { margin-left: auto !important; margin-right: auto !important; }
+  .site-header.header-collapsed .holo-glass { display: none !important; }
 }
