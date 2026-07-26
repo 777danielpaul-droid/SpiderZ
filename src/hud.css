@@ -452,3 +452,7 @@
   .hud-bar-fill,
   .hud-team-str { animation: none; }
 }
+
+/* Toggle-Leiste: nur im Mobile-Layout (<=767px) sichtbar.
+   Desktop: nie zeigen (sonst roher "HUD ▼"-Text ungestylt). */
+.hud-strip { display: none; }
