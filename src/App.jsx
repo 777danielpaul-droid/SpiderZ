@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import { usePokemonData } from "./usePokemonData";
-import { TOTAL_POKEMON, TYPE_COLORS } from "./pokemonList";
-import PokemonCard from "./PokemonCard";
+import { useMonData } from "./useMonData";
+import { TOTAL_MON, TYPE_COLORS } from "./monList";
+import MonCard from "./MonCard";
 import ScrubSection from "./ScrubSection";
 import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
@@ -22,7 +22,7 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
-  const { data, error, search, runSearch, clearSearch, reset, allData } = usePokemonData(TOTAL_POKEMON);
+  const { data, error, search, runSearch, clearSearch, reset, allData } = useMonData(TOTAL_MON);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
@@ -40,7 +40,7 @@ export default function App() {
       return () => clearTimeout(t);
     }
   }, []);
-  const [activeCard, setActiveCard] = useState(0); // Index des aktiven Pokemon
+  const [activeCard, setActiveCard] = useState(0); // Index des aktiven mon
   const [dark, setDark] = useState(true);
   const [hudView, setHudView] = useState("play");   // 'play' | 'records' | 'dex'
 
@@ -62,7 +62,7 @@ export default function App() {
 
   // Runde beendet (alle gefangen) -> in Pokedex + Rekord speichern.
   useEffect(() => {
-    if (!data || caughtIds.length < TOTAL_POKEMON) return;
+    if (!data || caughtIds.length < TOTAL_MON) return;
     const caught = data.filter((p) => caughtIds.includes(p.id));
     if (caught.length === 0) return;
     const teamStrength = caught.reduce((s, p) => s + (p.strength || 0), 0);
@@ -84,13 +84,13 @@ export default function App() {
   // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
   const [arenaOpponents, setArenaOpponents] = useState(null); // Array(3) oder null
   useEffect(() => {
-    if (!allData || caughtIds.length < TOTAL_POKEMON || boostedId == null) { setArenaOpponents(null); return; }
+    if (!allData || caughtIds.length < TOTAL_MON || boostedId == null) { setArenaOpponents(null); return; }
     const own = new Set(caughtIds);
     const pool = allData.filter((m) => !own.has(m.id));
     const shuffled = pool
       .map((m) => ({ m, r: Math.random() }))
       .sort((a, b) => a.r - b.r)
-      .slice(0, TOTAL_POKEMON)
+      .slice(0, TOTAL_MON)
       .map((x) => x.m);
     setArenaOpponents(shuffled);
   }, [allData, caughtIds, boostedId]);
@@ -102,8 +102,8 @@ export default function App() {
     p.id === boostedId ? { ...p, strength: (p.strength || 0) + 100 } : p
   );
   const arenaMatches = [];
-  if (arenaOpponents && boostedTeam.length >= TOTAL_POKEMON) {
-    for (let i = 0; i < TOTAL_POKEMON; i++) {
+  if (arenaOpponents && boostedTeam.length >= TOTAL_MON) {
+    for (let i = 0; i < TOTAL_MON; i++) {
       const a = boostedTeam[i];
       const b = arenaOpponents[i];
       if (a && b) arenaMatches.push({ a, b, result: resolveMatch(a, b) });
@@ -118,7 +118,7 @@ export default function App() {
   // sonst wird die Zeile am Scroll-Ende nie so weit hochgeschoben).
   const boostShown = useRef(false);
   useEffect(() => {
-    if (arenaWins < 2 || arenaMatches.length !== TOTAL_POKEMON) return;
+    if (arenaWins < 2 || arenaMatches.length !== TOTAL_MON) return;
     if (!arenaEndRef.current || boostShown.current) return;
     const id = requestAnimationFrame(() => {
       // Layout (async Spider-Bilder) erst finalisieren, dann Trigger vermessen.
@@ -163,13 +163,13 @@ export default function App() {
   const revealPlayed = useRef(false); // Finale nur einmal abspielen
   const logoRef = useRef(null);      // SpiderZ-Wortmarke (Fade-in beim 1. Scroll)
 
-  // "Weiter"-Button: smooth zum naechsten Pokemon (oder ans Team-Ende).
-  // Erst nach dem ersten gefangenen Pokemon nutzbar (vorher muss gescrollt werden).
+  // "Weiter"-Button: smooth zum naechsten mon (oder ans Team-Ende).
+  // Erst nach dem ersten gefangenen mon nutzbar (vorher muss gescrollt werden).
   const goNext = useCallback(() => {
     if (caughtIds.length === 0) return;
     // Bei der letzten Karte: direkt zur Team-Endcard (kein ueberfluessiger
     // Zwischenschritt — ein Druck reicht vom Final-Reveal zum Team).
-    if (activeCard >= TOTAL_POKEMON - 1) {
+    if (activeCard >= TOTAL_MON - 1) {
       // Zum absoluten Dokumentende scrollen -> Endcard komplett unten.
       // onComplete prueft erneut: falls Seite durch nachladende Bilder noch
       // gewachsen ist, wird der Rest kurz nachgescrollt (kein Luftloch).
@@ -184,13 +184,13 @@ export default function App() {
         });
       };
       toBottom();
-      setActiveCard(TOTAL_POKEMON);
+      setActiveCard(TOTAL_MON);
       return;
     }
     const next = activeCard + 1;
     const trg = cardTrgRef.current[next];
     if (trg) {
-      // ans Ende des naechsten Pokemons springen -> voll aufgedeckt
+      // ans Ende des naechsten Monsters springen -> voll aufgedeckt
       const y = trg.end - window.innerHeight * 0.3;
       gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
     }
@@ -429,7 +429,7 @@ export default function App() {
       </header>
       <div className="reveal-flash" aria-hidden="true" />
       <HUD
-        total={TOTAL_POKEMON}
+        total={TOTAL_MON}
         caughtIds={caughtIds}
         data={data}
         scrollFillRef={scrollFillRef}
@@ -440,7 +440,7 @@ export default function App() {
         onShowRecords={() => setHudView("records")}
         onNext={goNext}
         canNext={caughtIds.length > 0}
-        nextLabel={activeCard >= TOTAL_POKEMON - 1 ? "Zum Team ▾" : "Weiter ▸"}
+        nextLabel={activeCard >= TOTAL_MON - 1 ? "Zum Team ▾" : "Weiter ▸"}
         onSearch={runSearch}
         searchQuery={query}
         setSearchQuery={setQuery}
@@ -538,9 +538,9 @@ export default function App() {
       {data && (
         <main className="cards">
           {data.map((p, i) => (
-            <PokemonCard
+            <MonCard
               key={p.name_en}
-              pokemon={p}
+              mon={p}
               index={i}
               onReveal={handleReveal}
             />
@@ -549,7 +549,7 @@ export default function App() {
           <footer className="endcard" ref={endcardRef}>
             <div className="scanline-sweep" aria-hidden="true" />
             <h2 className="end-title">
-              {caughtIds.length >= TOTAL_POKEMON ? "Dein TEAM!" : "Dein Team"}
+              {caughtIds.length >= TOTAL_MON ? "Dein TEAM!" : "Dein Team"}
             </h2>
 
             <div className="team-grid">
@@ -602,7 +602,7 @@ export default function App() {
           </footer>
 
           {/* VIAL / STEROIDE: erscheint NACH dem Team-Reveal (verzoegert), blockiert Arena bis vergeben */}
-          {revealed && data && caughtIds.length >= TOTAL_POKEMON && boostedId == null && (
+          {revealed && data && caughtIds.length >= TOTAL_MON && boostedId == null && (
             <section className="vial-stage">
               <h2 className="vial-title">STEROID-VIAL</h2>
               <p className="vial-sub">Nimm das Vial und verpasse EINER deiner Spinnen +100 Stärke.</p>
@@ -627,13 +627,13 @@ export default function App() {
           )}
 
           {/* Cuteness-Overload: nur wenn Team komplett + Stärke < 1100 */}
-          {data && caughtIds.length >= TOTAL_POKEMON && (() => {
+          {data && caughtIds.length >= TOTAL_MON && (() => {
             const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
             return ts < 1100 ? <CutenessSection /> : null;
           })()}
 
           {/* ARENA: 3 gefangene vs 3 RNG-Gegner (1:1, Typ-Advantage = +100) */}
-          {arenaMatches.length === TOTAL_POKEMON && (
+          {arenaMatches.length === TOTAL_MON && (
             <section className="arena">
               <h2 className="arena-title">ARENA · DEIN TEAM VS RNG-SCHWARM</h2>
               <div className="arena-battles">

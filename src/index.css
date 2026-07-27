@@ -5,12 +5,7 @@
    Funktionalität unverändert — nur Optik.
    ============================================================ */
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap");
-/* Offizieller Pokémon-Logo-Font (Wortmarke) */
-@font-face {
-  font-family: "Pokemon Solid";
-  src: url("https://fonts.cdnfonts.com/s/17890/Pokemon Solid.woff") format("woff");
-  font-display: swap;
-}
+/* Display-Font: Fredoka (bereits via Google Fonts importiert) */
 
 :root {
   /* Flächen */
@@ -58,7 +53,7 @@
   --hud-lime: #b6ff3b;
   --hud-violet: #8b5cf6;
 
-  --font-display: "Pokemon Solid", "Fredoka", "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Fredoka", "Space Grotesk", system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, monospace;
 }
 

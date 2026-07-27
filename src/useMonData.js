@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TOTAL_POKEMON } from "./pokemonList";
+import { TOTAL_MON } from "./monList";
 import { supabase, isSupabaseReady } from "./lib/supabase";
 
 // In-Memory-Cache: verhindert Repeated-Fetch bei HMR/Reload des gleichen Sets.
@@ -40,7 +40,7 @@ async function fetchNasaMon(id) {
 }
 
 // count zufällige eindeutige IDs aus dem gesamten NasaMon-Dex.
-function randomIds(count = TOTAL_POKEMON, max = MAX_NASAMON) {
+function randomIds(count = TOTAL_MON, max = MAX_NASAMON) {
   return shuffle(Array.from({ length: max }, (_, i) => i + 1)).slice(0, count);
 }
 
@@ -74,7 +74,7 @@ async function resolveQuery(raw) {
   throw new Error(`Nicht gefunden – Nummer (1–${MAX_NASAMON}) oder Name (z.B. arachnex, spider, glow).`);
 }
 
-export function usePokemonData(count = TOTAL_POKEMON) {
+export function useMonData(count = TOTAL_MON) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [progress, setProgress] = useState(0);

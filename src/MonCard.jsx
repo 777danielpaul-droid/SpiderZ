@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TYPE_COLORS } from "./pokemonList";
+import { TYPE_COLORS } from "./monList";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
  * (Scale/Rotate/Parallax/Reveal) ist ueber ~10 Viewports gestreckt statt
  * snappy. Das ist die "10fache" Scroll-gesteuerte Transformation.
  */
-export default function PokemonCard({ pokemon, index, onReveal }) {
+export default function MonCard({ mon, index, onReveal }) {
   const sectionRef = useRef(null);
   const pinRef = useRef(null);
   const imgRef = useRef(null);
@@ -22,8 +22,8 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
   const bgRef = useRef(null);
   const revealedRef = useRef(false);
 
-  const primary = TYPE_COLORS[pokemon.types[0]] || "#6d28d9";
-  const secondary = TYPE_COLORS[pokemon.types[1]] || primary;
+  const primary = TYPE_COLORS[mon.types[0]] || "#6d28d9";
+  const secondary = TYPE_COLORS[mon.types[1]] || primary;
   const dir = index % 2 === 0 ? 1 : -1; // abwechselnd links/rechts
 
   useLayoutEffect(() => {
@@ -43,7 +43,7 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
         onUpdate: (self) => {
           if (!revealedRef.current && self.progress > 0.08) {
             revealedRef.current = true;
-            onReveal?.(pokemon.id);
+            onReveal?.(mon.id);
           }
         },
       },
@@ -76,16 +76,16 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
       tl.scrollTrigger && tl.scrollTrigger.kill();
       tl.kill();
     };
-  }, [pokemon, index, dir, primary, secondary, onReveal]);
+  }, [mon, index, dir, primary, secondary, onReveal]);
 
-  const total = pokemon.stats.reduce((s, x) => s + x.value, 0);
+  const total = mon.stats.reduce((s, x) => s + x.value, 0);
 
   return (
     <section ref={sectionRef} className="card-section">
       <div ref={pinRef} className="card-pin">
         <div ref={bgRef} className="card-bg" />
         <div ref={numRef} className="card-num">
-          {String(pokemon.id).padStart(3, "0")}
+          {String(mon.id).padStart(3, "0")}
         </div>
 
         <div className="card-content">
@@ -93,9 +93,9 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
             className="card-art"
             style={{ filter: `drop-shadow(0 0 28px ${primary}aa)` }}
           >
-            <img ref={imgRef} src={pokemon.artwork} alt={pokemon.name_de} loading="lazy" />
+            <img ref={imgRef} src={mon.artwork} alt={mon.name_de} loading="lazy" />
             <div className="card-types">
-              {pokemon.types.map((t) => (
+              {mon.types.map((t) => (
                 <span key={t} className="type-badge" style={{ background: TYPE_COLORS[t] }}>
                   {t}
                 </span>
@@ -105,13 +105,13 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
 
           <div ref={panelRef} className="card-panel neon-border sheen" style={{ "--tc": primary }}>
             <span className="holo-glass" aria-hidden="true"></span>
-            <h2>{pokemon.name_de}</h2>
+            <h2>{mon.name_de}</h2>
             <p className="card-sub">
-              #{String(pokemon.id).padStart(3, "0")} · {pokemon.height / 10} m ·{" "}
-              {pokemon.weight / 10} kg
+              #{String(mon.id).padStart(3, "0")} · {mon.height / 10} m ·{" "}
+              {mon.weight / 10} kg
             </p>
             <div className="stat-grid">
-              {pokemon.stats.map((s) => (
+              {mon.stats.map((s) => (
                 <div className="stat-row" key={s.name}>
                   <span className="stat-name">{s.name}</span>
                   <div className="stat-bar">
@@ -125,7 +125,7 @@ export default function PokemonCard({ pokemon, index, onReveal }) {
               ))}
             </div>
             <div className="stat-total" style={{ color: primary }}>
-              BST {total} · <span className="strength-badge">STÄRKE {pokemon.strength}</span>
+              BST {total} · <span className="strength-badge">STÄRKE {mon.strength}</span>
             </div>
           </div>
         </div>

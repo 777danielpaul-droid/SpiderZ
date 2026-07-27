@@ -14,15 +14,15 @@ import "./hud.css";
 export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery }) {
   const caught = caughtIds.length;
 
-  // Challenge-Score: Gesamtstaerke aller gefangenen Pokemon.
+  // Challenge-Score: Gesamtstaerke aller gefangenen mon.
   const teamStrength = data
     ? data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0)
     : 0;
   const level = Math.floor(teamStrength / 300) + 1;
 
-  const caughtPokemon = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
+  const caughtMon = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
   // Letzte 4 gefangene (neueste zuerst) fuer das Team-Readout.
-  const teamPreview = [...caughtPokemon].slice(-4).reverse();
+  const teamPreview = [...caughtMon].slice(-4).reverse();
 
   const [displayScore, setDisplayScore] = useState(teamStrength);
   const prevRef = useRef(teamStrength);
@@ -32,7 +32,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
   const fxRef = useRef(null);    // Partikel-Container
   const toastRef = useRef(null); // aufsteigender "+STÄRKE"-Toast
 
-  // Reward-Pop bei jedem neu aufgedeckten Pokemon.
+  // Reward-Pop bei jedem neu aufgedeckten mon.
   useEffect(() => {
     if (caught === 0) return;
     const from = prevRef.current;
@@ -126,7 +126,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
             <button type="button" className="hud-btn" onClick={onRestart} title="Neue Runde">↻ NEUSTART</button>
             <button type="button" className="hud-btn" onClick={onShowRecords} title="Rekorde & Dex">★ REKORDE</button>
             {canNext && (
-              <button type="button" className="hud-btn hud-btn-next" onClick={onNext} title="Zum nächsten Pokémon">
+              <button type="button" className="hud-btn hud-btn-next" onClick={onNext} title="Zum nächsten Monster">
                 {nextLabel}
               </button>
             )}

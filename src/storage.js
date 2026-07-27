@@ -1,6 +1,6 @@
 // Persistente Sammlung + Rekorde (localStorage, kein Backend).
-const DEX_KEY = "pc_dex";            // Array aller je gefangenen Pokemon (dedupe nach id)
-const BEST_KEY = "pc_bestTeamStrength"; // hoechste Team-Staerke einer Runde
+const DEX_KEY = "nasamon_dex";            // Array aller je gefangenen Monster (dedupe nach id)
+const BEST_KEY = "nasamon_bestTeamStrength"; // hoechste Team-Staerke einer Runde
 
 function safeParse(raw, fallback) {
   try {
@@ -18,7 +18,7 @@ export function loadDex() {
   return Array.isArray(arr) ? arr : [];
 }
 
-// Gefangene einer Runde hinzufuegen. pokemon: {id,name_de,types,artwork,strength}
+// Gefangene einer Runde hinzufuegen. mon: {id,name_de,types,artwork,strength}
 export function saveCaught(caught) {
   if (typeof localStorage === "undefined" || !caught.length) return;
   const map = new Map(loadDex().map((p) => [p.id, p]));

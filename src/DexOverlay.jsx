@@ -1,8 +1,8 @@
 import { loadDex } from "./storage";
-import { TYPE_COLORS } from "./pokemonList";
+import { TYPE_COLORS } from "./monList";
 
 /**
- * Dex-Overlay: listet alle je gefangenen Pokemon (aus localStorage).
+ * Dex-Overlay: listet alle je gefangenen mon (aus localStorage).
  */
 export default function DexOverlay({ onClose }) {
   const dex = loadDex();
@@ -12,10 +12,10 @@ export default function DexOverlay({ onClose }) {
       <span className="holo-glass" aria-hidden="true"></span>
       <div className="overlay-panel overlay-panel-wide" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="overlay-close" onClick={onClose} aria-label="Zurück">←</button>
-        <h2 className="overlay-title">POKÉDEX</h2>
+        <h2 className="overlay-title">NASAMON-DEX</h2>
 
         {dex.length === 0 ? (
-          <p className="overlay-empty">Noch keine Pokémon gefangen. Fang eine Runde an!</p>
+          <p className="overlay-empty">Noch keine Monster gefangen. Fang eine Runde an!</p>
         ) : (
           <div className="dex-grid">
             {dex.map((p) => {

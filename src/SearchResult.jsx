@@ -1,6 +1,6 @@
-import { TYPE_COLORS } from "./pokemonList";
+import { TYPE_COLORS } from "./monList";
 
-// Modal-Ergebnis der Header-Suche: zeigt ein einzelnes Pokémon ohne
+// Modal-Ergebnis der Header-Suche: zeigt ein einzelnes Monster ohne
 // Scroll-Transformation (reines Datenblatt). Schließbar via X / Klick außerhalb.
 export default function SearchResult({ result, error, loading, onClose }) {
   if (loading) {

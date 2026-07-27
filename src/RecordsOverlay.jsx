@@ -2,7 +2,7 @@ import { loadBestTeamStrength, loadDex } from "./storage";
 
 /**
  * Records-Overlay: zeigt den Rekord (hoechste Team-Staerke) + Anzahl
- * gefangener Pokemon. Button fuehrt zum eigentlichen Dex.
+ * gefangener mon. Button fuehrt zum eigentlichen Dex.
  */
 export default function RecordsOverlay({ onClose, onOpenDex }) {
   const best = loadBestTeamStrength();
@@ -27,7 +27,7 @@ export default function RecordsOverlay({ onClose, onOpenDex }) {
         </div>
 
         <button type="button" className="overlay-cta" onClick={onOpenDex}>
-          ZUM POKÉDEX →
+          ZUM NASAMON-DEX →
         </button>
       </div>
     </div>
