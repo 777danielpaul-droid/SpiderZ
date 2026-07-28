@@ -13,6 +13,9 @@ import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength } from 
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
 import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
+import { useAuth } from "./lib/auth.jsx";
+import { useCloudSave } from "./useCloudSave";
+import LoginOverlay from "./LoginOverlay";
 import "./App.css";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -112,6 +115,21 @@ export default function App() {
   const arenaWins = arenaMatches.filter((m) => m.result.winner === "a").length;
   const arenaLosses = arenaMatches.filter((m) => m.result.winner === "b").length;
   const arenaDraws = arenaMatches.filter((m) => m.result.winner === "draw").length;
+
+  // ---- CLOUD-SYNC: verbindet localStorage mit Supabase user_saves ----
+  const { user, signOut } = useAuth();
+  const bestTeamForSave = boostedTeam; // volle Spider-Objekte fuer die Cloud
+  const bestTeamStrengthForSave = caughtIds.length >= TOTAL_MON
+    ? caughtTeam.reduce((s, p) => s + (p.strength || 0), 0)
+    : loadBestTeamStrength(); // aktueller lokaler Rekord
+  useCloudSave({
+    caughtIds,
+    bestTeamStrength: bestTeamStrengthForSave,
+    bestTeam: bestTeamForSave,
+  });
+
+  // Login-Overlay sichtbar/unsichtbar (Header-Button).
+  const [loginOpen, setLoginOpen] = useState(false);
 
   // Booster-Screen erst, wenn die Arena-Ergebnisse durchgescrollt wurden (nicht direkt bei Sieg).
   // arena-result ist das letzte Element -> start muss erreichbar sein (nicht "top 70%",
@@ -414,6 +432,18 @@ export default function App() {
         >
           <span className="theme-toggle-icon">{dark ? "☀" : "☾"}</span>
         </button>
+        {/* Auth-Bereich: Login-Button oder eingeloggter User-Chip */}
+        {user ? (
+          <div className="user-chip" title={user.email}>
+            <span className="user-avatar">{(user.email || "U").charAt(0).toUpperCase()}</span>
+            <span className="user-email">{(user.email || "").split("@")[0]}</span>
+            <button type="button" className="user-logout" onClick={() => signOut()} aria-label="Abmelden">⏻</button>
+          </div>
+        ) : (
+          <button type="button" className="login-btn" onClick={() => setLoginOpen(true)}>
+            Anmelden
+          </button>
+        )}
         {/* Integrierte Top-Leiste: einziger Header-Toggle (Mobile, HUD-Look) */}
         <div
           className="header-strip"
@@ -454,6 +484,10 @@ export default function App() {
       )}
       {hudView === "dex" && (
         <DexOverlay onClose={() => setHudView("records")} />
+      )}
+
+      {loginOpen && (
+        <LoginOverlay onClose={() => setLoginOpen(false)} />
       )}
 
       <header className={`hero`} ref={heroRef} id="spiderz">
