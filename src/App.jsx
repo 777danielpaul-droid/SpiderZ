@@ -17,6 +17,7 @@ import { useCloudSave } from "./useCloudSave";
 import LoginOverlay from "./LoginOverlay";
 import BoosterOpen from "./BoosterOpen";
 import "./App.css";
+import { useSound, SFX } from "./useSound";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -26,6 +27,7 @@ if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
   const { data, error, search, runSearch, clearSearch, reset, allData } = useMonData(TOTAL_MON);
+  const { play } = useSound(0.18);
   const [caughtIds, setCaughtIds] = useState([]);
   const [query, setQuery] = useState("");
   const rootRef = useRef(null);
@@ -160,22 +162,20 @@ export default function App() {
     if (arenaWins < REQUIRED_WINS || arenaMatches.length !== LEVEL_TEAM_SIZE) return;
     if (!arenaEndRef.current || boostShown.current) return;
     const id = requestAnimationFrame(() => {
-      // Layout (async Spider-Bilder) erst finalisieren, dann Trigger vermessen.
       ScrollTrigger.refresh();
       const el = arenaEndRef.current;
       const trigger = ScrollTrigger.create({
         trigger: el,
-        start: "top 90%", // erreichbar: feuert, sobald die Ergebnis-Zeile im unteren Viewport erscheint
+        start: "top 90%",
         once: true,
-        onEnter: () => { boostShown.current = true; setBoosterCta(true); },
+        onEnter: () => { boostShown.current = true; setBoosterCta(true); play(SFX.arena.win); },
       });
-      // Fallback: falls bei Mount schon sichtbar (sehr hoher Viewport) -> sofort öffnen.
       if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
-        boostShown.current = true; setBoosterOpen(true); trigger.kill();
+        boostShown.current = true; setBoosterOpen(true); trigger.kill(); play(SFX.arena.win);
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [arenaWins, arenaMatches.length]);
+  }, [arenaWins, arenaMatches.length, play]);
 
   // Neustart: frische Runde + UI zuruecksetzen.
   const handleRestart = useCallback(() => {
@@ -423,7 +423,8 @@ export default function App() {
 
   const handleReveal = useCallback((id) => {
     setCaughtIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-  }, []);
+    play(SFX.ui.collect);
+  }, [play]);
 
   // Sanfter Anker-Scroll ueber GSAP (konsistent mit ScrollTrigger-Architektur).
   const scrollToId = useCallback((id) => {
@@ -495,8 +496,14 @@ export default function App() {
           className="header-strip"
           role="button"
           tabIndex={0}
-          onClick={toggleHeader}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleHeader(); } }}
+          onClick={() => play(SFX.ui.tap)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              play(SFX.ui.tap);
+              toggleHeader();
+            }
+          }}
           aria-label="Header ein-/ausfahren"
         >
           <span className="header-strip-label">MENÜ</span>

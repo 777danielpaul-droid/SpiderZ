@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "./lib/auth.jsx";
 import { getSupabase, isSupabaseReady } from "./lib/supabase";
+import { useSound } from "./useSound";
 
 /* ============================================================
    BoosterOpen — Modal mit Booster-Animation.
@@ -37,6 +38,7 @@ const ITEM_ICONS = {
 
 export default function BoosterOpen({ onClose, onUnlock }) {
   const { user } = useAuth();
+  const { play } = useSound(0.18);
   const [phase, setPhase] = useState("idle"); // idle | opening | revealed
   const [unlockedItem, setUnlockedItem] = useState(null);
   const [error, setError] = useState(null);
@@ -47,6 +49,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
     setPhase("opening");
     setError(null);
+    play(SFX.ui.click);
 
     try {
       const supabase = getSupabase();
@@ -130,6 +133,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
       setUnlockedItem(item);
       setPhase("revealed");
+      play(SFX.ui.collect);
 
       // Callback für Inventar/Dex-Update
       if (onUnlock) onUnlock(item);
@@ -234,7 +238,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
         <button
           type="button"
           className="booster-back"
-          onClick={onClose}
+          onClick={() => { play(SFX.ui.tap); onClose(); }}
           aria-label="Zurück"
         >
           ✕

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import "./hud.css";
+import { useSound, SFX } from "./useSound";
 
 /**
  * Horizontales Cyberpunk-HUD für SpiderZ (unten, mittig).
@@ -19,6 +20,8 @@ export default function HUD({ total, level: appLevel, caughtIds, data, scrollFil
   useEffect(() => {
     setSteroids(steroidsProp || 0);
   }, [steroidsProp]);
+
+  const { play } = useSound(0.18);
 
   // ECHTES Level aus App.jsx (nicht aus Team-Stärke berechnen)
   const level = appLevel || 1;
@@ -131,8 +134,8 @@ export default function HUD({ total, level: appLevel, caughtIds, data, scrollFil
             <span className="hud-dot hud-dot-sync" /> LINK
           </div>
           <div className="hud-actions">
-            <button type="button" className="hud-btn hud-btn-restart" onClick={onRestart} title="Neue Runde">↻ NEUSTART</button>
-            <button type="button" className="hud-btn" onClick={onShowRecords} title="Rekorde & Dex">★ REKORDE</button>
+            <button type="button" className="hud-btn hud-btn-restart" onClick={() => { play(SFX.ui.tap); onRestart(); }} title="Neue Runde">↻ NEUSTART</button>
+            <button type="button" className="hud-btn" onClick={() => { play(SFX.ui.tap); onShowRecords(); }} title="Rekorde & Dex">★ REKORDE</button>
             {canNext && (
               <button type="button" className="hud-btn hud-btn-next" onClick={onNext} title="Zum nächsten Monster">
                 {nextLabel}
