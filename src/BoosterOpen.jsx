@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "./lib/auth.jsx";
 import { getSupabase, isSupabaseReady } from "./lib/supabase";
-import { useSound } from "./useSound";
+import { useSound, SFX } from "./useSound";
 
 /* ============================================================
    BoosterOpen — Modal mit Booster-Animation.
@@ -49,7 +49,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
     setPhase("opening");
     setError(null);
-    play(SFX.ui.click);
+    try { play(SFX.ui.click); } catch { /* no sound file yet */ }
 
     try {
       const supabase = getSupabase();

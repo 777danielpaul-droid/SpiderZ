@@ -29,6 +29,16 @@ export function useSound(volume = 0.18) {
     return c;
   }, []);
 
+  const resumeFromGesture = useCallback(() => {
+    try {
+      const ctx = getCtx();
+      if (!ctx) return;
+      if (ctx.state === "suspended") ctx.resume();
+    } catch {
+      // ignore
+    }
+  }, [getCtx]);
+
   const play = useCallback(
     (path) => {
       try {
@@ -38,11 +48,11 @@ export function useSound(volume = 0.18) {
         audio.volume = volume;
         audio.play().catch(() => {});
       } catch {
-        // Kein Crash, wenn keine Datei liegt.
+        // ignore missing files / playback errors
       }
     },
     [getCtx, volume]
   );
 
-  return { play };
+  return { play, resumeFromGesture };
 }
