@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 
 export const SFX = {
   ui: {
@@ -16,34 +16,56 @@ export const SFX = {
 
 export function useSound(volume = 0.18) {
   const ctxRef = useRef(null);
+  const gestureUnlocked = useRef(false);
 
-  const getCtx = useCallback(() => {
-    if (typeof window === "undefined") return null;
-    if (!ctxRef.current) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return null;
-      ctxRef.current = new AudioContext();
-    }
-    const c = ctxRef.current;
-    if (c.state === "suspended") c.resume();
-    return c;
+  // Global one-time gesture listener to unlock AudioContext
+  useEffect(() => {
+    if (gestureUnlocked.current) return;
+    if (typeof window === "undefined") return;
+
+    const unlock = () => {
+      gestureUnlocked.current = true;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = ctxRef.current || new AudioContext();
+        ctxRef.current = ctx;
+        if (ctx.state === "suspended") ctx.resume();
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener("click", unlock, { once: true });
+    window.addEventListener("touchstart", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+
+    return () => {
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
   }, []);
-
-  const resumeFromGesture = useCallback(() => {
-    try {
-      const ctx = getCtx();
-      if (!ctx) return;
-      if (ctx.state === "suspended") ctx.resume();
-    } catch {
-      // ignore
-    }
-  }, [getCtx]);
 
   const play = useCallback(
     (path) => {
       try {
-        const ctx = getCtx();
-        if (!ctx) return;
+        if (typeof window === "undefined") return;
+        
+        // Ensure AudioContext exists and is unlocked
+        let ctx = ctxRef.current;
+        if (!ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          ctx = new AudioContext();
+          ctxRef.current = ctx;
+        }
+        if (ctx.state === "suspended") {
+          // Only try to resume if user has interacted
+          if (!gestureUnlocked.current) return;
+          ctx.resume();
+        }
+
         const audio = new Audio(path);
         audio.volume = volume;
         audio.play().catch(() => {});
@@ -51,8 +73,8 @@ export function useSound(volume = 0.18) {
         // ignore missing files / playback errors
       }
     },
-    [getCtx, volume]
+    [volume]
   );
 
-  return { play, resumeFromGesture };
+  return { play };
 }
