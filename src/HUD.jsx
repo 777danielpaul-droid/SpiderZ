@@ -11,14 +11,22 @@ import "./hud.css";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery, steroids, onUseSteroid, collectors, totalCollectors, collectorPct }) {
+export default function HUD({ total, level: appLevel, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery, steroids: steroidsProp, onUseSteroid, collectors, totalCollectors, collectorPct }) {
   const caught = caughtIds.length;
+
+  // Steroid-Anzeige: reagiert auf Prop-Änderungen
+  const [steroids, setSteroids] = useState(steroidsProp || 0);
+  useEffect(() => {
+    setSteroids(steroidsProp || 0);
+  }, [steroidsProp]);
+
+  // ECHTES Level aus App.jsx (nicht aus Team-Stärke berechnen)
+  const level = appLevel || 1;
 
   // Challenge-Score: Gesamtstaerke aller gefangenen mon.
   const teamStrength = data
     ? data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0)
     : 0;
-  const level = Math.floor(teamStrength / 300) + 1;
 
   const caughtMon = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
   // Letzte 4 gefangene (neueste zuerst) fuer das Team-Readout.
@@ -123,7 +131,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
             <span className="hud-dot hud-dot-sync" /> LINK
           </div>
           <div className="hud-actions">
-            <button type="button" className="hud-btn" onClick={onRestart} title="Neue Runde">↻ NEUSTART</button>
+            <button type="button" className="hud-btn hud-btn-restart" onClick={onRestart} title="Neue Runde">↻ NEUSTART</button>
             <button type="button" className="hud-btn" onClick={onShowRecords} title="Rekorde & Dex">★ REKORDE</button>
             {canNext && (
               <button type="button" className="hud-btn hud-btn-next" onClick={onNext} title="Zum nächsten Monster">

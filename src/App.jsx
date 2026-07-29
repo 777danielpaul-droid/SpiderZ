@@ -6,10 +6,9 @@ import { useMonData } from "./useMonData";
 import { TOTAL_MON, TOTAL_COLLECTORS, TYPE_COLORS } from "./monList";
 import MonCard from "./MonCard";
 import ScrubSection from "./ScrubSection";
-import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
-import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, useSteroid, loadCollectors, saveCollectors } from "./storage";
+import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, saveSteroids, loadCollectors, saveCollectors } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
 import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
@@ -66,7 +65,7 @@ export default function App() {
 
   // Runde beendet (alle gefangen) -> in Pokedex + Rekord speichern.
   useEffect(() => {
-    if (!data || caughtIds.length < TOTAL_MON) return;
+    if (!data || caughtIds.length < LEVEL_TEAM_SIZE) return;
     const caught = data.filter((p) => caughtIds.includes(p.id));
     if (caught.length === 0) return;
     const teamStrength = caught.reduce((s, p) => s + (p.strength || 0), 0);
@@ -76,6 +75,14 @@ export default function App() {
     saveBestTeamStrength(teamStrength);
   }, [data, caughtIds]);
 
+  // ---- LEVEL-PROGRESSION: Level 1 = 3 Spinnen, Level 2 = 2 Spinnen, Level 3 = 1 Spinne ----
+  const [level, setLevel] = useState(1);
+  const LEVEL_TEAM_SIZE = level === 1 ? TOTAL_MON : level === 2 ? 2 : 1; // Level 3: nur 1 Spinne
+  const [levelTransition, setLevelTransition] = useState(false); // LEVEL COMPLETE Screen
+
+  // ---- STEROIDE: Inventar-State (live HUD-Update bei Booster-Vial) ----
+  const [steroids, setSteroids] = useState(() => loadSteroids());
+
   // ---- VIAL / STEROIDE: einmalig nutzbar, blockiert Arena bis vergeben ----
   const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
   const [boostedId, setBoostedId] = useState(null);    // Spinne mit +100 (null = noch nicht vergeben)
@@ -84,33 +91,40 @@ export default function App() {
   const [boosterOpen, setBoosterOpen] = useState(false); // Booster-Screen nach Arena-Sieg
   const [boosterCta, setBoosterCta] = useState(false);   // "Booster öffnen"-Button nach Durchscrollen
 
-  // ---- ARENA: 3 gefangene vs 3 RNG-Gegner (aus allen 18, exkl. eigene) ----
+  // ---- ARENA: LEVEL_TEAM_SIZE gefangene vs gleiche Anzahl RNG-Gegner ----
   // Gegner werden ERST berechnet, wenn das Vial vergeben wurde (boostedId != null).
-  const [arenaOpponents, setArenaOpponents] = useState(null); // Array(3) oder null
+  // Level 3: Gegner bekommt 2 Steroid-Vials = +200 Stärke
+  const ENEMY_BOOST = level === 3 ? 200 : 0;
+  const [arenaOpponents, setArenaOpponents] = useState(null); // Array(LEVEL_TEAM_SIZE) oder null
   useEffect(() => {
-    if (!allData || caughtIds.length < TOTAL_MON || boostedId == null) { setArenaOpponents(null); return; }
+    if (!allData || caughtIds.length < LEVEL_TEAM_SIZE || boostedId == null) { setArenaOpponents(null); return; }
     const own = new Set(caughtIds);
     const pool = allData.filter((m) => !own.has(m.id));
     const shuffled = pool
       .map((m) => ({ m, r: Math.random() }))
       .sort((a, b) => a.r - b.r)
-      .slice(0, TOTAL_MON)
+      .slice(0, LEVEL_TEAM_SIZE)
       .map((x) => x.m);
     setArenaOpponents(shuffled);
-  }, [allData, caughtIds, boostedId]);
+  }, [allData, caughtIds, boostedId, LEVEL_TEAM_SIZE]);
 
   // Arena-Matches (1:1 in Reihenfolge) + Gesamt-Ergebnis.
   // Geboostete Spinne bekommt +100 Stärke vor dem Match.
+  // Level 3: Gegner bekommt +200 Stärke (2 Steroid-Vials).
   const caughtTeam = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
   const boostedTeam = caughtTeam.map((p) =>
     p.id === boostedId ? { ...p, strength: (p.strength || 0) + 100 } : p
   );
   const arenaMatches = [];
-  if (arenaOpponents && boostedTeam.length >= TOTAL_MON) {
-    for (let i = 0; i < TOTAL_MON; i++) {
+  if (arenaOpponents && boostedTeam.length >= LEVEL_TEAM_SIZE) {
+    for (let i = 0; i < LEVEL_TEAM_SIZE; i++) {
       const a = boostedTeam[i];
       const b = arenaOpponents[i];
-      if (a && b) arenaMatches.push({ a, b, result: resolveMatch(a, b) });
+      if (a && b) {
+        // Level 3: Gegner bekommt +200 Stärke
+        const boostedB = ENEMY_BOOST > 0 ? { ...b, strength: (b.strength || 0) + ENEMY_BOOST } : b;
+        arenaMatches.push({ a, b: boostedB, result: resolveMatch(a, boostedB) });
+      }
     }
   }
   const arenaWins = arenaMatches.filter((m) => m.result.winner === "a").length;
@@ -120,25 +134,30 @@ export default function App() {
   // ---- CLOUD-SYNC: verbindet localStorage mit Supabase user_saves ----
   const { user, signOut } = useAuth();
   const bestTeamForSave = boostedTeam; // volle Spider-Objekte fuer die Cloud
-  const bestTeamStrengthForSave = caughtIds.length >= TOTAL_MON
+  const bestTeamStrengthForSave = caughtIds.length >= LEVEL_TEAM_SIZE
     ? caughtTeam.reduce((s, p) => s + (p.strength || 0), 0)
     : loadBestTeamStrength(); // aktueller lokaler Rekord
   useCloudSave({
     caughtIds,
     bestTeamStrength: bestTeamStrengthForSave,
     bestTeam: bestTeamForSave,
-    steroids: loadSteroids(),
+    steroids: steroids,
+    collectors: loadCollectors(),
   });
 
   // Login-Overlay sichtbar/unsichtbar (Header-Button).
   const [loginOpen, setLoginOpen] = useState(false);
 
   // Booster-Screen erst, wenn die Arena-Ergebnisse durchgescrollt wurden (nicht direkt bei Sieg).
-  // arena-result ist das letzte Element -> start muss erreichbar sein (nicht "top 70%",
-  // sonst wird die Zeile am Scroll-Ende nie so weit hochgeschoben).
+  // Sieg-Bedingung:
+  //   Level 1 (3 Spinnen): 2/3 Siege nötig
+  //   Level 2 (2 Spinnen): 2/2 Siege nötig (beide müssen gewinnen)
+  //   Level 3 (1 Spinne): 1/1 Sieg nötig
+  const REQUIRED_WINS = level === 2 ? LEVEL_TEAM_SIZE : Math.ceil(LEVEL_TEAM_SIZE / 2);
   const boostShown = useRef(false);
+  console.log(`[debug] level=${level}, LEVEL_TEAM_SIZE=${LEVEL_TEAM_SIZE}, total=${TOTAL_MON}, REQUIRED_WINS=${REQUIRED_WINS}`);
   useEffect(() => {
-    if (arenaWins < 2 || arenaMatches.length !== TOTAL_MON) return;
+    if (arenaWins < REQUIRED_WINS || arenaMatches.length !== LEVEL_TEAM_SIZE) return;
     if (!arenaEndRef.current || boostShown.current) return;
     const id = requestAnimationFrame(() => {
       // Layout (async Spider-Bilder) erst finalisieren, dann Trigger vermessen.
@@ -168,10 +187,10 @@ export default function App() {
     setRevealed(false);
     setBoosterOpen(false);
     setBoosterCta(false);
+    setLevel(1);
     boostShown.current = false;
     revealPlayed.current = false;
     reset();
-    // Zu den Spielregeln scrollen (nicht zum Seitenanfang)
     scrollToId("story");
   }, [reset]);
 
@@ -188,9 +207,9 @@ export default function App() {
   // Erst nach dem ersten gefangenen mon nutzbar (vorher muss gescrollt werden).
   const goNext = useCallback(() => {
     if (caughtIds.length === 0) return;
-    // Bei der letzten Karte: direkt zur Team-Endcard (kein ueberfluessiger
+    // Bei der letzten Karte: direkt zur Team-Endcard (kein überflüssiger
     // Zwischenschritt — ein Druck reicht vom Final-Reveal zum Team).
-    if (activeCard >= TOTAL_MON - 1) {
+    if (activeCard >= LEVEL_TEAM_SIZE - 1) {
       // Zum absoluten Dokumentende scrollen -> Endcard komplett unten.
       // onComplete prueft erneut: falls Seite durch nachladende Bilder noch
       // gewachsen ist, wird der Rest kurz nachgescrollt (kein Luftloch).
@@ -205,7 +224,7 @@ export default function App() {
         });
       };
       toBottom();
-      setActiveCard(TOTAL_MON);
+      setActiveCard(LEVEL_TEAM_SIZE);
       return;
     }
     const next = activeCard + 1;
@@ -462,12 +481,12 @@ export default function App() {
         {/* Auth-Bereich: Login-Button oder eingeloggter User-Chip */}
         {user ? (
           <div className="user-chip" title={user.email}>
-            <span className="user-avatar">{(user.email || "U").charAt(0).toUpperCase()}</span>
+            <span className="user-avatar user-avatar-lime">{(user.email || "U").charAt(0).toUpperCase()}</span>
             <span className="user-email">{(user.email || "").split("@")[0]}</span>
             <button type="button" className="user-logout" onClick={() => signOut()} aria-label="Abmelden">⏻</button>
           </div>
         ) : (
-          <button type="button" className="login-btn" onClick={() => setLoginOpen(true)}>
+          <button type="button" className="login-btn login-btn-lime" onClick={() => setLoginOpen(true)}>
             Anmelden
           </button>
         )}
@@ -486,7 +505,8 @@ export default function App() {
       </header>
       <div className="reveal-flash" aria-hidden="true" />
       <HUD
-        total={TOTAL_MON}
+        total={LEVEL_TEAM_SIZE}
+        level={level}
         caughtIds={caughtIds}
         data={data}
         scrollFillRef={scrollFillRef}
@@ -497,16 +517,17 @@ export default function App() {
         onShowRecords={() => setHudView("records")}
         onNext={goNext}
         canNext={caughtIds.length > 0}
-        nextLabel={activeCard >= TOTAL_MON - 1 ? "Zum Team ▾" : "Weiter ▸"}
+        nextLabel={activeCard >= LEVEL_TEAM_SIZE - 1 ? "Zum Team ▾" : "Weiter ▸"}
         onSearch={runSearch}
         searchQuery={query}
         setSearchQuery={setQuery}
-        steroids={loadSteroids()}
+        steroids={steroids}
         onUseSteroid={() => {
-          const bonus = useSteroid();
-          if (bonus > 0) {
+          const current = loadSteroids();
+          if (current > 0) {
+            saveSteroids(current - 1);
+            setSteroids((n) => n - 1);
             console.log("[steroid] +100 Stärke für nächsten Kampf");
-            // Steroid-Bonus wird im nächsten Kampf angewendet
           }
         }}
         collectors={loadCollectors()}
@@ -609,7 +630,7 @@ export default function App() {
 
       {data && (
         <main className="cards">
-          {data.map((p, i) => (
+          {data.slice(0, LEVEL_TEAM_SIZE).map((p, i) => (
             <MonCard
               key={p.name_en}
               mon={p}
@@ -621,7 +642,7 @@ export default function App() {
           <footer className="endcard" ref={endcardRef}>
             <div className="scanline-sweep" aria-hidden="true" />
             <h2 className="end-title">
-              {caughtIds.length >= TOTAL_MON ? "Dein TEAM!" : "Dein Team"}
+              {caughtIds.length >= LEVEL_TEAM_SIZE ? "Dein TEAM!" : "Dein Team"}
             </h2>
 
             <div className="team-grid">
@@ -674,7 +695,7 @@ export default function App() {
           </footer>
 
           {/* VIAL / STEROIDE: erscheint NACH dem Team-Reveal (verzoegert), blockiert Arena bis vergeben */}
-          {revealed && data && caughtIds.length >= TOTAL_MON && boostedId == null && (
+          {revealed && data && caughtIds.length >= LEVEL_TEAM_SIZE && boostedId == null && (
             <section className="vial-stage">
               <h2 className="vial-title">STEROID-VIAL</h2>
               <p className="vial-sub">Nimm das Vial und verpasse EINER deiner Spinnen +100 Stärke.</p>
@@ -699,13 +720,12 @@ export default function App() {
           )}
 
           {/* Cuteness-Overload: nur wenn Team komplett + Stärke < 1100 */}
-          {data && caughtIds.length >= TOTAL_MON && (() => {
+          {data && caughtIds.length >= LEVEL_TEAM_SIZE && (() => {
             const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
-            return ts < 1100 ? <CutenessSection /> : null;
           })()}
 
           {/* ARENA: 3 gefangene vs 3 RNG-Gegner (1:1, Typ-Advantage = +100) */}
-          {arenaMatches.length === TOTAL_MON && (
+          {arenaMatches.length === LEVEL_TEAM_SIZE && (
             <section className="arena">
               <h2 className="arena-title">ARENA · DEIN TEAM VS RNG-SCHWARM</h2>
               <div className="arena-battles">
@@ -762,7 +782,7 @@ export default function App() {
           )}
 
           {/* BOOSTER-CTA: nach Durchscrollen der Ergebnisse, vor dem Booster-Screen */}
-          {boosterCta && arenaWins >= 2 && (
+          {boosterCta && arenaWins >= REQUIRED_WINS && (
             <div className="booster-cta-wrap">
               <button
                 type="button"
@@ -778,17 +798,69 @@ export default function App() {
           )}
 
           {/* BOOSTER-SCREEN: nach Klick auf CTA */}
-          {boosterOpen && arenaWins >= 2 && (
+          {boosterOpen && arenaWins >= REQUIRED_WINS && (
             <BoosterOpen
               onClose={() => {
                 setBoosterOpen(false);
-                setBoosterCta(false); // CTA verschwindet nach Schließen
-                boostShown.current = false; // Erlaubt erneutes Auslösen beim nächsten Sieg
+                setBoosterCta(false);
+                boostShown.current = false;
+                // Level-Up: nach Level-1-Sieg -> Level-Transition-Screen zeigen
+                if (level === 1) {
+                  setLevelTransition(true);
+                  console.log("[level] Level 1 gewonnen → Level-Transition");
+                }
               }}
-              onUnlock={(spider) => {
-                console.log("[booster] Spider freigeschaltet:", spider.name_de);
+              onUnlock={(item) => {
+                if (item.type === "steroid") {
+                  setSteroids((n) => n + 1);
+                  console.log("[booster] Steroid-Vial erhalten — HUD-Zähler hochgezählt");
+                } else if (item.type === "spider") {
+                  console.log("[booster] Spider freigeschaltet:", item.name_de);
+                } else if (item.type === "collector") {
+                  console.log("[booster] Collector-Item erhalten:", item.name_de);
+                }
               }}
             />
+          )}
+
+          {/* LEVEL TRANSITION: LEVEL COMPLETE Screen mit Klick-Button */}
+          {levelTransition && (
+            <div className="level-transition-overlay" role="dialog" aria-modal="true" aria-label="Level Complete">
+              <div className="level-transition-content">
+                <h2 className="level-transition-title">LEVEL {level} COMPLETE</h2>
+                <p className="level-transition-sub">Du hast Level {level} gewonnen!</p>
+                <div className="level-transition-team">
+                  {boostedTeam.slice(0, LEVEL_TEAM_SIZE).map((p) => (
+                    <div key={p.id} className="level-transition-card">
+                      <img src={p.artwork} alt={p.name_de} className="level-transition-img" />
+                      <div className="level-transition-name">{p.name_de}</div>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="level-transition-btn"
+                  onClick={() => {
+                    const nextLevel = level + 1;
+                    setLevelTransition(false);
+                    setCaughtIds([]);
+                    setActiveCard(0);
+                    setVialTaken(false);
+                    setBoostedId(null);
+                    setRevealed(false);
+                    setBoosterOpen(false);
+                    setBoosterCta(false);
+                    boostShown.current = false;
+                    revealPlayed.current = false;
+                    setLevel(nextLevel);
+                    reset();
+                    scrollToId("story");
+                  }}
+                >
+                  ▶ LEVEL {level + 1} ({level === 2 ? "1 Spinne + Steroid-Boost" : level === 1 ? "2 Spinnen" : "3 Spinnen"})
+                </button>
+              </div>
+            </div>
           )}
 
         </main>

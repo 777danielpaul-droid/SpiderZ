@@ -123,15 +123,15 @@ export async function loadCloudSave() {
   if (!user) return null;
   const { data, error } = await supabase
     .from("user_saves")
-    .select("caught_ids, best_team, best_team_strength, updated_at")
+    .select("caught_ids, best_team, best_team_strength, steroids, collectors, updated_at")
     .eq("user_id", user.id)
     .maybeSingle();
   if (error) { console.warn("[cloud] load fehlgeschlagen:", error.message); return null; }
   return data;
 }
 
-// Upsert der eigenen Zeile (PK = user_id).
-export async function saveCloudSave({ caughtIds, bestTeam, bestTeamStrength }) {
+// Upsert der eigenenen Zeile (PK = user_id).
+export async function saveCloudSave({ caughtIds, bestTeam, bestTeamStrength, steroids, collectors }) {
   if (!isSupabaseReady) return false;
   const supabase = getSupabase();
   const { data: { user } } = await supabase.auth.getUser();
@@ -144,6 +144,8 @@ export async function saveCloudSave({ caughtIds, bestTeam, bestTeamStrength }) {
         caught_ids: caughtIds,
         best_team: bestTeam,
         best_team_strength: bestTeamStrength,
+        steroids: steroids ?? 0,
+        collectors: collectors ?? 0,
       },
       { onConflict: "user_id" }
     );

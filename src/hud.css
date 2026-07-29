@@ -201,6 +201,20 @@
 }
 .hud-btn:active { transform: scale(0.96); }
 
+/* ---- Neustart-Button: Neon-Grün Hintergrund ---- */
+.hud-btn-restart {
+  color: var(--hud-lime);
+  background: rgba(182, 255, 59, 0.12);
+  border: 1px solid var(--hud-lime);
+  box-shadow: 0 0 12px -4px var(--hud-lime);
+  animation: glow-pulse 2.6s ease-in-out infinite;
+}
+.hud-btn-restart:hover {
+  background: rgba(182, 255, 59, 0.25);
+  box-shadow: 0 0 16px -4px var(--hud-lime);
+  filter: brightness(1.15);
+}
+
 /* ---- TEAM-STÄRKE (grosse horizontale Zahl) ---- */
 .hud-mod-score { gap: 4px; }
 .hud-score-readout {
