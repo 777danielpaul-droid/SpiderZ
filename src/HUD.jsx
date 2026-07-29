@@ -215,31 +215,29 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
 
         <div className="hud-divider" />
 
-        {/* SUCHE (NasaMon-DB) */}
-        <section className="hud-mod hud-mod-search">
-          <div className="hud-mod-label mono-label">SUCHE</div>
-          <form
-            className="hud-search-row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const q = (searchQuery || "").trim();
-              if (q && onSearch) onSearch(q);
-            }}
-          >
-            <input
-              className="hud-input"
-              type="text"
-              inputMode="text"
-              placeholder="Nr (1–18) / Name"
-              value={searchQuery || ""}
-              onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-              aria-label="Spider-Monster suchen"
-            />
-            <button className="hud-btn hud-search-btn" type="submit" title="Suchen">
-              SUCHEN
+        {/* STEROIDE (Inventar) */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">STEROIDE</div>
+          <div className="hud-readout-row">
+            <span className="hud-count-val">{steroids || 0}</span>
+            <span className="hud-count-sep">×</span>
+            <span className="hud-count-max">+100</span>
+          </div>
+          {steroids > 0 && onUseSteroid && (
+            <button
+              type="button"
+              className="hud-btn hud-btn-steroid"
+              onClick={onUseSteroid}
+              title="Steroid für +100 Stärke im nächsten Kampf einsetzen"
+            >
+              💉 EINSETZEN
             </button>
-          </form>
+          )}
         </section>
+
+        <div className="hud-divider" />
+
+        {/* SUCHE (NasaMon-DB) - wurde in Header verlegt */}
       </div>
 
       {/* Integrierte Bottom-Leiste: einziger Toggle-Trigger (Mobile) */}
