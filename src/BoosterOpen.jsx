@@ -106,7 +106,25 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
         item = { type: "steroid", name_de: "STEROID-VIAL", rarity: "rare" };
       } else {
-        // Collector-Item (Sammler-Item)
+        // Collector-Item (Sammler-Item) speichern
+        const { data: saveData, error: saveErr } = await supabase
+          .from("user_saves")
+          .select("collectors")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (saveErr) throw saveErr;
+
+        const currentCollectors = saveData?.collectors || 0;
+        const { error: updateErr } = await supabase
+          .from("user_saves")
+          .upsert({
+            user_id: user.id,
+            collectors: currentCollectors + 1,
+          }, { onConflict: "user_id" });
+
+        if (updateErr) throw updateErr;
+
         item = { type: "collector", name_de: "COLLECTOR'S ITEM", rarity: "legendary" };
       }
 

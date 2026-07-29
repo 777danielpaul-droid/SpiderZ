@@ -4,6 +4,7 @@ import {
   loadDex, saveCaught,
   loadBestTeamStrength, saveBestTeamStrength,
   loadSteroids, saveSteroids,
+  loadCollectors, saveCollectors,
 } from "./storage";
 
 /* ============================================================
@@ -12,7 +13,7 @@ import {
 
    - Beim Login: Cloud-Stand laden, mit localStorage mergen
      (neuester updated_at gewinnt), lokal spiegeln.
-   - Bei jeder Änderung von caughtIds / bestTeamStrength / steroids:
+   - Bei jeder Änderung von caughtIds / bestTeamStrength / steroids / collectors:
        * localStorage sofort aktualisieren (Offline-Fallback)
        * Cloud debounced (~700ms) schreiben (nur wenn eingeloggt)
    - Beim Logout: nur noch localStorage (Cloud-Write stoppt).
@@ -20,7 +21,7 @@ import {
 
 const DEBOUNCE_MS = 700;
 
-export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }) {
+export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids, collectors }) {
   const { user, ready, isSupabaseReady } = useAuth();
   const loggedIn = Boolean(user);
 
@@ -28,7 +29,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
   const mergedRef = useRef(false);
   const timerRef = useRef(null);
   // letzter geschriebener Stand (Damit wir nur bei echter Änderung schreiben).
-  const lastRef = useRef({ caught: "", best: -1, team: "", steroids: -1 });
+  const lastRef = useRef({ caught: "", best: -1, team: "", steroids: -1, collectors: -1 });
 
   // --- Merge beim Login (einmalig pro Session) ---
   useEffect(() => {
@@ -55,9 +56,11 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
       const localDex = loadDex();
       const localBest = loadBestTeamStrength();
       const localSteroids = loadSteroids();
+      const localCollectors = loadCollectors();
       const cloudIds = Array.isArray(cloud.caught_ids) ? cloud.caught_ids : [];
       const cloudBest = Number(cloud.best_team_strength) || 0;
       const cloudSteroids = Number(cloud.steroids) || 0;
+      const cloudCollectors = Number(cloud.collectors) || 0;
 
       // Union der IDs (beide Seiten behalten gefangene Spider).
       const mergedMap = new Map();
@@ -77,18 +80,23 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
       // Steroide: höherer Wert gewinnt (mehr Steroide = besser)
       const mergedSteroids = Math.max(localSteroids, cloudSteroids);
 
+      // Collector-Items: höherer Wert gewinnt (mehr = besser)
+      const mergedCollectors = Math.max(localCollectors, cloudCollectors);
+
       // Zurück in localStorage spiegeln (UI liest daraus).
       saveCaught(mergedDex);
       if (mergedBest > localBest) saveBestTeamStrength(mergedBest);
       if (mergedSteroids > localSteroids) saveSteroids(mergedSteroids);
+      if (mergedCollectors > localCollectors) saveCollectors(mergedCollectors);
 
       // Falls Cloud weniger hatte als lokal -> lokalen Stand in Cloud nachziehen.
-      if (mergedBest > cloudBest || mergedDex.length > cloudIds.length || mergedSteroids > cloudSteroids) {
+      if (mergedBest > cloudBest || mergedDex.length > cloudIds.length || mergedSteroids > cloudSteroids || mergedCollectors > cloudCollectors) {
         await saveCloudSave({
           caughtIds: mergedDex.map((p) => p.id),
           bestTeam: bestTeam ?? (Array.isArray(cloud.best_team) ? cloud.best_team : []),
           bestTeamStrength: mergedBest,
           steroids: mergedSteroids,
+          collectors: mergedCollectors,
         });
       }
     })();
@@ -102,7 +110,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
     const caughtKey = (caughtIds || []).join(",");
     const teamKey = JSON.stringify(bestTeam ?? []);
     const last = lastRef.current;
-    if (last.caught === caughtKey && last.best === bestTeamStrength && last.team === teamKey && last.steroids === steroids) {
+    if (last.caught === caughtKey && last.best === bestTeamStrength && last.team === teamKey && last.steroids === steroids && last.collectors === collectors) {
       return; // keine echte Änderung
     }
 
@@ -116,6 +124,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
     }
     if (bestTeamStrength > 0) saveBestTeamStrength(bestTeamStrength);
     if (steroids !== undefined && steroids !== null) saveSteroids(steroids);
+    if (collectors !== undefined && collectors !== null) saveCollectors(collectors);
 
     // Cloud debounced schreiben.
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -125,12 +134,13 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }
         bestTeam: bestTeam ?? [],
         bestTeamStrength: bestTeamStrength,
         steroids: steroids ?? 0,
+        collectors: collectors ?? 0,
       });
       if (ok) {
-        lastRef.current = { caught: caughtKey, best: bestTeamStrength, team: teamKey, steroids: steroids ?? 0 };
+        lastRef.current = { caught: caughtKey, best: bestTeamStrength, team: teamKey, steroids: steroids ?? 0, collectors: collectors ?? 0 };
       }
     }, DEBOUNCE_MS);
 
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [loggedIn, ready, isSupabaseReady, caughtIds, bestTeamStrength, bestTeam, steroids]);
+  }, [loggedIn, ready, isSupabaseReady, caughtIds, bestTeamStrength, bestTeam, steroids, collectors]);
 }

@@ -171,7 +171,8 @@ export default function App() {
     boostShown.current = false;
     revealPlayed.current = false;
     reset();
-    window.scrollTo(0, 0);
+    // Zu den Spielregeln scrollen (nicht zum Seitenanfang)
+    scrollToId("story");
   }, [reset]);
 
   const scrollFillRef = useRef(null);

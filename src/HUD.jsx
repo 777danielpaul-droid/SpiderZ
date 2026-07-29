@@ -166,27 +166,6 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
 
         <div className="hud-divider" />
 
-        {/* STEROIDE (Inventar) */}
-        <section className="hud-mod">
-          <div className="hud-mod-label mono-label">STEROIDE</div>
-          <div className="hud-readout-row">
-            <span className="hud-count-val">{steroids || 0}</span>
-            <span className="hud-count-sep">×</span>
-            <span className="hud-count-max">+100</span>
-          </div>
-          {steroids > 0 && onUseSteroid && (
-            <button
-              type="button"
-              className="hud-btn hud-btn-steroid"
-              onClick={onUseSteroid}
-              title="Steroid für +100 Stärke im nächsten Kampf einsetzen"
-            >
-              💉 EINSETZEN
-            </button>
-          )}
-        </section>
-
-        <div className="hud-divider" />
         <section className="hud-mod">
           <div className="hud-mod-label mono-label">SCAN</div>
           <div className="hud-bar">
@@ -201,8 +180,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
           <div className="hud-mod-label mono-label">STEROIDE</div>
           <div className="hud-readout-row">
             <span className="hud-count-val">{steroids || 0}</span>
-            <span className="hud-count-sep">×</span>
-            <span className="hud-count-max">+100</span>
+            <span className="hud-count-sep">VIALS</span>
           </div>
           {steroids > 0 && onUseSteroid && (
             <button
@@ -211,7 +189,7 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
               onClick={onUseSteroid}
               title="Steroid für +100 Stärke im nächsten Kampf einsetzen"
             >
-              💉 EINSETZEN
+              💉 +100
             </button>
           )}
         </section>

@@ -12,6 +12,7 @@ create table if not exists public.user_saves (
   best_team          jsonb       not null default '[]',          -- [{id,name_de,types,artwork,strength}]
   best_team_strength integer     not null default 0,            -- hoechste Team-Staerke einer Runde
   steroids           integer     not null default 0,            -- gesammelte Steroide (je 1 = +100 Stärke im Kampf)
+  collectors         integer     not null default 0,            -- gesammelte Collector-Items (Sammler-Fortschritt)
   updated_at         timestamptz not null default now()
 );
 
