@@ -61,3 +61,15 @@ export function useSteroid() {
   }
   return 0;
 }
+
+// Collector-Items verwalten
+export function loadCollectors() {
+  if (typeof localStorage === "undefined") return 0;
+  const v = parseInt(localStorage.getItem("nasamon_collectors") || "0", 10);
+  return Number.isFinite(v) ? v : 0;
+}
+
+export function saveCollectors(value) {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem("nasamon_collectors", String(value));
+}

@@ -11,7 +11,7 @@ import "./hud.css";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery, steroids, onUseSteroid }) {
+export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery, steroids, onUseSteroid, collectors, totalCollectors, collectorPct }) {
   const caught = caughtIds.length;
 
   // Challenge-Score: Gesamtstaerke aller gefangenen mon.
@@ -214,6 +214,21 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
               💉 EINSETZEN
             </button>
           )}
+        </section>
+
+        <div className="hud-divider" />
+
+        {/* COLLECTOR-ITEMS (Sammel-Fortschritt) */}
+        <section className="hud-mod">
+          <div className="hud-mod-label mono-label">COLLECTOR</div>
+          <div className="hud-readout-row">
+            <span className="hud-count-val">{collectors || 0}</span>
+            <span className="hud-count-sep">/</span>
+            <span className="hud-count-max">{totalCollectors || "?"}</span>
+          </div>
+          <div className="hud-bar">
+            <div className="hud-bar-fill hud-collector-fill" style={{ width: `${collectorPct}%` }} />
+          </div>
         </section>
 
         <div className="hud-divider" />

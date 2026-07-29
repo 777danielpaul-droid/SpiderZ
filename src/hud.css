@@ -353,6 +353,12 @@
   transform: translateY(-1px);
 }
 
+/* ---- COLLECTOR-Fortschrittsbalken ---- */
+.hud-collector-fill {
+  background: linear-gradient(95deg, var(--hud-magenta), var(--hud-cyan));
+  box-shadow: 0 0 12px -4px var(--hud-magenta);
+}
+
 /* ---- SUCHE (HUD-Input + Button) ---- */
 .hud-search-row {
   display: flex;

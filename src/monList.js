@@ -1,5 +1,6 @@
 // Typ-Farben (Light-Mode freundlich, lila als Akzent).
 export const TOTAL_MON = 3; // zufällige Auswahl aus dem nationalen Dex (1..1025)
+export const TOTAL_COLLECTORS = 10; // maximale Collector-Items die gesammelt werden können
 
 export const TYPE_COLORS = {
   normal:  "#9fa19f",

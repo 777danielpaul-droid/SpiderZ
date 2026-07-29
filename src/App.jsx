@@ -3,13 +3,13 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { useMonData } from "./useMonData";
-import { TOTAL_MON, TYPE_COLORS } from "./monList";
+import { TOTAL_MON, TOTAL_COLLECTORS, TYPE_COLORS } from "./monList";
 import MonCard from "./MonCard";
 import ScrubSection from "./ScrubSection";
 import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
-import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, useSteroid } from "./storage";
+import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, useSteroid, loadCollectors, saveCollectors } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
 import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
@@ -508,6 +508,9 @@ export default function App() {
             // Steroid-Bonus wird im nächsten Kampf angewendet
           }
         }}
+        collectors={loadCollectors()}
+        totalCollectors={TOTAL_COLLECTORS}
+        collectorPct={((loadCollectors() / TOTAL_COLLECTORS) * 100) || 0}
       />
 
       {hudView === "records" && (
