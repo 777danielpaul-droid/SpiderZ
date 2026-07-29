@@ -333,6 +333,26 @@
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
 
+/* ---- STEROID-BUTTON ---- */
+.hud-btn-steroid {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hud-lime);
+  background: rgba(182, 255, 59, 0.1);
+  border: 1px solid var(--hud-lime);
+  box-shadow: 0 0 12px -4px var(--hud-lime);
+  transition: all 0.18s ease;
+}
+.hud-btn-steroid:hover {
+  background: rgba(182, 255, 59, 0.25);
+  box-shadow: 0 0 16px -4px var(--hud-lime);
+  transform: translateY(-1px);
+}
+
 /* ---- SUCHE (HUD-Input + Button) ---- */
 .hud-search-row {
   display: flex;

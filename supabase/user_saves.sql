@@ -11,6 +11,7 @@ create table if not exists public.user_saves (
   caught_ids         integer[]   not null default '{}',         -- alle je gefangenen Spider-IDs
   best_team          jsonb       not null default '[]',          -- [{id,name_de,types,artwork,strength}]
   best_team_strength integer     not null default 0,            -- hoechste Team-Staerke einer Runde
+  steroids           integer     not null default 0,            -- gesammelte Steroide (je 1 = +100 Stärke im Kampf)
   updated_at         timestamptz not null default now()
 );
 

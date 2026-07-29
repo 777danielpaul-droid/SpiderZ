@@ -9,7 +9,7 @@ import ScrubSection from "./ScrubSection";
 import CutenessSection from "./CutenessSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
-import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength } from "./storage";
+import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, useSteroid } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
 import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
@@ -127,6 +127,7 @@ export default function App() {
     caughtIds,
     bestTeamStrength: bestTeamStrengthForSave,
     bestTeam: bestTeamForSave,
+    steroids: loadSteroids(),
   });
 
   // Login-Overlay sichtbar/unsichtbar (Header-Button).
@@ -475,6 +476,14 @@ export default function App() {
         onSearch={runSearch}
         searchQuery={query}
         setSearchQuery={setQuery}
+        steroids={loadSteroids()}
+        onUseSteroid={() => {
+          const bonus = useSteroid();
+          if (bonus > 0) {
+            console.log("[steroid] +100 Stärke für nächsten Kampf");
+            // Steroid-Bonus wird im nächsten Kampf angewendet
+          }
+        }}
       />
 
       {hudView === "records" && (

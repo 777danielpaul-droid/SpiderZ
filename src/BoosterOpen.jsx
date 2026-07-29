@@ -5,17 +5,22 @@ import { getSupabase, isSupabaseReady } from "./lib/supabase";
 /* ============================================================
    BoosterOpen — Modal mit Booster-Animation.
    Wird nach Spielgewinn gezeigt: öffnet einen Booster und
-   schaltet eine zufällige locked Spider frei.
+   schenkt eine zufällige Item (Spider, Steroide, PSA 10).
 
    Props:
      onClose   — wird nach Abschluss aufgerufen
-     onUnlock  — (spider) callback wenn eine Spinne freigeschaltet wurde
+     onUnlock  — (item) callback wenn ein Item gefunden wurde
+
+   Item-Typen:
+     - spider:  neue Spider wird freigeschaltet
+     - steroid: +1 Steroid im Inventar
+     - psa:     Sammler-Item (kosmetisch)
 
    Flow:
      1. User sieht Booster-Pack → klickt zum Öffnen
      2. Animation (Pack-Pop + Burst + Flakes)
-     3. Karte wird enthüllt → Spinne freigeschaltet
-     4. onUnlock(spider) → Dex updatet sich
+     3. Karte wird enthüllt → Item wird verliehen
+     4. onUnlock(item) → Inventar/Dex updatet sich
    ============================================================ */
 
 const RARITY_COLORS = {
@@ -24,13 +29,19 @@ const RARITY_COLORS = {
   legendary: "#b6ff3b", // lime
 };
 
+const ITEM_ICONS = {
+  spider: "🕷️",
+  steroid: "💉",
+  psa: "🏆",
+};
+
 export default function BoosterOpen({ onClose, onUnlock }) {
   const { user } = useAuth();
   const [phase, setPhase] = useState("idle"); // idle | opening | revealed
-  const [unlockedSpider, setUnlockedSpider] = useState(null);
+  const [unlockedItem, setUnlockedItem] = useState(null);
   const [error, setError] = useState(null);
 
-  // Booster öffnen: wähle zufällige locked Spider + freischalten
+  // Booster öffnen: wähle zufälliges Item
   const openBooster = useCallback(async () => {
     if (phase !== "idle" || !isSupabaseReady || !user) return;
 
@@ -40,7 +51,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
     try {
       const supabase = getSupabase();
 
-      // Alle locked Spider (available=false) die der User NOCH nicht hat
+      // 1. Prüfe ob locked Spider verfügbar sind
       const { data: lockedSpiders, error: fetchErr } = await supabase
         .from("nasamon")
         .select("id, name_de, name_en, artwork, types, rarity, available")
@@ -49,29 +60,61 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
       if (fetchErr) throw fetchErr;
 
-      if (!lockedSpiders || lockedSpiders.length === 0) {
-        // Alle Spider bereits freigeschaltet
-        setUnlockedSpider({ name_de: "Alle Spider gefunden!", name_en: "Complete" });
-        setPhase("revealed");
-        setTimeout(() => onClose?.(), 3000);
-        return;
+      // 2. Zufälliges Item wählen (70% Spider, 20% Steroid, 10% PSA)
+      const roll = Math.random();
+      let itemType;
+
+      if (roll < 0.7 && lockedSpiders && lockedSpiders.length > 0) {
+        itemType = "spider";
+      } else if (roll < 0.9) {
+        itemType = "steroid";
+      } else {
+        itemType = "psa";
       }
 
-      // Zufällige Spinne wählen
-      const spider = lockedSpiders[Math.floor(Math.random() * lockedSpiders.length)];
+      // 3. Item verarbeiten
+      let item;
+      if (itemType === "spider" && lockedSpiders && lockedSpiders.length > 0) {
+        // Spider freischalten
+        const spider = lockedSpiders[Math.floor(Math.random() * lockedSpiders.length)];
+        const { error: unlockErr } = await supabase
+          .from("user_unlocks")
+          .upsert({ user_id: user.id, spider_id: spider.id });
 
-      // In user_unlocks eintragen (upsert verhindert duplicate key)
-      const { error: unlockErr } = await supabase
-        .from("user_unlocks")
-        .upsert({ user_id: user.id, spider_id: spider.id });
+        if (unlockErr) throw unlockErr;
 
-      if (unlockErr) throw unlockErr;
+        item = { type: "spider", ...spider };
+      } else if (itemType === "steroid") {
+        // Steroid zum Inventar hinzufügen
+        const { data: saveData, error: saveErr } = await supabase
+          .from("user_saves")
+          .select("steroids")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      setUnlockedSpider(spider);
+        if (saveErr) throw saveErr;
+
+        const currentSteroids = saveData?.steroids || 0;
+        const { error: updateErr } = await supabase
+          .from("user_saves")
+          .upsert({
+            user_id: user.id,
+            steroids: currentSteroids + 1,
+          }, { onConflict: "user_id" });
+
+        if (updateErr) throw updateErr;
+
+        item = { type: "steroid", name_de: "STEROID-VIAL", rarity: "rare" };
+      } else {
+        // PSA 10 (Sammler-Item)
+        item = { type: "psa", name_de: "PSA 10", rarity: "legendary" };
+      }
+
+      setUnlockedItem(item);
       setPhase("revealed");
 
-      // Callback für Dex-Update
-      if (onUnlock) onUnlock(spider);
+      // Callback für Inventar/Dex-Update
+      if (onUnlock) onUnlock(item);
 
     } catch (err) {
       console.error("[booster] Fehler:", err.message);
@@ -142,21 +185,21 @@ export default function BoosterOpen({ onClose, onUnlock }) {
         </div>
 
         {/* Entdeckte Karte */}
-        {phase === "revealed" && unlockedSpider && (
-          <div className="booster-card revealed">
+        {phase === "revealed" && unlockedItem && (
+          <div className={`booster-card revealed type-${unlockedItem.type}`}>
             <div className="booster-card-icon">
-              {unlockedSpider.artwork ? (
-                <img src={unlockedSpider.artwork} alt={unlockedSpider.name_de} />
+              {unlockedItem.type === "spider" && unlockedItem.artwork ? (
+                <img src={unlockedItem.artwork} alt={unlockedItem.name_de} />
               ) : (
-                "🕷️"
+                ITEM_ICONS[unlockedItem.type] || "🕷️"
               )}
             </div>
-            <div className="booster-card-label">{unlockedSpider.name_de || unlockedSpider.name_en}</div>
+            <div className="booster-card-label">{unlockedItem.name_de || unlockedItem.name_en}</div>
             <div
               className="booster-card-rarity"
-              style={{ color: RARITY_COLORS[unlockedSpider.rarity] || RARITY_COLORS.common }}
+              style={{ color: RARITY_COLORS[unlockedItem.rarity] || RARITY_COLORS.common }}
             >
-              {unlockedSpider.rarity?.toUpperCase() || "FREIGESCHALTET"}
+              {unlockedItem.rarity?.toUpperCase() || "FREIGESCHALTET"}
             </div>
           </div>
         )}

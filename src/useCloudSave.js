@@ -3,6 +3,7 @@ import { useAuth, loadCloudSave, saveCloudSave } from "./lib/auth.jsx";
 import {
   loadDex, saveCaught,
   loadBestTeamStrength, saveBestTeamStrength,
+  loadSteroids, saveSteroids,
 } from "./storage";
 
 /* ============================================================
@@ -11,7 +12,7 @@ import {
 
    - Beim Login: Cloud-Stand laden, mit localStorage mergen
      (neuester updated_at gewinnt), lokal spiegeln.
-   - Bei jeder Änderung von caughtIds / bestTeamStrength:
+   - Bei jeder Änderung von caughtIds / bestTeamStrength / steroids:
        * localStorage sofort aktualisieren (Offline-Fallback)
        * Cloud debounced (~700ms) schreiben (nur wenn eingeloggt)
    - Beim Logout: nur noch localStorage (Cloud-Write stoppt).
@@ -19,7 +20,7 @@ import {
 
 const DEBOUNCE_MS = 700;
 
-export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
+export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam, steroids }) {
   const { user, ready, isSupabaseReady } = useAuth();
   const loggedIn = Boolean(user);
 
@@ -27,7 +28,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
   const mergedRef = useRef(false);
   const timerRef = useRef(null);
   // letzter geschriebener Stand (Damit wir nur bei echter Änderung schreiben).
-  const lastRef = useRef({ caught: "", best: -1, team: "" });
+  const lastRef = useRef({ caught: "", best: -1, team: "", steroids: -1 });
 
   // --- Merge beim Login (einmalig pro Session) ---
   useEffect(() => {
@@ -53,8 +54,10 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
       // Cloud vorhanden -> lokale Daten als Fallback / Merge-Basis nehmen.
       const localDex = loadDex();
       const localBest = loadBestTeamStrength();
+      const localSteroids = loadSteroids();
       const cloudIds = Array.isArray(cloud.caught_ids) ? cloud.caught_ids : [];
       const cloudBest = Number(cloud.best_team_strength) || 0;
+      const cloudSteroids = Number(cloud.steroids) || 0;
 
       // Union der IDs (beide Seiten behalten gefangene Spider).
       const mergedMap = new Map();
@@ -71,16 +74,21 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
       // Bestes Team: höherer Wert gewinnt.
       const mergedBest = Math.max(localBest, cloudBest);
 
+      // Steroide: höherer Wert gewinnt (mehr Steroide = besser)
+      const mergedSteroids = Math.max(localSteroids, cloudSteroids);
+
       // Zurück in localStorage spiegeln (UI liest daraus).
       saveCaught(mergedDex);
       if (mergedBest > localBest) saveBestTeamStrength(mergedBest);
+      if (mergedSteroids > localSteroids) saveSteroids(mergedSteroids);
 
       // Falls Cloud weniger hatte als lokal -> lokalen Stand in Cloud nachziehen.
-      if (mergedBest > cloudBest || mergedDex.length > cloudIds.length) {
+      if (mergedBest > cloudBest || mergedDex.length > cloudIds.length || mergedSteroids > cloudSteroids) {
         await saveCloudSave({
           caughtIds: mergedDex.map((p) => p.id),
           bestTeam: bestTeam ?? (Array.isArray(cloud.best_team) ? cloud.best_team : []),
           bestTeamStrength: mergedBest,
+          steroids: mergedSteroids,
         });
       }
     })();
@@ -94,7 +102,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
     const caughtKey = (caughtIds || []).join(",");
     const teamKey = JSON.stringify(bestTeam ?? []);
     const last = lastRef.current;
-    if (last.caught === caughtKey && last.best === bestTeamStrength && last.team === teamKey) {
+    if (last.caught === caughtKey && last.best === bestTeamStrength && last.team === teamKey && last.steroids === steroids) {
       return; // keine echte Änderung
     }
 
@@ -107,6 +115,7 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
       saveCaught([...map.values()]);
     }
     if (bestTeamStrength > 0) saveBestTeamStrength(bestTeamStrength);
+    if (steroids !== undefined && steroids !== null) saveSteroids(steroids);
 
     // Cloud debounced schreiben.
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -115,12 +124,13 @@ export function useCloudSave({ caughtIds, bestTeamStrength, bestTeam }) {
         caughtIds: caughtIds,
         bestTeam: bestTeam ?? [],
         bestTeamStrength: bestTeamStrength,
+        steroids: steroids ?? 0,
       });
       if (ok) {
-        lastRef.current = { caught: caughtKey, best: bestTeamStrength, team: teamKey };
+        lastRef.current = { caught: caughtKey, best: bestTeamStrength, team: teamKey, steroids: steroids ?? 0 };
       }
     }, DEBOUNCE_MS);
 
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [loggedIn, ready, isSupabaseReady, caughtIds, bestTeamStrength, bestTeam]);
+  }, [loggedIn, ready, isSupabaseReady, caughtIds, bestTeamStrength, bestTeam, steroids]);
 }

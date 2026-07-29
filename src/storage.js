@@ -1,6 +1,7 @@
 // Persistente Sammlung + Rekorde (localStorage, kein Backend).
 const DEX_KEY = "nasamon_dex";            // Array aller je gefangenen Monster (dedupe nach id)
 const BEST_KEY = "nasamon_bestTeamStrength"; // hoechste Team-Staerke einer Runde
+const STEROIDS_KEY = "nasamon_steroids";     // gesammelte Steroide (je 1 = +100 Stärke im Kampf)
 
 function safeParse(raw, fallback) {
   try {
@@ -37,4 +38,26 @@ export function saveBestTeamStrength(value) {
   if (typeof localStorage === "undefined") return;
   const cur = loadBestTeamStrength();
   if (value > cur) localStorage.setItem(BEST_KEY, String(value));
+}
+
+// Steroide verwalten (je 1 = +100 Stärke im nächsten Kampf)
+export function loadSteroids() {
+  if (typeof localStorage === "undefined") return 0;
+  const v = parseInt(localStorage.getItem(STEROIDS_KEY) || "0", 10);
+  return Number.isFinite(v) ? v : 0;
+}
+
+export function saveSteroids(value) {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(STEROIDS_KEY, String(value));
+}
+
+// Steroid einsetzen (verbraucht 1, gibt +100 Stärke zurück)
+export function useSteroid() {
+  const current = loadSteroids();
+  if (current > 0) {
+    saveSteroids(current - 1);
+    return 100;
+  }
+  return 0;
 }
