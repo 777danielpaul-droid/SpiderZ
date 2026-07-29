@@ -60,10 +60,10 @@ export default function BoosterOpen({ onClose, onUnlock }) {
       // Zufällige Spinne wählen
       const spider = lockedSpiders[Math.floor(Math.random() * lockedSpiders.length)];
 
-      // In user_unlocks eintragen
+      // In user_unlocks eintragen (upsert verhindert duplicate key)
       const { error: unlockErr } = await supabase
         .from("user_unlocks")
-        .insert({ user_id: user.id, spider_id: spider.id });
+        .upsert({ user_id: user.id, spider_id: spider.id });
 
       if (unlockErr) throw unlockErr;
 
@@ -168,6 +168,16 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
         {/* Fehler */}
         {error && <div className="booster-error">{error}</div>}
+
+        {/* Zurück-Button (immer sichtbar) */}
+        <button
+          type="button"
+          className="booster-back"
+          onClick={onClose}
+          aria-label="Zurück"
+        >
+          ✕
+        </button>
       </div>
     </div>
   );

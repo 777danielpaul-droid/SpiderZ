@@ -725,11 +725,16 @@ export default function App() {
           )}
 
           {/* BOOSTER-CTA: nach Durchscrollen der Ergebnisse, vor dem Booster-Screen */}
-          {boosterCta && arenaWins >= 2 && !boosterOpen && (
+          {boosterCta && arenaWins >= 2 && (
             <div className="booster-cta-wrap">
-              <button type="button" className="booster-cta" onClick={() => setBoosterOpen(true)}>
+              <button
+                type="button"
+                className="booster-cta"
+                onClick={() => setBoosterOpen(true)}
+                disabled={boosterOpen}
+              >
                 <span className="booster-cta-arrow" aria-hidden="true">⬡</span>
-                BOOSTER ÖFFNEN
+                {boosterOpen ? "BEREIT!" : "BOOSTER ÖFFNEN"}
                 <span className="booster-cta-arrow" aria-hidden="true">⬡</span>
               </button>
             </div>
@@ -738,9 +743,12 @@ export default function App() {
           {/* BOOSTER-SCREEN: nach Klick auf CTA */}
           {boosterOpen && arenaWins >= 2 && (
             <BoosterOpen
-              onClose={() => setBoosterOpen(false)}
+              onClose={() => {
+                setBoosterOpen(false);
+                setBoosterCta(false); // CTA verschwindet nach Schließen
+                boostShown.current = false; // Erlaubt erneutes Auslösen beim nächsten Sieg
+              }}
               onUnlock={(spider) => {
-                // Dex wird automatisch aktualisiert, da user_unlocks in Supabase geschrieben wurde
                 console.log("[booster] Spider freigeschaltet:", spider.name_de);
               }}
             />
