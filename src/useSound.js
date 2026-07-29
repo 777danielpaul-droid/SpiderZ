@@ -2,15 +2,15 @@ import { useCallback, useRef } from "react";
 
 export const SFX = {
   ui: {
-    click: "/sfx/ui/click.mp3",
-    collect: "/sfx/ui/collect.mp3",
-    tap: "/sfx/ui/tap.mp3",
+    click: "/sfx/ui/click.wav",
+    collect: "/sfx/ui/collect.wav",
+    tap: "/sfx/ui/tap.wav",
   },
   arena: {
-    start: "/sfx/arena/start.mp3",
-    win: "/sfx/arena/win.mp3",
-    lose: "/sfx/arena/lose.mp3",
-    draw: "/sfx/arena/draw.mp3",
+    start: "/sfx/arena/start.wav",
+    win: "/sfx/arena/win.wav",
+    lose: "/sfx/arena/lose.wav",
+    draw: "/sfx/arena/draw.wav",
   },
 };
 
