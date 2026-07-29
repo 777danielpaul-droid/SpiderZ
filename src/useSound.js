@@ -68,9 +68,9 @@ export function useSound(volume = 0.18) {
 
         const audio = new Audio(path);
         audio.volume = volume;
-        audio.play().catch(() => {});
-      } catch {
-        // ignore missing files / playback errors
+        audio.play().catch((err) => {
+        });
+      } catch (err) {
       }
     },
     [volume]
