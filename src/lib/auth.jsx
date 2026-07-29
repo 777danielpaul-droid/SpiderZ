@@ -47,9 +47,47 @@ export function AuthProvider({ children }) {
     if (!isSupabaseReady) return { error: new Error("Supabase nicht konfiguriert.") };
     const supabase = getSupabase();
     // redirectTo: nach dem Google-Roundtrip zurück auf dieselbe Seite.
+    // Wichtig: Die in Google Cloud Console hinterlegte "Authorized redirect URI"
+    // muss die Supabase-Callback-URL sein:
+    //   https://fxdrrowbzcddxmknjuvv.supabase.co/auth/v1/callback
+    // Supabase verarbeitet den Code und redirectet dann zu dieser redirectTo-URL.
+    const redirectTo = window.location.origin + window.location.pathname;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + window.location.pathname },
+      options: { redirectTo },
+    });
+    return { error: error ?? null };
+  }, []);
+
+  // Email + Password: Registrierung (neuer Account)
+  const signUpWithEmail = useCallback(async (email, password) => {
+    if (!isSupabaseReady) return { error: new Error("Supabase nicht konfiguriert.") };
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // Nach E-Mail-Bestätigung: zurück zur App
+        emailRedirectTo: window.location.origin + window.location.pathname,
+      },
+    });
+    return { error: error ?? null };
+  }, []);
+
+  // Email + Password: Login (bestehender Account)
+  const signInWithEmail = useCallback(async (email, password) => {
+    if (!isSupabaseReady) return { error: new Error("Supabase nicht konfiguriert.") };
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error ?? null };
+  }, []);
+
+  // Passwort zurücksetzen (Sendet Magic-Link / Reset-Mail)
+  const resetPassword = useCallback(async (email) => {
+    if (!isSupabaseReady) return { error: new Error("Supabase nicht konfiguriert.") };
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname + "?reset=true",
     });
     return { error: error ?? null };
   }, []);
@@ -61,7 +99,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const value = { user, loading, ready, isSupabaseReady, signInWithGoogle, signOut };
+  const value = {
+    user, loading, ready, isSupabaseReady,
+    signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword,
+    signOut,
+  };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
