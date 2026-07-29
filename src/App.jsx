@@ -16,6 +16,7 @@ import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
 import { useAuth } from "./lib/auth.jsx";
 import { useCloudSave } from "./useCloudSave";
 import LoginOverlay from "./LoginOverlay";
+import BoosterOpen from "./BoosterOpen";
 import "./App.css";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -736,62 +737,17 @@ export default function App() {
 
           {/* BOOSTER-SCREEN: nach Klick auf CTA */}
           {boosterOpen && arenaWins >= 2 && (
-            <BoosterScreen onClose={() => setBoosterOpen(false)} />
+            <BoosterOpen
+              onClose={() => setBoosterOpen(false)}
+              onUnlock={(spider) => {
+                // Dex wird automatisch aktualisiert, da user_unlocks in Supabase geschrieben wurde
+                console.log("[booster] Spider freigeschaltet:", spider.name_de);
+              }}
+            />
           )}
 
         </main>
       )}
-    </div>
-  );
-}
-
-// ===== BOOSTER-SCREEN (Animation; Mechanik folgt spaeter) =====
-function BoosterScreen({ onClose }) {
-  const [phase, setPhase] = useState("idle"); // idle -> opening -> revealed
-  const open = () => {
-    if (phase !== "idle") return;
-    if (navigator.vibrate) navigator.vibrate(30);
-    setPhase("opening");
-    setTimeout(() => setPhase("revealed"), 520);
-  };
-  const cards = [
-    { type: "spider", icon: "🕷️", label: "NEUE SPINNE", rarity: "FREIGESCHALTET" },
-    { type: "vial", icon: "💉", label: "STEROID-VIAL", rarity: "+1 DOPEN" },
-    { type: "psa", icon: "🏆", label: "PSA 10", rarity: "SAMMEL-ITEM" },
-  ];
-  return (
-    <div className={`booster-screen ${phase}`}>
-      <div className="booster-stage">
-        <div className="booster-pack" role="button" tabIndex={0} aria-label="Booster öffnen" onClick={open}
-             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}>
-          <div className="pack-body">
-            <div className="pack-perf" />
-            <div className="pack-top" />
-            <div className="pack-foil" />
-            <div className="pack-logo"><div className="big">SPIDER<span>Z</span></div><div className="sub">BOOSTER</div></div>
-          </div>
-          <div className="booster-burst">
-            <svg viewBox="0 0 200 200"><g fill="none" stroke="url(#bg)" strokeWidth="3">
-              <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#22d3ee" /><stop offset="1" stopColor="#ff35d0" /></linearGradient></defs>
-              <path d="M100 10 L100 60 M100 140 L100 190 M10 100 L60 100 M140 100 L190 100 M37 37 L73 73 M127 127 L163 163 M163 37 L127 73 M73 127 L37 163" />
-            </g></svg>
-          </div>
-        </div>
-
-        <div className="booster-cards">
-          {cards.map((c) => (
-            <div key={c.type} className={`booster-card type-${c.type} shimmer`}>
-              <div className="icon">{c.icon}</div>
-              <div className="label">{c.label}</div>
-              <div className="rarity">{c.rarity}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="booster-hint">TIPPE ZUM ÖFFNEN</div>
-      </div>
-      <button type="button" className="booster-reset" onClick={onClose}>↻ WEITER</button>
     </div>
   );
 }
