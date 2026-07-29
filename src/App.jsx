@@ -646,7 +646,7 @@ export default function App() {
             </h2>
 
             <div className="team-grid">
-              {data.map((p) => {
+              {data.filter((p) => caughtIds.includes(p.id)).slice(0, LEVEL_TEAM_SIZE).map((p) => {
                 const caught = caughtIds.includes(p.id);
                 const primary = p.types && p.types[0];
                 return (
