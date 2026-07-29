@@ -196,25 +196,6 @@ export default function HUD({ total, caughtIds, data, scrollFillRef, pulseRef, v
 
         <div className="hud-divider" />
 
-        {/* AKTIVES TEAM (letzte 4) */}
-        <section className="hud-mod">
-          <div className="hud-mod-label mono-label">AKTIVES TEAM</div>
-          {teamPreview.length === 0 ? (
-            <div className="hud-team-empty">— keine Daten —</div>
-          ) : (
-            <ul className="hud-team-list">
-              {teamPreview.map((p) => (
-                <li className="hud-team-item" key={p.id}>
-                  <span className="hud-team-name">{p.name_de}</span>
-                  <span className="hud-team-str">{p.strength}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <div className="hud-divider" />
-
         {/* STEROIDE (Inventar) */}
         <section className="hud-mod">
           <div className="hud-mod-label mono-label">STEROIDE</div>

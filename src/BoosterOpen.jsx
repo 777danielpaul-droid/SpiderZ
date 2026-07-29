@@ -5,16 +5,16 @@ import { getSupabase, isSupabaseReady } from "./lib/supabase";
 /* ============================================================
    BoosterOpen — Modal mit Booster-Animation.
    Wird nach Spielgewinn gezeigt: öffnet einen Booster und
-   schenkt eine zufällige Item (Spider, Steroide, PSA 10).
+   schenkt eine zufällige Item (Spider, Steroide, Collector-Item).
 
    Props:
      onClose   — wird nach Abschluss aufgerufen
      onUnlock  — (item) callback wenn ein Item gefunden wurde
 
    Item-Typen:
-     - spider:  neue Spider wird freigeschaltet
-     - steroid: +1 Steroid im Inventar
-     - psa:     Sammler-Item (kosmetisch)
+     - spider:     neue Spider wird freigeschaltet (30%)
+     - steroid:    +1 Steroid im Inventar (60%)
+     - collector:  Sammler-Item (10%)
 
    Flow:
      1. User sieht Booster-Pack → klickt zum Öffnen
@@ -32,7 +32,7 @@ const RARITY_COLORS = {
 const ITEM_ICONS = {
   spider: "🕷️",
   steroid: "💉",
-  psa: "🏆",
+  collector: "🏆",
 };
 
 export default function BoosterOpen({ onClose, onUnlock }) {
@@ -60,16 +60,16 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
       if (fetchErr) throw fetchErr;
 
-      // 2. Zufälliges Item wählen (70% Spider, 20% Steroid, 10% PSA)
+      // 2. Zufälliges Item wählen (30% Spider, 60% Steroid, 10% Collector)
       const roll = Math.random();
       let itemType;
 
-      if (roll < 0.7 && lockedSpiders && lockedSpiders.length > 0) {
+      if (roll < 0.3 && lockedSpiders && lockedSpiders.length > 0) {
         itemType = "spider";
       } else if (roll < 0.9) {
         itemType = "steroid";
       } else {
-        itemType = "psa";
+        itemType = "collector";
       }
 
       // 3. Item verarbeiten
@@ -106,8 +106,8 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
         item = { type: "steroid", name_de: "STEROID-VIAL", rarity: "rare" };
       } else {
-        // PSA 10 (Sammler-Item)
-        item = { type: "psa", name_de: "PSA 10", rarity: "legendary" };
+        // Collector-Item (Sammler-Item)
+        item = { type: "collector", name_de: "COLLECTOR'S ITEM", rarity: "legendary" };
       }
 
       setUnlockedItem(item);
