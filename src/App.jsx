@@ -417,14 +417,38 @@ export default function App() {
     <div className="app" ref={rootRef}>
       <header className={`site-header${headerCollapsed ? " header-collapsed" : ""}`} ref={headerRef}>
       <span className="holo-glass" aria-hidden="true"></span>
-        <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ">SPIDER<span>Z</span></a>
+        {/* Logo oben links: Klick scrollt zum Seitenanfang */}
+        <a className="site-logo" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }} aria-label="SpiderZ - Zum Seitenanfang">SPIDER<span>Z</span></a>
         <nav className="site-nav">
-          <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); }}>SpiderZ</a>
+          {/* Anker "SpiderZ" öffnet direkt den NASAMON-Dex */}
+          <a className="site-link" href="#spiderz" onClick={(e) => { e.preventDefault(); scrollToId("spiderz"); setHudView("dex"); }}>SpiderZ</a>
           <a className="site-link" href="#story" onClick={(e) => { e.preventDefault(); scrollToId("story"); }}>Spielregeln</a>
           <button type="button" className="site-link lore-link" onClick={() => setLoreOpen(true)}>Lore</button>
           <a className="site-link" href={import.meta.env.BASE_URL + "datenschutz.html"} target="_blank" rel="noopener">Datenschutz</a>
           <a className="site-link" href={import.meta.env.BASE_URL + "impressum.html"} target="_blank" rel="noopener">Impressum</a>
         </nav>
+        {/* Suchleiste im Header */}
+        <form
+          className="header-search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = (query || "").trim();
+            if (q && runSearch) runSearch(q);
+          }}
+        >
+          <input
+            className="header-search-input"
+            type="text"
+            inputMode="text"
+            placeholder="Nr (1–18) / Name"
+            value={query || ""}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Spider-Monster suchen"
+          />
+          <button className="header-search-btn" type="submit" title="Suchen">
+            SUCHEN
+          </button>
+        </form>
         <button
           type="button"
           className="theme-toggle"

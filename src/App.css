@@ -861,6 +861,51 @@
 }
 .site-header .theme-toggle:hover { filter: brightness(1.25); transform: scale(1.06); }
 
+/* ---- Header-Suchleiste ---- */
+.header-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 14px;
+}
+.header-search-input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--hud-text);
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: rgba(13, 10, 25, 0.5);
+  border: 1px solid var(--hud-border);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  width: 180px;
+}
+.header-search-input:focus {
+  outline: none;
+  border-color: var(--hud-cyan);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
+}
+.header-search-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hud-text);
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid var(--hud-border);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.header-search-btn:hover {
+  color: var(--hud-cyan);
+  border-color: var(--hud-cyan);
+  box-shadow: 0 0 16px -4px var(--hud-cyan);
+}
+
 /* Ausgleich: Inhalt beginnt unter dem festen Header -> entfernt, damit das
    Hero-Video bündig an der Oberkante klebt (Header liegt transparent drüber). */
 
