@@ -51,7 +51,7 @@ Built with a **modern React 19 + Vite** stack, GSAP for scroll-orchestration, an
 - **`MonCard.jsx`** / **`ScrubSection.jsx`** — Scroll-pinned catch cards + hint pills
 - **`typeBattle.js`** — Type-advantage resolver (GIFT / STÄRKE / VERTEIDIGUNG)
 - **`storage.js`** — localStorage persistence (Dex, best-team, records)
-- **`BoosterScreen`** — Tap-to-open pack animation (mobile-first)
+- **`BoosterOpen.jsx`** — Tap-to-open pack animation (mobile-first)
 - **`supabase/schema.sql`** — `nasamon` table + RLS + public storage bucket
 
 Data lives in **Supabase** (`nasamon` table, public read, service-role write). Apply `supabase/schema.sql` in the Supabase SQL editor, then seed via `scripts/seed.mjs`.
