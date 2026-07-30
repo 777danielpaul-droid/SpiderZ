@@ -146,20 +146,21 @@ export default function ScrubSection({ children, hintHidden, onReady }) {
               </div>
               <p>Lade Sequenz … {pct}%</p>
             </div>
-          ) : (
-            <div className="scrub-hint">
-              <span className="holo-glass" aria-hidden="true"></span>
-              <span className={`scrub-hint-text${hintHidden ? " hidden" : ""}`}>
-                <span className="scrub-hint-arrow" aria-hidden="true">↓</span>
-                Scrollen spult vor
-                <span className="scrub-hint-sep" aria-hidden="true">·</span>
-                <span className="scrub-hint-arrow" aria-hidden="true">↑</span>
-                zurück
-              </span>
-            </div>
-          )}
+          ) : null}
           {children && <div className="scrub-overlay-children">{children}</div>}
         </div>
+        {!ready ? null : (
+          <div className="scrub-hint">
+            <span className="holo-glass" aria-hidden="true"></span>
+            <span className={`scrub-hint-text${hintHidden ? " hidden" : ""}`}>
+              <span className="scrub-hint-arrow" aria-hidden="true">↓</span>
+              Scrollen spult vor
+              <span className="scrub-hint-sep" aria-hidden="true">·</span>
+              <span className="scrub-hint-arrow" aria-hidden="true">↑</span>
+              zurück
+            </span>
+          </div>
+        )}
       </div>
     </section>
   );
