@@ -44,6 +44,11 @@ export default function App() {
   const [dark, setDark] = useState(true);
   const [hudView, setHudView] = useState("play");   // 'play' | 'records' | 'dex'
 
+  // ---- LEVEL-PROGRESSION: Level 1 = 3 Spinnen, Level 2 = 2 Spinnen, Level 3 = 1 Spinne ----
+  const [level, setLevel] = useState(1);
+  const LEVEL_TEAM_SIZE = useMemo(() => level === 1 ? TOTAL_MON : level === 2 ? 2 : 1, [level]); // Level 3: nur 1 Spinne
+  const [levelTransition, setLevelTransition] = useState(false); // LEVEL COMPLETE Screen
+
   // Theme auf <html data-theme> spiegeln (CSS reagiert via [data-theme="dark"])
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
@@ -71,11 +76,6 @@ export default function App() {
     })));
     saveBestTeamStrength(teamStrength);
   }, [data, caughtIds, level, LEVEL_TEAM_SIZE]);
-
-  // ---- LEVEL-PROGRESSION: Level 1 = 3 Spinnen, Level 2 = 2 Spinnen, Level 3 = 1 Spinne ----
-  const [level, setLevel] = useState(1);
-  const LEVEL_TEAM_SIZE = useMemo(() => level === 1 ? TOTAL_MON : level === 2 ? 2 : 1, [level]); // Level 3: nur 1 Spinne
-  const [levelTransition, setLevelTransition] = useState(false); // LEVEL COMPLETE Screen
 
   // ---- STEROIDE: Inventar-State (live HUD-Update bei Booster-Vial) ----
   const [steroids, setSteroids] = useState(() => loadSteroids());
@@ -171,6 +171,14 @@ export default function App() {
     });
     return () => cancelAnimationFrame(id);
   }, [arenaWins, arenaMatches.length, play, level, LEVEL_TEAM_SIZE, REQUIRED_WINS]);
+
+  // Sanfter Anker-Scroll ueber GSAP (konsistent mit ScrollTrigger-Architektur).
+  const scrollToId = useCallback((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 60; // Header-Hoehe abziehen
+    gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
+  }, []);
 
   // Gemeinsamer State-Reset für Neustart und Level-Transition.
   const resetGameState = useCallback((nextLevel) => {
@@ -422,14 +430,6 @@ export default function App() {
     setCaughtIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
     play(SFX.ui.collect);
   }, [play]);
-
-  // Sanfter Anker-Scroll ueber GSAP (konsistent mit ScrollTrigger-Architektur).
-  const scrollToId = useCallback((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - 60; // Header-Hoehe abziehen
-    gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
-  }, []);
 
   return (
     <div className="app" ref={rootRef}>
