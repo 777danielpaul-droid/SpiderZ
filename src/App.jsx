@@ -153,6 +153,14 @@ export default function App() {
   //   Level 3 (1 Spinne): 1/1 Sieg nötig
   const REQUIRED_WINS = level === 2 ? LEVEL_TEAM_SIZE : Math.ceil(LEVEL_TEAM_SIZE / 2);
   const boostShown = useRef(false);
+  const scrollFillRef = useRef(null);
+  const stRef = useRef(null);
+  const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
+  const endcardRef = useRef(null);   // Final-Event: Team-Reveal
+  const arenaEndRef = useRef(null);  // Arena-Ergebnis -> Booster-Screen nach Durchscrollen
+  const teamRefs = useRef({});       // DOM-Refs der Team-Karten
+  const revealPlayed = useRef(false); // Finale nur einmal abspielen
+
   useEffect(() => {
     if (arenaWins < REQUIRED_WINS || arenaMatches.length !== LEVEL_TEAM_SIZE) return;
     if (!arenaEndRef.current || boostShown.current) return;
@@ -202,14 +210,6 @@ export default function App() {
   const handleRestart = useCallback(() => {
     resetGameState(1);
   }, [resetGameState]);
-
-  const scrollFillRef = useRef(null);
-  const stRef = useRef(null);
-  const cardTrgRef = useRef([]); // ScrollTrigger je Karte (fuer "Weiter"-Button)
-  const endcardRef = useRef(null);   // Final-Event: Team-Reveal
-  const arenaEndRef = useRef(null);  // Arena-Ergebnis -> Booster-Screen nach Durchscrollen
-  const teamRefs = useRef({});       // DOM-Refs der Team-Karten
-  const revealPlayed = useRef(false); // Finale nur einmal abspielen
 
   // "Weiter"-Button: smooth zum naechsten mon (oder ans Team-Ende).
   // Erst nach dem ersten gefangenen mon nutzbar (vorher muss gescrollt werden).
