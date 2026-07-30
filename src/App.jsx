@@ -19,10 +19,6 @@ import BoosterOpen from "./BoosterOpen";
 import "./App.css";
 import { useSound, SFX } from "./useSound";
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-// Refresh: Browser-Restoration deaktivieren (muss vor nativem Restore laufen
-// -> Modul-Ebene, nicht erst im Effect).
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
 export default function App() {
@@ -157,7 +153,6 @@ export default function App() {
   //   Level 3 (1 Spinne): 1/1 Sieg nötig
   const REQUIRED_WINS = level === 2 ? LEVEL_TEAM_SIZE : Math.ceil(LEVEL_TEAM_SIZE / 2);
   const boostShown = useRef(false);
-  console.log(`[debug] level=${level}, LEVEL_TEAM_SIZE=${LEVEL_TEAM_SIZE}, total=${TOTAL_MON}, REQUIRED_WINS=${REQUIRED_WINS}`);
   useEffect(() => {
     if (arenaWins < REQUIRED_WINS || arenaMatches.length !== LEVEL_TEAM_SIZE) return;
     if (!arenaEndRef.current || boostShown.current) return;
@@ -525,16 +520,12 @@ export default function App() {
         onNext={goNext}
         canNext={caughtIds.length > 0}
         nextLabel={activeCard >= LEVEL_TEAM_SIZE - 1 ? "Zum Team ▾" : "Weiter ▸"}
-        onSearch={runSearch}
-        searchQuery={query}
-        setSearchQuery={setQuery}
         steroids={steroids}
         onUseSteroid={() => {
           const current = loadSteroids();
           if (current > 0) {
             saveSteroids(current - 1);
             setSteroids((n) => n - 1);
-            console.log("[steroid] +100 Stärke für nächsten Kampf");
           }
         }}
         collectors={loadCollectors()}
@@ -811,20 +802,15 @@ export default function App() {
                 setBoosterOpen(false);
                 setBoosterCta(false);
                 boostShown.current = false;
-                // Level-Up: nach Level-1-Sieg -> Level-Transition-Screen zeigen
-                if (level === 1) {
-                  setLevelTransition(true);
-                  console.log("[level] Level 1 gewonnen → Level-Transition");
-                }
+                setLevelTransition(true);
               }}
               onUnlock={(item) => {
                 if (item.type === "steroid") {
                   setSteroids((n) => n + 1);
-                  console.log("[booster] Steroid-Vial erhalten — HUD-Zähler hochgezählt");
                 } else if (item.type === "spider") {
-                  console.log("[booster] Spider freigeschaltet:", item.name_de);
+                  // Spider freigeschaltet - wird über Cloud-Sync/Dex aktualisiert
                 } else if (item.type === "collector") {
-                  console.log("[booster] Collector-Item erhalten:", item.name_de);
+                  // Collector-Item erhalten - wird über Cloud-Sync aktualisiert
                 }
               }}
             />

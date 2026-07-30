@@ -81,7 +81,7 @@ export default function ScrubSection({ children, hintHidden, onReady }) {
         const t = Math.round(targetRef.current);
         if (t !== drawnRef.current) draw(t);
       } catch (e) {
-        console.log("RAF_ERR: " + (e && e.stack ? e.stack : String(e)));
+        // Canvas-Fehler sind nicht kritisch - Frame wird übersprungen
       }
       rafRef.current = requestAnimationFrame(loop);
     };
@@ -122,7 +122,7 @@ export default function ScrubSection({ children, hintHidden, onReady }) {
         ctx.revert();
       };
     } catch (e) {
-      console.log("ST_ERR: " + (e && e.stack ? e.stack : String(e)));
+      // ScrollTrigger-Fehler sind nicht kritisch
     }
   }, [ready]);
 

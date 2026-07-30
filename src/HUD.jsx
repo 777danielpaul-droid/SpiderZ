@@ -12,7 +12,7 @@ import { useSound, SFX } from "./useSound";
  * Effekte: Sci-Fi-Glow, Pulse bei Wertänderung, Scanline, Cyberpunk-Brackets.
  * Reward-Pop (Score-Count-up, Partikel, +STÄRKE-Toast) + Gating bleiben erhalten.
  */
-export default function HUD({ total, level: appLevel, caughtIds, data, scrollFillRef, pulseRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, onSearch, searchQuery, setSearchQuery, steroids: steroidsProp, onUseSteroid, collectors, totalCollectors, collectorPct }) {
+export default function HUD({ total, level: appLevel, caughtIds, data, scrollFillRef, visible, collapsed, onToggle, onRestart, onShowRecords, onNext, canNext, nextLabel, steroids: steroidsProp, onUseSteroid, collectors, totalCollectors, collectorPct }) {
   const caught = caughtIds.length;
 
   // Steroid-Anzeige: reagiert auf Prop-Änderungen

@@ -1,14 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import App from './App.jsx'
 import { AuthProvider } from './lib/auth.jsx'
-import './mobile.css' // Mobile-Stacking (<=767px) — zuletzt laden, gewinnt
-import { initStarfield } from './starfield.js'
+import './index.css'
+import './mobile.css'
 
-const canvas = document.getElementById('starfield')
-// ~8000 Sterne => krasser Holo-Look mit Parallax, 60fps. Erhoehbar via setCount().
-const starfield = initStarfield(canvas, 8000)
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
+
+if ("scrollRestoration" in history) history.scrollRestoration = "manual"
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,5 +20,13 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// Aufraeumen beim Entladen (HMR-sicher)
-window.addEventListener('beforeunload', () => starfield.destroy())
+// Starfield asynchron laden (optional, darf React nicht blockieren)
+const canvas = document.getElementById('starfield')
+if (canvas) {
+  setTimeout(() => {
+    import('./starfield.js').then(({ initStarfield }) => {
+      const starfield = initStarfield(canvas, 8000)
+      window.addEventListener('beforeunload', () => starfield.destroy())
+    }).catch(() => { /* Starfield ist optional */ })
+  }, 0)
+}
