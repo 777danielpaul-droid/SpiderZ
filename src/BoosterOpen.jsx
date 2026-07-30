@@ -45,13 +45,31 @@ export default function BoosterOpen({ onClose, onUnlock }) {
 
   // Booster öffnen: wähle zufälliges Item
   const openBooster = useCallback(async () => {
-    if (phase !== "idle" || !isSupabaseReady || !user) return;
+    if (phase !== "idle") return;
 
     setPhase("opening");
     setError(null);
     try { play(SFX.ui.click); } catch { /* no sound file yet */ }
 
     try {
+      // Offline-Modus: kein Supabase -> lokales Item generieren
+      if (!isSupabaseReady || !user) {
+        const roll = Math.random();
+        let item;
+        if (roll < 0.7) {
+          // 70% Steroid
+          item = { type: "steroid", name_de: "STEROID-VIAL", rarity: "rare" };
+        } else {
+          // 30% Collector
+          item = { type: "collector", name_de: "COLLECTOR'S ITEM", rarity: "legendary" };
+        }
+        setUnlockedItem(item);
+        setPhase("revealed");
+        play(SFX.ui.collect);
+        if (onUnlock) onUnlock(item);
+        return;
+      }
+
       const supabase = getSupabase();
 
       // 1. Prüfe ob locked Spider verfügbar sind

@@ -30,3 +30,39 @@ export function avgStat(mon) {
   const n = arr.length || 1;
   return Math.round(sum / n);
 }
+
+// Lokaler Fallback-Datensatz (für Offline-Modus ohne Supabase).
+// 3 Spider mit verschiedenen Typen-Fraktionen (GIFT / STÄRKE / VERTEIDIGUNG).
+const BASE = typeof import.meta !== "undefined" ? import.meta.env.BASE_URL : "/SpiderZ/";
+export const FALLBACK_MONS = [
+  {
+    id: 1, name_de: "Arachnex", name_en: "Arachnex",
+    types: ["gift"], strength: 85, height: 7, weight: 15,
+    artwork: `${BASE}assets/arachnex.png`,
+    stats: [
+      { name: "ANGRIFF", value: 92 },
+      { name: "VERTEIDIGUNG", value: 68 },
+      { name: "GESCHWINDIGKEIT", value: 76 },
+    ],
+  },
+  {
+    id: 2, name_de: "Neonarach", name_en: "Neonarach",
+    types: ["stärk"], strength: 112, height: 11, weight: 28,
+    artwork: `${BASE}assets/neonarach.png`,
+    stats: [
+      { name: "ANGRIFF", value: 118 },
+      { name: "VERTEIDIGUNG", value: 82 },
+      { name: "GESCHWINDIGKEIT", value: 94 },
+    ],
+  },
+  {
+    id: 3, name_de: "Toxipede", name_en: "Toxipede",
+    types: ["gift", "verteidigung"], strength: 74, height: 9, weight: 22,
+    artwork: `${BASE}assets/toxipede.png`,
+    stats: [
+      { name: "ANGRIFF", value: 66 },
+      { name: "VERTEIDIGUNG", value: 94 },
+      { name: "GESCHWINDIGKEIT", value: 58 },
+    ],
+  },
+];

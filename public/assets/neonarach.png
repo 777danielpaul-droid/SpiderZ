@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="20" fill="#160d2b"/>
+  <circle cx="100" cy="90" r="32" fill="#1a0d36"/>
+  <!-- Spider body -->
+  <circle cx="100" cy="90" r="22" fill="#ffd23c" filter="url(#glow)"/>
+  <!-- Legs -->
+  <path d="M70 80 Q80 70 90 80" stroke="#ffd23c" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M110 80 Q120 70 130 80" stroke="#ffd23c" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M70 100 Q80 95 90 100" stroke="#ffd23c" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M110 100 Q120 95 130 100" stroke="#ffd23c" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Eyes -->
+  <circle cx="92" cy="86" r="4" fill="#fff"/>
+  <circle cx="108" cy="86" r="4" fill="#fff"/>
+  <!-- Name -->
+  <text x="100" y="160" text-anchor="middle" font-family="monospace" font-size="16" fill="#b9a8e8">NEONARACH</text>
+  <defs>
+    <filter id="glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffd23c" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+</svg>

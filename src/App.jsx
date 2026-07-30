@@ -7,7 +7,7 @@ import MonCard from "./MonCard";
 import ScrubSection from "./ScrubSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
-import { loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, saveSteroids, loadCollectors } from "./storage";
+import { loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, saveSteroids, loadCollectors, saveCollectors } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
 import { resolveMatch, BONUS } from "./typeBattle";
@@ -79,7 +79,7 @@ export default function App() {
 
   // ---- STEROIDE: Inventar-State (live HUD-Update bei Booster-Vial) ----
   const [steroids, setSteroids] = useState(() => loadSteroids());
-  const collectors = loadCollectors();
+  const [collectors, setCollectors] = useState(() => loadCollectors());
 
   // ---- VIAL / STEROIDE: einmalig nutzbar, blockiert Arena bis vergeben ----
   const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
@@ -812,11 +812,15 @@ export default function App() {
               }}
               onUnlock={(item) => {
                 if (item.type === "steroid") {
-                  setSteroids((n) => n + 1);
+                  const next = steroids + 1;
+                  saveSteroids(next);
+                  setSteroids(next);
                 } else if (item.type === "spider") {
                   // Spider freigeschaltet - wird über Cloud-Sync/Dex aktualisiert
                 } else if (item.type === "collector") {
-                  // Collector-Item erhalten - wird über Cloud-Sync aktualisiert
+                  const next = collectors + 1;
+                  saveCollectors(next);
+                  setCollectors(next);
                 }
               }}
             />
