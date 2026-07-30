@@ -47,8 +47,8 @@ GPU-composited neon (cyan / magenta / lime) over a starfield of 42 drifting spar
 Built with a **modern React 19 + Vite** stack, GSAP for scroll-orchestration, and Supabase as the cloud data layer.
 
 - **`App.jsx`** — Central game state, arena resolution, booster & lore flows
-- **`usePokemonData.js`** — Supabase fetch + seeded RNG opponent generation
-- **`PokemonCard.jsx` / `ScrubSection.jsx`** — Scroll-pinned catch cards + hint pills
+- **`useMonData.js`** — Supabase fetch + seeded RNG opponent generation
+- **`MonCard.jsx`** / **`ScrubSection.jsx`** — Scroll-pinned catch cards + hint pills
 - **`typeBattle.js`** — Type-advantage resolver (GIFT / STÄRKE / VERTEIDIGUNG)
 - **`storage.js`** — localStorage persistence (Dex, best-team, records)
 - **`BoosterScreen`** — Tap-to-open pack animation (mobile-first)
