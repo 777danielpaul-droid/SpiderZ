@@ -4,6 +4,12 @@ import { TYPE_COLORS } from "./monList";
 import { useAuth } from "./lib/auth.jsx";
 import { getSupabase, isSupabaseReady } from "./lib/supabase";
 
+const RARITY_COLORS = {
+  common: "#22d3ee",   // cyan
+  rare: "#ff35d0",     // magenta
+  legendary: "#b6ff3b", // lime
+};
+
 /**
  * DexOverlay: listet alle Spider auf — gefangen + locked.
  * - Gefangene Spider aus localStorage (offline-first)
@@ -110,7 +116,6 @@ export default function DexOverlay({ onClose }) {
             {/* Alle Spider aus DB (mit locked-Status) */}
             {sortedSpiders.map((spider) => {
               const caught = isCaught(spider.id);
-              const unlocked = isUnlocked(spider.id);
               const available = isAvailable(spider);
               const locked = !available;
 
@@ -152,9 +157,3 @@ export default function DexOverlay({ onClose }) {
     </div>
   );
 }
-
-const RARITY_COLORS = {
-  common: "#22d3ee",   // cyan
-  rare: "#ff35d0",     // magenta
-  legendary: "#b6ff3b", // lime
-};

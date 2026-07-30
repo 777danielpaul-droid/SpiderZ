@@ -31,7 +31,7 @@ async function applySchema() {
   // 1. Versuche Spider als locked zu markieren (wenn Spalte existiert)
   console.log("1️⃣  Spider #101-104 als 'locked' markieren...");
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("nasamon")
       .update({ available: false })
       .in("id", [101, 102, 103, 104]);
@@ -59,7 +59,7 @@ async function applySchema() {
     // und die Fehlermeldung zu nutzen
 
     // Alternative: Nutze die PostgREST-Management-API
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

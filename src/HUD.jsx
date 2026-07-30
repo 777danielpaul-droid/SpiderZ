@@ -31,10 +31,6 @@ export default function HUD({ total, level: appLevel, caughtIds, data, scrollFil
     ? data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0)
     : 0;
 
-  const caughtMon = data ? data.filter((p) => caughtIds.includes(p.id)) : [];
-  // Letzte 4 gefangene (neueste zuerst) fuer das Team-Readout.
-  const teamPreview = [...caughtMon].slice(-4).reverse();
-
   const [displayScore, setDisplayScore] = useState(teamStrength);
   const prevRef = useRef(teamStrength);
 

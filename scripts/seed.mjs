@@ -9,8 +9,7 @@
 //  Start:  node scripts/seed.mjs
 // ============================================================
 import { readFileSync, readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 

@@ -21,11 +21,6 @@ function shuffle(arr) {
   return a;
 }
 
-// Liefert einen zufälligen Datensatz aus dem Cache (oder null).
-function getCached(id) {
-  return cache.get(id) || null;
-}
-
 async function fetchNasaMon(id) {
   if (!isSupabaseReady) throw new Error(NO_SUPABASE);
   if (cache.has(id)) return cache.get(id);
@@ -77,7 +72,6 @@ async function resolveQuery(raw) {
 export function useMonData(count = TOTAL_MON) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [progress, setProgress] = useState(0);
   // Einzel-Suche (Header): { loading, result, error }
   const [search, setSearch] = useState({ loading: false, result: null, error: null });
 
@@ -88,18 +82,12 @@ export function useMonData(count = TOTAL_MON) {
   const loadIds = useCallback((ids) => {
     let cancelled = false;
     setError(null);
-    setProgress(0);
     setData(null);
     (async () => {
       try {
-        const results = [];
-        for (let i = 0; i < ids.length; i++) {
-          const mon = await fetchNasaMon(ids[i]);
-          // Shape 1:1 wie vorher: { id, name_en, name_de, artwork, types, strength, stats, height, weight }
-          results.push(mon);
-          if (!cancelled) setProgress(Math.round(((i + 1) / ids.length) * 100));
-        }
-        if (!cancelled) setData(results);
+      // Parallel laden (Promise.all statt sequenziell)
+      const results = await Promise.all(ids.map((id) => fetchNasaMon(id)));
+      if (!cancelled) setData(results);
       } catch (e) {
         if (!cancelled) setError(e.message);
       }
@@ -122,11 +110,11 @@ export function useMonData(count = TOTAL_MON) {
     let cancelled = false;
     (async () => {
       try {
-        const all = [];
-        for (let id = 1; id <= MAX_NASAMON; id++) {
-          all.push(await fetchNasaMon(id));
-        }
-        if (!cancelled) setAllData(all);
+      // Alle 18 Spider parallel laden (statt sequenziell)
+      const all = await Promise.all(
+        Array.from({ length: MAX_NASAMON }, (_, i) => fetchNasaMon(i + 1))
+      );
+      if (!cancelled) setAllData(all);
       } catch {
         /* nicht kritisch fuer das Hauptspiel */
       }
@@ -149,5 +137,5 @@ export function useMonData(count = TOTAL_MON) {
     setSearch({ loading: false, result: null, error: null });
   }, []);
 
-  return { data, error, progress, search, runSearch, clearSearch, reset, allData };
+  return { data, error, search, runSearch, clearSearch, reset, allData };
 }

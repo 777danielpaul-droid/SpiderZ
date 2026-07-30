@@ -68,9 +68,11 @@ export function useSound(volume = 0.18) {
 
         const audio = new Audio(path);
         audio.volume = volume;
-        audio.play().catch((err) => {
+        audio.play().catch(() => {
         });
-      } catch (err) {
+        // Speicher freigeben nach dem Abspielen
+        audio.addEventListener("ended", () => audio.remove(), { once: true });
+      } catch {
       }
     },
     [volume]

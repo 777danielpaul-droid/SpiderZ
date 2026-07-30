@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { useMonData } from "./useMonData";
-import { TOTAL_MON, TOTAL_COLLECTORS, TYPE_COLORS } from "./monList";
+import { TOTAL_MON, TOTAL_COLLECTORS, TYPE_COLORS, avgStat } from "./monList";
 import MonCard from "./MonCard";
 import ScrubSection from "./ScrubSection";
 import SearchResult from "./SearchResult";
 import HUD from "./HUD";
-import { loadDex, loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, saveSteroids, loadCollectors, saveCollectors } from "./storage";
+import { loadBestTeamStrength, saveCaught, saveBestTeamStrength, loadSteroids, saveSteroids, loadCollectors } from "./storage";
 import RecordsOverlay from "./RecordsOverlay";
 import DexOverlay from "./DexOverlay";
-import { resolveMatch, hasAdvantage, BONUS } from "./typeBattle";
+import { resolveMatch, BONUS } from "./typeBattle";
 import { useAuth } from "./lib/auth.jsx";
 import { useCloudSave } from "./useCloudSave";
 import LoginOverlay from "./LoginOverlay";
@@ -71,15 +70,16 @@ export default function App() {
       id: p.id, name_de: p.name_de, types: p.types, artwork: p.artwork, strength: p.strength,
     })));
     saveBestTeamStrength(teamStrength);
-  }, [data, caughtIds]);
+  }, [data, caughtIds, level, LEVEL_TEAM_SIZE]);
 
   // ---- LEVEL-PROGRESSION: Level 1 = 3 Spinnen, Level 2 = 2 Spinnen, Level 3 = 1 Spinne ----
   const [level, setLevel] = useState(1);
-  const LEVEL_TEAM_SIZE = level === 1 ? TOTAL_MON : level === 2 ? 2 : 1; // Level 3: nur 1 Spinne
+  const LEVEL_TEAM_SIZE = useMemo(() => level === 1 ? TOTAL_MON : level === 2 ? 2 : 1, [level]); // Level 3: nur 1 Spinne
   const [levelTransition, setLevelTransition] = useState(false); // LEVEL COMPLETE Screen
 
   // ---- STEROIDE: Inventar-State (live HUD-Update bei Booster-Vial) ----
   const [steroids, setSteroids] = useState(() => loadSteroids());
+  const collectors = loadCollectors();
 
   // ---- VIAL / STEROIDE: einmalig nutzbar, blockiert Arena bis vergeben ----
   const [vialTaken, setVialTaken] = useState(false);   // Vial aufgenommen (armed)
@@ -104,7 +104,7 @@ export default function App() {
       .slice(0, LEVEL_TEAM_SIZE)
       .map((x) => x.m);
     setArenaOpponents(shuffled);
-  }, [allData, caughtIds, boostedId, LEVEL_TEAM_SIZE]);
+  }, [allData, caughtIds, boostedId, level, LEVEL_TEAM_SIZE]);
 
   // Arena-Matches (1:1 in Reihenfolge) + Gesamt-Ergebnis.
   // Geboostete Spinne bekommt +100 Stärke vor dem Match.
@@ -140,7 +140,7 @@ export default function App() {
     bestTeamStrength: bestTeamStrengthForSave,
     bestTeam: bestTeamForSave,
     steroids: steroids,
-    collectors: loadCollectors(),
+    collectors: collectors,
   });
 
   // Login-Overlay sichtbar/unsichtbar (Header-Button).
@@ -170,10 +170,10 @@ export default function App() {
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [arenaWins, arenaMatches.length, play]);
+  }, [arenaWins, arenaMatches.length, play, level, LEVEL_TEAM_SIZE, REQUIRED_WINS]);
 
-  // Neustart: frische Runde + UI zuruecksetzen.
-  const handleRestart = useCallback(() => {
+  // Gemeinsamer State-Reset für Neustart und Level-Transition.
+  const resetGameState = useCallback((nextLevel) => {
     setCaughtIds([]);
     setActiveCard(0);
     setHudView("play");
@@ -182,12 +182,18 @@ export default function App() {
     setRevealed(false);
     setBoosterOpen(false);
     setBoosterCta(false);
-    setLevel(1);
+    setLevelTransition(false);
     boostShown.current = false;
     revealPlayed.current = false;
+    setLevel(nextLevel);
     reset();
     scrollToId("story");
-  }, [reset]);
+  }, [reset, scrollToId]);
+
+  // Neustart: frische Runde + UI zuruecksetzen.
+  const handleRestart = useCallback(() => {
+    resetGameState(1);
+  }, [resetGameState]);
 
   const scrollFillRef = useRef(null);
   const stRef = useRef(null);
@@ -196,7 +202,6 @@ export default function App() {
   const arenaEndRef = useRef(null);  // Arena-Ergebnis -> Booster-Screen nach Durchscrollen
   const teamRefs = useRef({});       // DOM-Refs der Team-Karten
   const revealPlayed = useRef(false); // Finale nur einmal abspielen
-  const logoRef = useRef(null);      // SpiderZ-Wortmarke (Fade-in beim 1. Scroll)
 
   // "Weiter"-Button: smooth zum naechsten mon (oder ans Team-Ende).
   // Erst nach dem ersten gefangenen mon nutzbar (vorher muss gescrollt werden).
@@ -230,10 +235,7 @@ export default function App() {
       gsap.to(window, { scrollTo: y, duration: 0.8, ease: "power2.inOut" });
     }
     setActiveCard(next);
-  }, [activeCard, caughtIds.length]);
-
-  // Refresh: Browser-Restoration deaktivieren (Modul-Ebene, vor nativem Restore).
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  }, [activeCard, caughtIds.length, LEVEL_TEAM_SIZE]);
 
   // HUD sichtbar erst nach der Video-Animation (Held-Scrub durchgescrollt).
   useEffect(() => {
@@ -285,7 +287,7 @@ export default function App() {
 
   // FINAL-EVENT: Team-Reveal. Laeuft erst, wenn die Team-Sektion wirklich
   // in den View scrollt (nicht schon beim Fangen unten im Off).
-  function playTeamReveal() {
+  const playTeamReveal = useCallback(() => {
     if (revealPlayed.current) return;
     revealPlayed.current = true;
 
@@ -382,7 +384,7 @@ export default function App() {
     // Verzoegerung am Punkt des Team-Reveals: nach dem Effekt kurz Pause,
     // DANN erst darf das Vial erscheinen.
     tl.call(() => setRevealed(true), null, 1.5 + 0.8);
-  }
+  }, [data]);
 
   useEffect(() => {
     if (!data) return;
@@ -403,7 +405,7 @@ export default function App() {
       cancelAnimationFrame(id);
       if (trigger) trigger.kill();
     };
-  }, [data]);
+  }, [data, playTeamReveal]);
 
   // Escape schließt Such-Modal und Lore-Modal.
   useEffect(() => {
@@ -528,9 +530,9 @@ export default function App() {
             setSteroids((n) => n - 1);
           }
         }}
-        collectors={loadCollectors()}
+        collectors={collectors}
         totalCollectors={TOTAL_COLLECTORS}
-        collectorPct={((loadCollectors() / TOTAL_COLLECTORS) * 100) || 0}
+        collectorPct={((collectors / TOTAL_COLLECTORS) * 100) || 0}
       />
 
       {hudView === "records" && (
@@ -678,12 +680,7 @@ export default function App() {
                         ))}
                       </div>
                       <div className="team-avg">
-                        Ø {(() => {
-                          const arr = (p.stats || []).map((s) => s.value);
-                          const sum = arr.length ? arr.reduce((a, b) => a + b, 0) : (p.strength || 0);
-                          const n = arr.length || 1;
-                          return Math.round(sum / n);
-                        })()}
+                        Ø {avgStat(p)}
                       </div>
                     </div>
                   </div>
@@ -717,17 +714,12 @@ export default function App() {
             </section>
           )}
 
-          {/* Cuteness-Overload: nur wenn Team komplett + Stärke < 1100 */}
-          {data && caughtIds.length >= LEVEL_TEAM_SIZE && (() => {
-            const ts = data.filter((p) => caughtIds.includes(p.id)).reduce((s, p) => s + (p.strength || 0), 0);
-          })()}
-
           {/* ARENA: 3 gefangene vs 3 RNG-Gegner (1:1, Typ-Advantage = +100) */}
           {arenaMatches.length === LEVEL_TEAM_SIZE && (
             <section className="arena">
               <h2 className="arena-title">ARENA · DEIN TEAM VS RNG-SCHWARM</h2>
               <div className="arena-battles">
-                {arenaMatches.map((m, i) => {
+                {arenaMatches.map((m) => {
                   const { a, b, result } = m;
                   const pa = TYPE_COLORS[a.types[0]] || "#6d28d9";
                   const pb = TYPE_COLORS[b.types[0]] || "#6d28d9";
@@ -833,22 +825,7 @@ export default function App() {
                 <button
                   type="button"
                   className="level-transition-btn"
-                  onClick={() => {
-                    const nextLevel = level + 1;
-                    setLevelTransition(false);
-                    setCaughtIds([]);
-                    setActiveCard(0);
-                    setVialTaken(false);
-                    setBoostedId(null);
-                    setRevealed(false);
-                    setBoosterOpen(false);
-                    setBoosterCta(false);
-                    boostShown.current = false;
-                    revealPlayed.current = false;
-                    setLevel(nextLevel);
-                    reset();
-                    scrollToId("story");
-                  }}
+                  onClick={() => resetGameState(level + 1)}
                 >
                   ▶ LEVEL {level + 1} ({level === 2 ? "1 Spinne + Steroid-Boost" : level === 1 ? "2 Spinnen" : "3 Spinnen"})
                 </button>

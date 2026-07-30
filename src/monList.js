@@ -22,3 +22,11 @@ export const TYPE_COLORS = {
   steel:   "#9fb0c0",
   fairy:   "#ff9ed6",
 };
+
+/** Durchschnitt der Basis-Stats (fallback: strength, wenn keine stats-Array) */
+export function avgStat(mon) {
+  const arr = (mon.stats || []).map((s) => s.value);
+  const sum = arr.length ? arr.reduce((a, b) => a + b, 0) : (mon.strength || 0);
+  const n = arr.length || 1;
+  return Math.round(sum / n);
+}

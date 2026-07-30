@@ -80,7 +80,7 @@ export default function ScrubSection({ children, hintHidden, onReady }) {
       try {
         const t = Math.round(targetRef.current);
         if (t !== drawnRef.current) draw(t);
-      } catch (e) {
+      } catch {
         // Canvas-Fehler sind nicht kritisch - Frame wird übersprungen
       }
       rafRef.current = requestAnimationFrame(loop);
@@ -121,7 +121,7 @@ export default function ScrubSection({ children, hintHidden, onReady }) {
         cancelAnimationFrame(id);
         ctx.revert();
       };
-    } catch (e) {
+    } catch {
       // ScrollTrigger-Fehler sind nicht kritisch
     }
   }, [ready]);

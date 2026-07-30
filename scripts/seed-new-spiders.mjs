@@ -12,8 +12,6 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 
 config(); // lädt .env
 

@@ -12,8 +12,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
-import { readFileSync, statSync } from "node:fs";
-import { basename, extname } from "node:path";
+import { extname } from "node:path";
 
 config();
 
@@ -135,7 +134,7 @@ async function uploadAndSeed() {
 
     console.log(`  📤 Lade hoch: ${storagePath} (${contentType})`);
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("nasamon")
       .upload(storagePath, fileBuffer, {
         contentType: contentType,

@@ -143,7 +143,7 @@ export default function BoosterOpen({ onClose, onUnlock }) {
       setError(err.message || "Fehler beim Öffnen des Boosters.");
       setPhase("idle");
     }
-  }, [phase, user]);
+  }, [phase, user, play, onUnlock]);
 
   // Hilfsfunktion: IDs der bereits freigeschalteten Spider holen
   async function getUserUnlockedIds(supabase, userId) {

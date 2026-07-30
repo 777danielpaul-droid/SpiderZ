@@ -73,7 +73,7 @@ export default function MonCard({ mon, index, onReveal }) {
 
     return () => {
       if (img) img.removeEventListener("load", onLoad);
-      tl.scrollTrigger && tl.scrollTrigger.kill();
+      if (tl.scrollTrigger) tl.scrollTrigger.kill();
       tl.kill();
     };
   }, [mon, index, dir, primary, secondary, onReveal]);
