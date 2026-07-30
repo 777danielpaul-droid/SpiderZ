@@ -379,7 +379,8 @@
 .scrub-load-bar { width: 220px; height: 8px; border-radius: 99px; background: rgba(255,255,255,0.12); overflow: hidden; margin: 0 auto 10px; }
 .scrub-load-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--hud-cyan), var(--hud-magenta)); transition: width 0.2s ease; }
 .scrub-hint {
-  position: absolute; bottom: 26px;
+  position: fixed; bottom: 26px; left: 50%;
+  transform: translateX(-50%);
   /* HUD-Glas-Pill statt pinkem Bubble */
   display: inline-flex; align-items: center; gap: 8px;
   padding: 9px 18px; border-radius: 99px;
