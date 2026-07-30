@@ -22,8 +22,8 @@ export default function MonCard({ mon, index, onReveal }) {
   const bgRef = useRef(null);
   const revealedRef = useRef(false);
 
-  const primary = TYPE_COLORS[mon.types[0]] || "#6d28d9";
-  const secondary = TYPE_COLORS[mon.types[1]] || primary;
+  const primary = TYPE_COLORS[(mon.types || [])[0]] || "#6d28d9";
+  const secondary = TYPE_COLORS[(mon.types || [])[1]] || primary;
   const dir = index % 2 === 0 ? 1 : -1; // abwechselnd links/rechts
 
   useLayoutEffect(() => {
@@ -78,7 +78,7 @@ export default function MonCard({ mon, index, onReveal }) {
     };
   }, [mon, index, dir, primary, secondary, onReveal]);
 
-  const total = mon.stats.reduce((s, x) => s + x.value, 0);
+  const total = (mon.stats || []).reduce((s, x) => s + x.value, 0);
 
   return (
     <section ref={sectionRef} className="card-section">
@@ -95,7 +95,7 @@ export default function MonCard({ mon, index, onReveal }) {
           >
             <img ref={imgRef} src={mon.artwork} alt={mon.name_de} loading="lazy" />
             <div className="card-types">
-              {mon.types.map((t) => (
+              {(mon.types || []).map((t) => (
                 <span key={t} className="type-badge" style={{ background: TYPE_COLORS[t] }}>
                   {t}
                 </span>
@@ -111,7 +111,7 @@ export default function MonCard({ mon, index, onReveal }) {
               {mon.weight / 10} kg
             </p>
             <div className="stat-grid">
-              {mon.stats.map((s) => (
+              {(mon.stats || []).map((s) => (
                 <div className="stat-row" key={s.name}>
                   <span className="stat-name">{s.name}</span>
                   <div className="stat-bar">
