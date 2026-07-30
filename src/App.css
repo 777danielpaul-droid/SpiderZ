@@ -61,6 +61,18 @@
   font-weight: 700; color: var(--ink-soft);
 }
 .loader.error { color: #dc2626; }
+.loader.error span { display: flex; align-items: center; gap: 8px; }
+.retry-btn {
+  margin-top: 12px; padding: 8px 20px; border-radius: 8px;
+  font-family: var(--font-mono, monospace); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--hud-text, #e8e2ff);
+  background: linear-gradient(165deg, rgba(217, 178, 95, 0.25), rgba(217, 178, 95, 0.15));
+  border: 1px solid var(--hud-magenta, #ff35d0);
+  cursor: pointer; transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+.retry-btn:hover { filter: brightness(1.1); box-shadow: 0 0 16px var(--hud-magenta, #ff35d0); }
+.retry-btn:active { filter: brightness(0.95); }
 
 /* ============ Karten / Scroll-Transformation ============ */
 .cards { position: relative; }

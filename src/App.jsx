@@ -625,7 +625,21 @@ export default function App() {
       )}
 
       {error && (
-        <div className="loader error">Fehler beim Laden: {error}</div>
+        <div className="loader error">
+          <span>⚠️ {error}</span>
+          <button
+            type="button"
+            className="retry-btn"
+            onClick={() => { play(SFX.ui.tap); reset(); }}
+            aria-label="Erneut versuchen"
+          >
+            NEU LADEN
+          </button>
+        </div>
+      )}
+
+      {!error && !data && (
+        <div className="loader">Lade SpiderDaten …</div>
       )}
 
       {data && (
